@@ -1,7 +1,7 @@
 #!/bin/bash
 # Show the bounty board
 
-echo "🍺 THE RAL-AI TAVERN - Bounty Board"
+echo "🍺 THE RALLY TAVERN - Bounty Board"
 echo "========================="
 echo ""
 

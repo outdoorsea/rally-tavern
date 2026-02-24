@@ -1,7 +1,7 @@
 #!/bin/bash
 # Who's working on what
 
-echo "🍺 THE RAL-AI TAB"
+echo "🍺 THE RALLY TAB"
 echo "=========="
 
 for f in bounties/claimed/*.yaml 2>/dev/null; do
