@@ -1,0 +1,17 @@
+name: Bounty Claimed
+
+on:
+  push:
+    paths:
+      - 'bounties/claimed/*.yaml'
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Log claim
+        run: |
+          echo "🔨 Bounty claimed!"
+          git diff --name-only HEAD~1 HEAD -- 'bounties/claimed/*.yaml'

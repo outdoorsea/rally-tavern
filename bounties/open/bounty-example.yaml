@@ -1,0 +1,11 @@
+id: bounty-example
+title: Example bounty (delete me)
+description: |
+  This is an example bounty to show the format.
+  Delete this file after you've seen it.
+priority: 3
+tags: [example, documentation]
+posted_by: the-pub
+posted_at: 2026-02-24T00:00:00Z
+context: |
+  Just an example. Real bounties should have actual context.
