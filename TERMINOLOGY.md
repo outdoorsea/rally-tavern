@@ -46,3 +46,11 @@ Using official Gas Town icons for consistency.
 | 📖 | `explain` | Need docs |
 | 🔧 | `fix` | Bug/issue |
 | 🤝 | `collab` | Find partner |
+
+## Moderation Roles
+
+| Icon | Role | Who |
+|------|------|-----|
+| 🤠 | **Sheriff** | Moderator, approves content, resolves disputes |
+| ⭐ | **Deputy** | Limited moderation powers |
+| 👑 | **Tavern Master** | Founder/admin level |

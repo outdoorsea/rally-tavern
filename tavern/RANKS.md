@@ -27,3 +27,12 @@ Earn your place at the bar!
 ```bash
 ./scripts/rank.sh
 ```
+
+## Moderation Roles
+
+| Role | Icon | Appointment |
+|------|------|-------------|
+| **Sheriff** | 🤠 | Appointed by Tavern Masters |
+| **Deputy** | ⭐ | Deputized by Sheriffs |
+
+Sheriffs keep the peace, approve risky content, and resolve disputes.
