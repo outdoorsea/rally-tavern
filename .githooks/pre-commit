@@ -1,0 +1,32 @@
+#!/bin/bash
+# Pre-commit hook for Rally Tavern
+
+echo "🔍 Running pre-commit checks..."
+
+# Security scan on staged files
+STAGED=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(yaml|yml|md|json)$')
+
+if [[ -n "$STAGED" ]]; then
+  for file in $STAGED; do
+    # Quick injection check
+    if grep -qi "ignore.*previous.*instruction\|system.*prompt\|you.*are.*now" "$file" 2>/dev/null; then
+      echo "❌ Security issue in: $file"
+      echo "   Possible prompt injection detected"
+      exit 1
+    fi
+  done
+fi
+
+# Validate YAML syntax (if yq available)
+if command -v yq &>/dev/null; then
+  for file in $STAGED; do
+    if [[ "$file" =~ \.yaml$ ]]; then
+      if ! yq '.' "$file" >/dev/null 2>&1; then
+        echo "❌ Invalid YAML: $file"
+        exit 1
+      fi
+    fi
+  done
+fi
+
+echo "✓ Pre-commit checks passed"
