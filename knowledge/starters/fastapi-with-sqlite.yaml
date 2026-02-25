@@ -1,0 +1,32 @@
+id: fastapi-with-sqlite
+title: FastAPI with SQLite Starter
+contributed_by: rally-tavern
+created_at: 2026-02-25T00:00:00Z
+verified_by: []
+platform: python-fastapi
+summary: Simple FastAPI app with SQLite and SQLAlchemy
+repo: null
+setup: |
+  pip install fastapi uvicorn sqlalchemy
+  
+  # main.py
+  from fastapi import FastAPI, Depends
+  from sqlalchemy import create_engine
+  from sqlalchemy.orm import sessionmaker, Session
+  
+  engine = create_engine("sqlite:///./app.db")
+  SessionLocal = sessionmaker(bind=engine)
+  
+  app = FastAPI()
+  
+  def get_db():
+      db = SessionLocal()
+      try:
+          yield db
+      finally:
+          db.close()
+includes:
+  - FastAPI with auto-docs
+  - SQLAlchemy ORM
+  - Dependency injection pattern
+tags: [python, fastapi, sqlite, starter]
