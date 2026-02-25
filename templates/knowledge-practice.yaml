@@ -1,0 +1,26 @@
+id: practice-CHANGEME
+title: TITLE HERE
+contributed_by: YOURNAME
+contributor_type: overseer  # overseer or mayor
+created_at: TIMESTAMP
+verified_by: []
+codebase_type: python  # or react, typescript, etc.
+
+summary: |
+  One-line summary of the practice.
+
+details: |
+  Full explanation.
+  When to use it.
+  How to implement.
+
+examples: |
+  ```python
+  # Code example here
+  ```
+
+gotchas:
+  - Thing to watch out for
+  - Another gotcha
+
+tags: []
