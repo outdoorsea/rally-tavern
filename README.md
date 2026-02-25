@@ -142,3 +142,28 @@ Working with another human on the same project?
 ```
 
 Prevents: duplicate work, merge conflicts, stepping on toes.
+
+## 🎩 Multi-Mayor Coordination
+
+Multiple AI orchestrators on the same project:
+
+```bash
+# Mayor announces intent
+./scripts/mayor-intent.sh "myndy-mayor" "Refactoring auth" "src/auth/*"
+
+# Another Mayor checks before starting
+./scripts/mayor-check.sh "src/auth/"
+# ⚠️ 🎩 myndy-mayor is working here
+
+# Agree on style
+./scripts/style-agree.sh python
+# Edit coordination/style/python-style.yaml
+
+# Signal completion
+./scripts/mayor-done.sh "myndy-mayor"
+
+# Full coordination view
+./scripts/coord.sh
+```
+
+Mayors share context via gossip. Hand off via handoff script.

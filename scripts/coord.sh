@@ -1,10 +1,11 @@
 #!/bin/bash
-# Coordination overview
+# Full coordination overview
 
 echo "🤝 Project Coordination"
 echo ""
 
-echo "ACTIVE CLAIMS:"
+# Overseer claims
+echo "👤 OVERSEER CLAIMS:"
 for f in coordination/claims/*.yaml; do
   [ -f "$f" ] || continue
   area=$(grep "^area:" "$f" | cut -d: -f2- | xargs)
@@ -13,10 +14,31 @@ for f in coordination/claims/*.yaml; do
   echo "  👤 $by: $area"
   echo "     $desc"
 done
-[ ! "$(ls coordination/claims/*.yaml 2>/dev/null)" ] && echo "  (none)"
+HAS_CLAIMS=$(ls coordination/claims/*.yaml 2>/dev/null | grep -v gitkeep | head -1)
+[ -z "$HAS_CLAIMS" ] && echo "  (none)"
 
 echo ""
-echo "TODAY'S FOCUS:"
+
+# Mayor intents
+echo "🎩 MAYOR ACTIVITY:"
+for f in coordination/mayors/*-intent.yaml; do
+  [ -f "$f" ] || continue
+  status=$(grep "^status:" "$f" | cut -d: -f2 | xargs)
+  [ "$status" != "active" ] && continue
+  
+  mayor=$(grep "^mayor:" "$f" | cut -d: -f2 | xargs)
+  intent=$(grep "^intent:" "$f" | cut -d: -f2- | xargs)
+  scope=$(grep "^scope:" "$f" | cut -d: -f2- | xargs)
+  echo "  🎩 $mayor: $intent"
+  echo "     Scope: $scope"
+done
+HAS_MAYORS=$(ls coordination/mayors/*-intent.yaml 2>/dev/null | head -1)
+[ -z "$HAS_MAYORS" ] && echo "  (none)"
+
+echo ""
+
+# Today's focus
+echo "📅 TODAY'S FOCUS:"
 DATE=$(date +%Y-%m-%d)
 for f in coordination/today/*.yaml; do
   [ -f "$f" ] || continue
@@ -30,6 +52,5 @@ done
 
 echo ""
 echo "Commands:"
-echo "  ./scripts/claim-area.sh <area> <description>  - Claim an area"
-echo "  ./scripts/check-area.sh <file>                - Check if claimed"
-echo "  ./scripts/today.sh <focus>                    - Post today's work"
+echo "  👤 Overseer: claim-area.sh, check-area.sh, today.sh, release-area.sh"
+echo "  🎩 Mayor:    mayor-intent.sh, mayor-check.sh, mayor-done.sh"

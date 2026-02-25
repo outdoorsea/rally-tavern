@@ -95,3 +95,94 @@ TODAY'S FOCUS:
 RECENT HANDOFFS:
   jeremy → sarah: Database migrations (yesterday)
 ```
+
+---
+
+# 🎩 Multi-Mayor Coordination
+
+When multiple AI Mayors work on the same project.
+
+## The Problem
+
+Two Mayors, same codebase:
+- Both spawn polecats for same files → conflicts
+- Different coding styles → inconsistent code
+- No shared context → duplicate decisions
+
+## Mayor Protocols
+
+### 1. Announce Intent
+
+Before starting work, Mayor announces:
+
+```yaml
+# coordination/mayors/myndy-mayor-intent.yaml
+mayor: myndy-mayor
+runtime: claude
+intent: Refactoring auth module
+scope:
+  files: [src/auth/*]
+  exclude: [src/auth/legacy/*]
+timestamp: 2026-02-25T12:00:00Z
+expected_duration: 2h
+```
+
+### 2. Check for Conflicts
+
+```bash
+./scripts/mayor-check.sh "src/auth/"
+# ⚠️ myndy-mayor is working on src/auth/*
+```
+
+### 3. Coordinate via Gossip
+
+Mayors share context through gossip:
+
+```yaml
+# gossip/auth-refactor-approach.yaml
+topic: auth-refactor
+intel: |
+  Using OAuth2PasswordBearer pattern.
+  JWT stored in httponly cookies, not localStorage.
+  Refresh tokens in separate table.
+posted_by: myndy-mayor
+```
+
+### 4. Signal Completion
+
+```bash
+./scripts/mayor-done.sh "myndy-mayor" "auth module"
+```
+
+## Mayor Handoff Protocol
+
+When one Mayor needs to hand off to another:
+
+```yaml
+# coordination/handoffs/mayor-handoff-xyz.yaml
+from_mayor: myndy-mayor
+to_mayor: codex-mayor
+reason: Need test coverage, Claude can't run tests
+context: |
+  Auth refactor complete in src/auth/
+  Need pytest tests for jwt.py and refresh.py
+  Use existing test fixtures in tests/conftest.py
+beads: [gt-abc, gt-def]
+files_touched: [src/auth/jwt.py, src/auth/refresh.py]
+```
+
+## Style Sync
+
+Mayors should agree on style before parallel work:
+
+```yaml
+# coordination/style/python-style.yaml
+language: python
+agreed_by: [myndy-mayor, codex-mayor]
+conventions:
+  - Use type hints everywhere
+  - Pydantic for all schemas
+  - async def for IO operations
+  - 88 char line length (black default)
+  - Google-style docstrings
+```
