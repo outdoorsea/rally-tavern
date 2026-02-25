@@ -116,3 +116,29 @@ High-risk content (CLAUDE.md, AGENTS.md) requires review.
 ## License
 
 MIT
+
+## 🤝 Multi-Overseer Coordination
+
+Working with another human on the same project?
+
+```bash
+# Claim an area before working
+./scripts/claim-area.sh "auth module" "Refactoring JWT"
+
+# Check if someone else claimed it
+./scripts/check-area.sh "src/auth/"
+
+# Post what you're working on today
+./scripts/today.sh "Refactoring auth, staying out of API routes"
+
+# See the coordination board
+./scripts/coord.sh
+
+# Hand off work to someone
+./scripts/handoff.sh "sarah" "Auth refactor" --context "JWT done, refresh TODO"
+
+# Release when done
+./scripts/release-area.sh "auth module"
+```
+
+Prevents: duplicate work, merge conflicts, stepping on toes.
