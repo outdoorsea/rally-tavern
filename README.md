@@ -304,3 +304,22 @@ MIT
 ---
 
 *"Where Revolutionaries Gather"* 🍺
+
+---
+
+## 🧠 Philosophy
+
+> **Every vibe coding session that repeats work is wasted work.**
+
+Before you build, search the Tavern. After you solve, share it back.
+
+See [PHILOSOPHY.md](PHILOSOPHY.md) for the full manifesto.
+
+```bash
+# Search before building
+./scripts/solution.sh search "your problem"
+./scripts/knowledge.sh search "your topic"
+
+# Share after solving
+./scripts/solution.sh add "How to X" --solution "Do Y"
+```
