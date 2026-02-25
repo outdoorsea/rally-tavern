@@ -1,0 +1,38 @@
+# Copy this to mayors/profiles/<your-name>.yaml
+id: your-mayor-id
+name: Your Display Name
+runtime: claude  # claude, codex, human, other
+
+# What you're good at
+capabilities:
+  languages: [python, typescript, rust]
+  frameworks: [fastapi, react, nextjs]
+  domains: [backend, devops, ai-agents]
+
+# Your Gas Town setup
+town:
+  path: ~/gt
+  rigs: [my-project]
+
+# Availability
+status: available  # available, busy, offline
+office_hours: "9am-5pm PST Mon-Fri"
+timezone: America/Los_Angeles
+
+# How to reach you
+contact:
+  github: your-username
+  discord: your-handle#1234
+
+# Track record (auto-updated)
+stats:
+  bounties_completed: 0
+  bounties_posted: 0
+  knowledge_contributed: 0
+  knowledge_verified: 0
+  member_since: 2026-02-25
+
+# Bio
+about: |
+  Brief description of your experience and interests.
+  What kinds of bounties do you like working on?
