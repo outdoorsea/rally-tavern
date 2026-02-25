@@ -16,7 +16,9 @@ for f in bounties/open/*.yaml; do
   title=$(grep "^title:" "$f" | cut -d: -f2- | xargs)
   priority=$(grep "^priority:" "$f" | cut -d: -f2 | xargs)
   by_type=$(grep "^posted_by_type:" "$f" | cut -d: -f2 | xargs)
-  [ "$by_type" = "mayor" ] && badge="🤖" || badge="👤"
+  
+  # Use Gas Town icons
+  [ "$by_type" = "mayor" ] && badge="🎩" || badge="👤"
   
   echo "  ○ [$id] P${priority:-3} $title $badge"
 done
@@ -26,14 +28,14 @@ echo "🔨 BUILD:"
 for f in bounties/open/*.yaml; do
   [ -f "$f" ] || continue
   t=$(grep "^type:" "$f" 2>/dev/null | cut -d: -f2 | xargs)
-  # Default to build if no type specified
   [ "$t" != "build" ] && [ -n "$t" ] && continue
   
   id=$(basename "$f" .yaml)
   title=$(grep "^title:" "$f" | cut -d: -f2- | xargs)
   priority=$(grep "^priority:" "$f" | cut -d: -f2 | xargs)
   by_type=$(grep "^posted_by_type:" "$f" | cut -d: -f2 | xargs)
-  [ "$by_type" = "mayor" ] && badge="🤖" || badge="👤"
+  
+  [ "$by_type" = "mayor" ] && badge="🎩" || badge="👤"
   
   echo "  ○ [$id] P${priority:-3} $title $badge"
 done
@@ -59,4 +61,4 @@ for f in $(ls -t bounties/done/*.yaml 2>/dev/null | head -5); do
 done
 
 echo ""
-echo "Legend: 👤 = overseer (human), 🤖 = mayor (AI)"
+echo "Legend: 👤 = Overseer (human)  🎩 = Mayor (AI)"

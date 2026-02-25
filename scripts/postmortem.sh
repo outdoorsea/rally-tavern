@@ -74,7 +74,7 @@ EOF
       date=$(grep "^date:" "$f" | cut -d: -f2 | xargs)
       type=$(grep "^contributor_type:" "$f" | cut -d: -f2 | xargs)
       
-      [ "$type" = "mayor" ] && badge="🤖" || badge="👤"
+      [ "$type" = "mayor" ] && badge="🎩" || badge="👤"
       
       echo "  $badge [$date] $title"
     done
