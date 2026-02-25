@@ -1,0 +1,12 @@
+repo: openclaw/openclaw
+url: https://github.com/openclaw/openclaw
+category: ai-agents
+contributed_by: rally-tavern
+why: |
+  Personal AI assistant infrastructure.
+  Multi-channel (WhatsApp, Telegram, Discord), cron jobs, skills.
+use_for:
+  - Personal AI assistant
+  - Multi-channel messaging
+  - Scheduled agent tasks
+tags: [agents, assistant, messaging]

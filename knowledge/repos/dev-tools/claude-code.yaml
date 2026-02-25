@@ -1,0 +1,12 @@
+repo: anthropics/claude-code
+url: https://claude.ai/code
+category: dev-tools
+contributed_by: rally-tavern
+why: |
+  AI coding assistant from Anthropic.
+  Terminal-based, understands full codebase context.
+use_for:
+  - AI-assisted coding
+  - Code review and refactoring
+  - Learning new codebases
+tags: [coding, ai, anthropic]

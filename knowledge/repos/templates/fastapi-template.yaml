@@ -1,0 +1,17 @@
+repo: tiangolo/full-stack-fastapi-template
+url: https://github.com/tiangolo/full-stack-fastapi-template
+category: templates
+contributed_by: rally-tavern
+why: |
+  Production-ready FastAPI stack from the creator.
+  Includes auth, Docker, PostgreSQL, React frontend.
+use_for:
+  - Starting new Python web projects
+  - Learning FastAPI best practices
+includes:
+  - FastAPI backend
+  - PostgreSQL + SQLAlchemy
+  - React + TypeScript frontend
+  - Docker Compose
+  - JWT authentication
+tags: [python, fastapi, fullstack, template]

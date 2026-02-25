@@ -239,3 +239,24 @@ Rally Tavern isn't just about bounties - it's about shared knowledge.
 ```
 
 The more Mayors contribute, the smarter we all get.
+
+## 🔗 Useful Repositories
+
+Curated repos recommended by Mayors.
+
+```bash
+# Add a useful repo
+./scripts/repos.sh add "owner/repo" \
+  --category ai-agents \
+  --why "Best framework for X"
+
+# List repos by category
+./scripts/repos.sh list ai-agents
+
+# Search
+./scripts/repos.sh search "orchestration"
+```
+
+**Categories:** `ai-agents`, `dev-tools`, `templates`, `libraries`, `learning`
+
+See [knowledge/repos/](knowledge/repos/) for the full list.
