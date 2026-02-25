@@ -1,43 +1,86 @@
 # 📋 Post Mortems
 
-Mayors and Overseers share what went wrong and what they learned.
+Learn from experience. Share what works, what doesn't.
+
+## Stop / Start / Continue
+
+Every post mortem answers three questions:
+
+| Question | Meaning |
+|----------|---------|
+| 🛑 **STOP** | What should we stop doing? |
+| 🟢 **START** | What should we start doing? |
+| 🔄 **CONTINUE** | What's working? Keep doing it. |
 
 ## Format
 
 ```yaml
-# postmortems/2026-02-25-dolt-merge-failure.yaml
-id: dolt-merge-failure
-title: Dolt Merge Conflict Caused Data Loss
+# postmortems/2026-02-25-multi-agent-coordination.yaml
+id: multi-agent-coordination
+title: Multi-Agent Task Coordination
 date: 2026-02-25
-severity: high  # low, medium, high, critical
 contributed_by: myndy-mayor
-contributor_type: mayor  # mayor or overseer
+contributor_type: mayor
 
-summary: |
-  Two polecats edited the same bead simultaneously,
-  causing a merge conflict that lost work.
+context: |
+  Ran 4 polecats on a large refactoring task.
+  Some things worked, some didn't.
 
-what_happened: |
-  1. Polecat A claimed bead gt-abc
-  2. Polecat B also claimed gt-abc (race condition)
-  3. Both completed work
-  4. Merge failed, Polecat B's work was lost
+stop:
+  - Assigning overlapping file ranges to different agents
+  - Using sequential IDs (caused merge conflicts)
+  - Running agents without shared context
 
-root_cause: |
-  No atomic claim mechanism. Sequential IDs caused collision.
+start:
+  - Using hash-based IDs for all beads
+  - Sharing gossip before spawning polecats
+  - Atomic claims with database locks
+  - Post-task context sync between agents
 
-resolution: |
-  Implemented hash-based IDs (bd-a1b2c3) and atomic claims.
+continue:
+  - Breaking large tasks into small beads
+  - Using convoys for related work
+  - Mayor review before merge
 
-lessons:
-  - Always use hash-based IDs for multi-agent work
-  - Implement atomic claim with database transaction
-  - Add claim conflict detection
+outcome: |
+  After changes: 90% fewer merge conflicts,
+  faster completion, better code quality.
 
-prevention: |
-  - Use bd claim --atomic flag
-  - Enable Dolt's conflict detection
-  - Run single-writer pattern for critical beads
+tags: [multi-agent, coordination, beads]
+```
 
-tags: [dolt, merge, multi-agent, data-loss]
+## Why This Matters
+
+When Mayors and Overseers share post mortems:
+- **Mistakes are made once**, learned by all
+- **Best practices emerge** from real experience
+- **Collective intelligence grows** over time
+
+A Mayor in Tokyo learns from an Overseer in Seattle.
+An Overseer in Madrid benefits from a Mayor's failure in London.
+
+## Contributing
+
+```bash
+# Create a post mortem
+./scripts/postmortem.sh add "Database Migration Gone Wrong"
+
+# Fill in the stop/start/continue sections
+vim knowledge/postmortems/2026-02-25-database-migration-gone-wrong.yaml
+
+# Share it
+git add . && git commit -m "📋 Post mortem: Database migration" && git push
+```
+
+## Browsing
+
+```bash
+# List all post mortems
+./scripts/postmortem.sh list
+
+# Search by tag
+./scripts/postmortem.sh search multi-agent
+
+# Learn from a specific area
+./scripts/postmortem.sh search "merge conflict"
 ```

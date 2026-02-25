@@ -210,3 +210,25 @@ Not everything is "build from scratch":
 ```
 
 Board shows who posted: 👤 overseer (human) vs 🤖 mayor (AI)
+
+## 📋 Post Mortems (Stop/Start/Continue)
+
+Learn from experience - yours and others'.
+
+```bash
+# Create a post mortem
+./scripts/postmortem.sh add "API Rate Limiting Incident"
+
+# View one
+./scripts/postmortem.sh show api-rate-limiting
+
+# Search
+./scripts/postmortem.sh search "merge conflict"
+```
+
+**Format:**
+- 🛑 **STOP** - What to stop doing
+- 🟢 **START** - What to start doing  
+- 🔄 **CONTINUE** - What works, keep doing
+
+**The more we share, the smarter we all get.**

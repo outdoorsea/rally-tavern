@@ -1,91 +1,117 @@
 #!/bin/bash
-# Rally Tavern Post Mortem Management
+# Rally Tavern Post Mortem Management - Stop/Start/Continue
 
 ACTION="$1"
 shift
 
-CONTRIBUTOR=$(ls overseers/profiles/*.yaml mayors/*.yaml 2>/dev/null | head -1 | xargs -I{} basename {} .yaml)
+CONTRIBUTOR=$(ls overseers/profiles/*.yaml mayors/*.yaml 2>/dev/null | head -1 | xargs basename 2>/dev/null | sed 's/.yaml//')
 CONTRIBUTOR="${CONTRIBUTOR:-anonymous}"
 
-# Detect if contributor is mayor or overseer
+# Detect contributor type
 if [ -f "mayors/${CONTRIBUTOR}.yaml" ]; then
   CONTRIBUTOR_TYPE="mayor"
-elif [ -f "overseers/profiles/${CONTRIBUTOR}.yaml" ]; then
-  CONTRIBUTOR_TYPE="overseer"
 else
-  CONTRIBUTOR_TYPE="unknown"
+  CONTRIBUTOR_TYPE="overseer"
 fi
 
 case "$ACTION" in
   add)
     TITLE="$1"
-    shift
     
     DATE=$(date +%Y-%m-%d)
     ID=$(echo "$TITLE" | tr '[:upper:]' '[:lower:]' | tr ' ' '-' | tr -cd 'a-z0-9-')
     FILE="knowledge/postmortems/${DATE}-${ID}.yaml"
     
-    SEVERITY="medium"
-    while [[ $# -gt 0 ]]; do
-      case $1 in
-        --severity|-s) SEVERITY="$2"; shift 2;;
-        *) shift;;
-      esac
-    done
-    
     cat > "$FILE" << EOF
 id: $ID
 title: $TITLE
 date: $DATE
-severity: $SEVERITY
 contributed_by: $CONTRIBUTOR
 contributor_type: $CONTRIBUTOR_TYPE
 
-summary: |
-  [Brief summary of what happened]
+context: |
+  [What were you trying to do? What happened?]
 
-what_happened: |
-  [Detailed timeline]
+# 🛑 STOP - What should we stop doing?
+stop:
+  - [Thing to stop doing]
+  - [Another thing to stop]
 
-root_cause: |
-  [Why did this happen?]
+# 🟢 START - What should we start doing?
+start:
+  - [Thing to start doing]
+  - [Another thing to start]
 
-resolution: |
-  [How was it fixed?]
+# 🔄 CONTINUE - What's working? Keep doing it.
+continue:
+  - [Thing that works well]
+  - [Another thing to continue]
 
-lessons:
-  - [Lesson 1]
-  - [Lesson 2]
-
-prevention: |
-  [How to prevent this in the future]
+outcome: |
+  [What was the result after applying these lessons?]
 
 tags: []
 EOF
     
     echo "✓ Created post mortem: $FILE"
-    echo "  Edit to fill in details"
-    git add "$FILE"
+    echo ""
+    echo "Fill in the Stop/Start/Continue sections:"
+    echo "  🛑 STOP    - What to stop doing"
+    echo "  🟢 START   - What to start doing"  
+    echo "  🔄 CONTINUE - What's working"
+    echo ""
+    echo "Then: git add . && git commit -m '📋 Post mortem: $TITLE' && git push"
     ;;
     
   list)
-    echo "📋 Post Mortems"
+    echo "📋 Post Mortems - Learn from Experience"
     echo ""
-    for f in knowledge/postmortems/*.yaml 2>/dev/null; do
+    for f in knowledge/postmortems/*.yaml; do
       [ -f "$f" ] || continue
+      [[ "$f" == *"README"* ]] && continue
+      
       title=$(grep "^title:" "$f" | cut -d: -f2- | xargs)
       date=$(grep "^date:" "$f" | cut -d: -f2 | xargs)
-      severity=$(grep "^severity:" "$f" | cut -d: -f2 | xargs)
       type=$(grep "^contributor_type:" "$f" | cut -d: -f2 | xargs)
       
-      case "$severity" in
-        critical) icon="🔴";;
-        high) icon="🟠";;
-        medium) icon="🟡";;
-        *) icon="🟢";;
-      esac
+      [ "$type" = "mayor" ] && badge="🤖" || badge="👤"
       
-      echo "  $icon [$date] $title (by $type)"
+      echo "  $badge [$date] $title"
+    done
+    ;;
+    
+  show)
+    PM_ID="$1"
+    FILE=$(find knowledge/postmortems -name "*${PM_ID}*.yaml" | head -1)
+    
+    if [ -z "$FILE" ] || [ ! -f "$FILE" ]; then
+      echo "Post mortem not found: $PM_ID"
+      exit 1
+    fi
+    
+    title=$(grep "^title:" "$FILE" | cut -d: -f2- | xargs)
+    echo "📋 $title"
+    echo ""
+    
+    echo "🛑 STOP:"
+    grep -A20 "^stop:" "$FILE" | grep "^  -" | sed 's/^  - /    /'
+    
+    echo ""
+    echo "🟢 START:"
+    grep -A20 "^start:" "$FILE" | grep "^  -" | sed 's/^  - /    /'
+    
+    echo ""
+    echo "🔄 CONTINUE:"
+    grep -A20 "^continue:" "$FILE" | grep "^  -" | sed 's/^  - /    /'
+    ;;
+    
+  search)
+    QUERY="$1"
+    echo "🔍 Post mortems matching: $QUERY"
+    grep -rl "$QUERY" knowledge/postmortems/*.yaml 2>/dev/null | while read f; do
+      title=$(grep "^title:" "$f" | cut -d: -f2- | xargs)
+      echo "  • $title"
+      echo "    $f"
     done
     ;;
     
@@ -93,7 +119,14 @@ EOF
     echo "Usage: postmortem.sh <action> [args]"
     echo ""
     echo "Actions:"
-    echo "  add <title> [--severity low|medium|high|critical]"
-    echo "  list"
+    echo "  add <title>      - Create new post mortem"
+    echo "  list             - List all post mortems"
+    echo "  show <id>        - Show stop/start/continue"
+    echo "  search <query>   - Search post mortems"
+    echo ""
+    echo "Post mortems use Stop/Start/Continue format:"
+    echo "  🛑 STOP     - What to stop doing"
+    echo "  🟢 START    - What to start doing"
+    echo "  🔄 CONTINUE - What works, keep doing"
     ;;
 esac

@@ -1,0 +1,32 @@
+id: multi-agent-file-conflicts
+title: Multi-Agent File Edit Conflicts
+date: 2026-02-25
+contributed_by: rally-tavern
+contributor_type: overseer
+
+context: |
+  Two polecats were assigned to refactor a large codebase.
+  Both ended up editing the same files, causing merge conflicts
+  and lost work.
+
+stop:
+  - Assigning broad "refactor this module" tasks to multiple agents
+  - Using vague task boundaries
+  - Letting agents choose their own files to edit
+
+start:
+  - Explicitly listing which files each agent owns
+  - Using file-level locking or claim system
+  - Having Mayor coordinate file assignments before spawning polecats
+  - Adding "do not edit" lists to agent instructions
+
+continue:
+  - Breaking large refactors into small, focused beads
+  - Using atomic commits for each logical change
+  - Code review before merging agent work
+
+outcome: |
+  After implementing file ownership: zero merge conflicts
+  in the next 50 multi-agent tasks.
+
+tags: [multi-agent, merge-conflicts, file-editing, coordination]
