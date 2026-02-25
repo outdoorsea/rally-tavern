@@ -1,0 +1,54 @@
+name: Security Scan
+
+on:
+  pull_request:
+    paths:
+      - 'configs/**'
+      - 'knowledge/starters/**'
+  push:
+    paths:
+      - 'configs/**'
+      - 'knowledge/starters/**'
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Scan for injection patterns
+        run: |
+          echo "🛡️ Scanning for security issues..."
+          
+          PATTERNS=(
+            "ignore.*previous.*instruction"
+            "ignore.*all.*instruction"
+            "disregard.*instruction"
+            "system.*prompt"
+            "you.*are.*now"
+            "pretend.*you.*are"
+          )
+          
+          FOUND=0
+          for pattern in "${PATTERNS[@]}"; do
+            if grep -rqi "$pattern" configs/ knowledge/starters/ 2>/dev/null; then
+              echo "⚠️ Suspicious pattern found: $pattern"
+              grep -rni "$pattern" configs/ knowledge/starters/
+              FOUND=1
+            fi
+          done
+          
+          if [ $FOUND -eq 1 ]; then
+            echo "❌ Security scan failed - manual review required"
+            exit 1
+          fi
+          
+          echo "✅ Security scan passed"
+      
+      - name: Check for hidden content
+        run: |
+          # Check for HTML comments in markdown
+          if grep -r "<!--" configs/ knowledge/starters/ 2>/dev/null; then
+            echo "⚠️ HTML comments found - review for hidden content"
+            grep -rn "<!--" configs/ knowledge/starters/
+          fi

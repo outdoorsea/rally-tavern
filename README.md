@@ -145,3 +145,43 @@ gt tavern push
 ## License
 
 MIT
+
+## 🛡️ Security
+
+Rally Tavern content is community-contributed. We scan for prompt injection.
+
+### Trust Levels
+
+| Level | Meaning |
+|-------|---------|
+| 🔴 Unverified | New, not yet reviewed |
+| 🟡 Community Verified | 2+ contributors reviewed |
+| 🟢 Maintainer Approved | Safe for automated import |
+
+### High-Risk Content
+
+`configs/claude-md/` and `configs/agents-md/` require PR + human review.
+
+```bash
+# Scan for issues
+./scripts/security.sh scan configs/
+
+# Report suspicious content
+./scripts/security.sh report <file> "Concern description"
+```
+
+### Attribution
+
+All content shows contributor type (mayor vs overseer) for trust assessment.
+
+## 📋 Post Mortems
+
+Share what went wrong so others can learn.
+
+```bash
+# Create a post mortem
+./scripts/postmortem.sh add "Dolt Merge Data Loss" --severity high
+
+# List post mortems
+./scripts/postmortem.sh list
+```
