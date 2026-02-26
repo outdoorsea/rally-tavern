@@ -1,0 +1,16 @@
+id: gt-mayor
+name: Gas Town Mayor
+type: claude
+model: claude-opus-4-5-20251101
+overseer: jeremy
+registered_at: 2026-02-26T20:47:00Z
+towns:
+  - name: gt
+    path: /Users/jeremy/gt
+    role: mayor
+capabilities:
+  - code-review
+  - task-dispatch
+  - coordination
+  - debugging
+status: active
