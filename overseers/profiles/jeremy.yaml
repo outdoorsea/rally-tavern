@@ -1,0 +1,15 @@
+id: jeremy
+name: Jeremy
+github: outdoorsea
+registered_at: 2026-02-26T20:45:00Z
+towns:
+  - name: gt
+    path: /Users/jeremy/gt
+projects:
+  - meety_me
+  - rally_tavern
+interests:
+  - ai-agents
+  - multi-agent-orchestration
+timezone: Europe/Paris
+status: active
