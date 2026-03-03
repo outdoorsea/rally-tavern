@@ -1,0 +1,82 @@
+# TCEP Artifact Manifest
+# Tavern Component Exchange Protocol — reusable component descriptor
+# Schema version: 1
+
+schema_version: 1
+
+# --- Metadata ---
+metadata:
+  id: ""                        # Unique identifier (e.g., "fastapi-sso-starter")
+  name: ""                      # Human-readable name
+  version: "0.1.0"              # SemVer version string
+  description: ""               # One-line summary of what this artifact provides
+  tags: []                      # Discovery tags (e.g., [python, auth, oauth2])
+  license: "MIT"                # SPDX license identifier
+  maintainers:                  # Who maintains this artifact
+    - name: ""
+      contact: ""               # Email, GitHub handle, or other contact
+
+# --- Spec ---
+spec:
+  artifactType: ""              # starter-template | module | skill | mcp-server | playbook
+  audience: ""                  # developer | agent | both
+  compatibility:
+    platforms: []               # Compatible platforms (e.g., [python-web, python-fastapi])
+    languages: []               # Compatible languages (e.g., [python])
+    frameworks: []              # Compatible frameworks (e.g., [fastapi, flask])
+    minVersions: {}             # Minimum version requirements (e.g., {python: "3.11"})
+  packaging:
+    format: "directory"         # directory | single-file | archive
+    rootPath: "."               # Path to artifact root within the package
+  entrypoints:
+    setup: ""                   # Setup command (e.g., "pip install -r requirements.txt")
+    run: ""                     # Run command (e.g., "uvicorn main:app")
+    test: ""                    # Test command (e.g., "pytest")
+
+# --- Required Secrets ---
+requiredSecrets: []             # Secrets the artifact needs at runtime
+  # Example:
+  # - name: DATABASE_URL
+  #   description: "PostgreSQL connection string"
+  #   required: true
+  # - name: OAUTH_CLIENT_SECRET
+  #   description: "OAuth provider client secret"
+  #   required: true
+
+# --- Acceptance ---
+acceptance:
+  commands: []                  # Commands to verify the artifact works
+    # Example:
+    # - "pytest tests/"
+    # - "curl -s http://localhost:8000/health | jq .status"
+  criteria: []                  # Human-readable acceptance criteria
+    # Example:
+    # - "Health endpoint returns 200"
+    # - "All tests pass"
+    # - "Auth flow completes end-to-end"
+
+# --- Scoring ---
+scoring:
+  tokenSavingsEstimate: 0       # Estimated tokens saved vs. building from scratch
+
+# --- Fingerprints ---
+fingerprints:
+  contentSha256: ""             # SHA-256 hash of artifact contents
+  interfaceSha256: ""           # SHA-256 hash of public interface (API surface)
+
+# --- Trust ---
+trust:
+  level: "experimental"         # experimental | community | verified
+  reviewsRequired: 1            # Number of reviews needed before promotion
+  securityScans:
+    lastScan: ""                # ISO 8601 timestamp of last security scan
+    scanner: ""                 # Tool used (e.g., "rally-security-scan")
+    status: "pending"           # pending | pass | fail | warn
+
+# --- Provenance ---
+provenance:
+  sourceRepo: ""                # Git repository URL
+  revision: ""                  # Git commit SHA or tag
+  buildRef: ""                  # CI/CD build reference (e.g., pipeline URL)
+  createdAt: ""                 # ISO 8601 timestamp
+  updatedAt: ""                 # ISO 8601 timestamp
