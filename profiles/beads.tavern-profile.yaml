@@ -1,0 +1,95 @@
+# Beads — Project Profile
+# =======================
+# AI-native issue tracker with first-class dependency support.
+
+id: project-beads
+name: "Beads"
+description: |
+  Lightweight, AI-native issue tracker designed to live directly in project
+  codebases. Issues chained together like beads — with first-class dependency
+  tracking, blocking/blocked-by relationships, and molecule-based work
+  decomposition. Built for AI coding agents, not web UIs.
+repo: github.com/steveyegge/beads
+created_at: 2025-01-01T00:00:00Z
+updated_at: 2026-03-03T00:00:00Z
+contributed_by: jeremy
+contributed_by_type: overseer
+
+facets:
+  platform: cli
+  languages: [go]
+  frameworks: [cobra]
+  runtime: go-1.25
+  build_system: make
+  package_manager: go-modules
+
+architecture:
+  style: cli-tool
+  components:
+    - cmd/bd                  # CLI entry point
+    - issues                  # Core issue CRUD (create, list, show, update, close)
+    - dependencies            # Blocking/blocked-by/children relationship graph
+    - molecules               # Work decomposition templates (wisps, formulas)
+    - gates                   # Async coordination primitives
+    - merge-slots             # Serialized conflict resolution
+    - agents                  # Agent bead state management
+    - mail                    # Messaging delegation
+    - audit                   # Append-only JSONL interaction log
+    - integrations            # Jira, Linear, GitLab imports
+    - dolt-storage            # Dolt SQL backend (replaces SQLite)
+    - admin                   # Database maintenance commands
+    - search                  # Text search across issues
+    - query                   # Structured query language
+  data_stores: [dolt]         # Primary: Dolt SQL server on port 3307
+  protocols: [cli, mysql]     # MySQL wire protocol for Dolt access
+  deployment: homebrew        # brew install beads
+  ci_cd: github-actions
+
+security:
+  auth_method: none           # Local tool, trust is filesystem-based
+  encryption: none
+  multi_tenant: false         # Per-project .beads/ directories
+  sensitive_data: []
+  compliance: []
+
+quality:
+  test_framework: go-test
+  linter: null
+  type_checking: go-native
+  coverage_target: null
+
+constraints:
+  must_use: [go, cobra, dolt]
+  must_avoid: [sqlite]        # Migrated from SQLite to Dolt
+  budget: null
+  timeline: null
+  team_size: null
+
+needs:
+  - "Stable Dolt server lifecycle (fragile data plane)"
+  - "Cross-rig issue routing via prefix-based resolution"
+  - "Wisp compaction for ephemeral molecule cleanup"
+  - "Formula cooking and molecule orchestration"
+
+context: |
+  Beads is the data plane for Gas Town. Every issue, mail message, agent
+  identity, convoy, and work molecule flows through beads stored in Dolt.
+
+  Key concepts:
+  - BEAD: An issue with a unique prefix-ID (e.g., gt-abc12, hq-x7k2m)
+  - DEPENDENCY: First-class blocking/blocked-by relationships
+  - MOLECULE: Multi-step work template (formula → cooked proto → wisp instances)
+  - WISP: Ephemeral bead with TTL-based auto-compaction
+  - GATE: Async coordination primitive for multi-agent synchronization
+  - MERGE-SLOT: Serialized access for conflict-free merges
+  - PREFIX ROUTING: routes.jsonl maps prefixes to rig .beads/ directories
+
+  Storage migrated from embedded SQLite to Dolt SQL server — one server
+  per town on localhost:3307 serving all rig databases. This is the #1
+  operational fragility point in Gas Town.
+
+  Distributed via Homebrew (brew install beads). Current version: 0.57.0.
+  Custom issue types registered by Gas Town: agent, role, rig, convoy,
+  slot, queue, event, message, molecule, gate, merge-request.
+
+tags: [issue-tracking, cli, ai-native, dependency-graph, dolt, infrastructure]

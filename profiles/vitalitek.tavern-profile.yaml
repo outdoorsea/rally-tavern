@@ -1,0 +1,81 @@
+# Vitalitek — Tavern Profile
+# ==========================
+# Multi-tenant healthcare backend bridging Boulevard, Qualiphy, and GoHighLevel.
+
+id: project-vitalitek
+name: "Vitalitek"
+description: |
+  Multi-tenant healthcare backend that bridges appointment booking (Boulevard),
+  good faith exams (Qualiphy), and CRM automation (GoHighLevel). Receives
+  webhooks from Boulevard when appointments are booked, triggers exams in
+  Qualiphy, and manages superbill medical billing. Admin UI protected by
+  Google OAuth.
+repo: github.com/outdoorsea/vitalitek
+created_at: 2025-01-01T00:00:00Z
+updated_at: 2026-03-03T00:00:00Z
+contributed_by: jeremy
+contributed_by_type: overseer
+
+facets:
+  platform: web
+  languages: [python]
+  frameworks: [flask]
+  runtime: python-3.12
+  build_system: null
+  package_manager: pip
+
+architecture:
+  style: monolith
+  components:
+    - src/webhook_routes.py     # Boulevard + Qualiphy webhook handlers
+    - src/admin_routes.py       # Admin UI blueprint
+    - src/auth.py               # Google OAuth via Authlib
+    - src/database.py           # SQLAlchemy session management
+    - src/crypto.py             # Fernet credential encryption
+    - src/permissions.py        # RBAC (super_admin, org_admin, org_viewer)
+    - src/models/               # SQLAlchemy models by domain
+  data_stores: [postgres]
+  protocols: [rest]
+  deployment: docker            # Heroku MVP, Cloud Run portable
+  ci_cd: null
+
+security:
+  auth_method: oauth2           # Google OAuth for admin, API keys for webhooks
+  encryption: fernet            # Credential encryption at rest
+  multi_tenant: true            # Organization-scoped data with organization_id
+  sensitive_data: [api-keys, credentials]
+  compliance: []                # PHI-adjacent but doesn't store PHI directly
+
+quality:
+  test_framework: pytest
+  linter: null
+  type_checking: mypy
+  coverage_target: 80
+
+constraints:
+  must_use: [flask, postgres, sqlalchemy]
+  must_avoid: []
+  budget: null
+  timeline: null
+  team_size: null
+
+needs:
+  - "Idempotent webhook handling with deduplication"
+  - "Circuit breaker and retry logic for external API calls"
+  - "Rate limiting on webhook endpoints"
+  - "Comprehensive integration test suite"
+
+context: |
+  Multi-tenant architecture uses shared database with organization_id on
+  all tenant-scoped tables. Every query MUST filter by organization_id
+  to prevent cross-tenant data leaks. Credentials stored encrypted via
+  Fernet with key in environment variable.
+
+  Webhook flow: Boulevard appointment → webhook → create/update records →
+  trigger Qualiphy exam → receive results webhook → update superbill.
+
+  Stateless Flask app — no server-side sessions. Google OAuth for admin
+  UI, API keys for webhook authentication. RBAC with three roles:
+  super_admin, org_admin, org_viewer.
+
+tags: [healthcare, multi-tenant, webhooks, flask, saas]

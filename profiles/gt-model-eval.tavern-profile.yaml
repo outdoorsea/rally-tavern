@@ -1,0 +1,72 @@
+# GT Model Eval — Tavern Profile
+# ===============================
+# Promptfoo-based framework for comparing Claude models on Gas Town tasks.
+
+id: project-gt-model-eval
+name: "GT Model Eval"
+description: |
+  Testing framework that compares Claude Opus, Sonnet, and Haiku on
+  Gas Town patrol agent decision tasks. Provides evidence for safely
+  downgrading expensive Opus agents to cheaper models without quality loss.
+  Uses Promptfoo for structured evaluation with 94 test cases across
+  8 patrol scenarios.
+repo: null
+created_at: 2025-01-01T00:00:00Z
+updated_at: 2026-03-03T00:00:00Z
+contributed_by: jeremy
+contributed_by_type: overseer
+
+facets:
+  platform: cli
+  languages: [javascript, yaml]
+  frameworks: [promptfoo]
+  runtime: node-18
+  build_system: npm
+  package_manager: npm
+
+architecture:
+  style: cli-tool
+  components:
+    - promptfooconfig.yaml       # Main config (3 providers, assertions)
+    - prompts/patrol-decision.txt # Decision template
+    - tests/                     # 12 YAML test files (94 test cases)
+    - scripts/results-to-discussion.sh # Export to GitHub Discussions
+  data_stores: []
+  protocols: [anthropic-api]
+  deployment: local-binary
+  ci_cd: null
+
+security:
+  auth_method: api-key         # Anthropic API key
+  encryption: none
+  multi_tenant: false
+  sensitive_data: [api-keys]
+  compliance: []
+
+quality:
+  test_framework: promptfoo
+  linter: null
+  type_checking: null
+  coverage_target: null
+
+constraints:
+  must_use: [promptfoo, anthropic-api]
+  must_avoid: []
+  budget: null
+  timeline: null
+  team_size: null
+
+needs: []
+
+context: |
+  Two test classes:
+  - Class B (82 tests): Directive-following with answer hints.
+    Covers deacon zombie detection, plugin gates, dog health, witness stuck
+    assessment, cleanup, refinery triage, conflict handling, orphan triage.
+  - Class A (12 tests): Reasoning tests with neutral context, no hints.
+
+  Each test provides simulated shell output + role context. Models respond
+  with JSON: {"action": "...", "reason": "..."}. Assertions check
+  correctness, cost, latency, and safety.
+
+tags: [testing, model-evaluation, promptfoo, cost-optimization]

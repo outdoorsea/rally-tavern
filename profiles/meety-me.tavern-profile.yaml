@@ -1,0 +1,87 @@
+# Meety.me — Tavern Profile
+# =========================
+# AI-powered meeting assistant with real-time coaching.
+
+id: project-meety-me
+name: "Meety.me"
+description: |
+  AI-powered meeting assistant with three modes: Mock Court Coach for
+  pro se court hearing practice, general meeting helper for prep/live/followup,
+  and calendar-based meeting capture via email (joinme@meety.me).
+  Full-stack app with FastAPI backend, React frontend, and native macOS client.
+repo: github.com/outdoorsea/meety-me
+created_at: 2025-01-01T00:00:00Z
+updated_at: 2026-03-03T00:00:00Z
+contributed_by: jeremy
+contributed_by_type: overseer
+
+facets:
+  platform: web
+  languages: [python, javascript, swift]
+  frameworks: [fastapi, react, swiftui]
+  runtime: python-3.10
+  build_system: docker-compose
+  package_manager: pip
+
+architecture:
+  style: monolith
+  components:
+    - app/main.py               # FastAPI app, SendGrid webhook, routes
+    - app/coach/engine.py       # Real-time AI coaching engine (async)
+    - app/document_store/       # RAG system — LanceDB vector + Tantivy keyword search
+    - app/models.py             # SQLAlchemy ORM (User, Meeting, MeetingHistory)
+    - app/api.py                # Core API endpoints
+    - app/coach_api.py          # Coach engine API routes
+    - app/document_api.py       # Document management API
+    - app/email_service.py      # SendGrid integration
+    - app/dashboard.py          # Gradio dashboard UI
+    - frontend/                 # React 18 + Vite + Bootstrap 5
+    - macos/                    # Native macOS app (SwiftUI + XcodeGen)
+  data_stores: [postgres, lancedb]
+  protocols: [rest, websocket]
+  deployment: docker
+  ci_cd: null
+
+security:
+  auth_method: api-key         # JWT via python-jose
+  encryption: none
+  multi_tenant: false
+  sensitive_data: [meeting-transcripts, user-emails]
+  compliance: []
+
+quality:
+  test_framework: null         # No tests yet
+  linter: null
+  type_checking: null
+  coverage_target: null
+
+constraints:
+  must_use: [fastapi, postgres, anthropic-api, lancedb]
+  must_avoid: []
+  budget: null
+  timeline: null
+  team_size: null
+
+needs:
+  - "Automated test suite (unit + integration)"
+  - "Voice attribution for meeting transcripts"
+  - "Calendar integration beyond email-based capture"
+  - "Mobile app (iOS/Android)"
+
+context: |
+  Core AI feature is the Coach Engine — runs on a ~2 second loop during
+  live meetings using fast LLM (Haiku) for real-time coaching with
+  precision mode (Sonnet) available. Tracks "case strength" score (0-100)
+  with subscores for support, consistency, control, and exposure.
+
+  Document store uses LanceDB (embedded vector DB) with sentence-transformers
+  for embeddings and Tantivy for full-text search. Hybrid search for
+  sub-100ms retrieval latency during live coaching.
+
+  Email-driven meeting capture: user adds joinme@meety.me to calendar
+  invite, SendGrid webhook receives .ics, parses and creates meeting record.
+
+  Frontend is React 18 + Vite, separate from backend. Gradio dashboard
+  on port 8200 for internal monitoring. Native macOS app in SwiftUI.
+
+tags: [ai, meeting-assistant, coaching, rag, fastapi, react, swiftui]

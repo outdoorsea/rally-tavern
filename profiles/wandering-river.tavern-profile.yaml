@@ -1,0 +1,74 @@
+# Wandering River — Tavern Profile
+# =================================
+# Legal case management repository for campground development project.
+
+id: project-wandering-river
+name: "Wandering River"
+description: |
+  Legal/regulatory documentation repository for a campground development
+  project in Kalama, Washington. Houses LUPA appeal filings, Ecology
+  Department permit responses, and case support materials. Not a software
+  project — it's a structured legal document workspace.
+repo: github.com/outdoorsea/wandering-river
+created_at: 2025-01-01T00:00:00Z
+updated_at: 2026-03-03T00:00:00Z
+contributed_by: jeremy
+contributed_by_type: overseer
+
+facets:
+  platform: cli
+  languages: [markdown, bash]
+  frameworks: []
+  runtime: bash-5
+  build_system: null
+  package_manager: null
+
+architecture:
+  style: monorepo
+  components:
+    - wandering-river-lupa/       # Main LUPA appeal (Case 26-2-00111-08)
+    - ecology-response/           # State Ecology Department responses
+    - Case_JD_Jolma/              # Related contract dispute
+    - WA_Court_Forms/             # Official court form templates
+    - generate_pdfs.sh            # Pandoc + LaTeX PDF generation
+  data_stores: []
+  protocols: []
+  deployment: git-clone
+  ci_cd: null
+
+security:
+  auth_method: none
+  encryption: none
+  multi_tenant: false
+  sensitive_data: [legal-filings, case-records]
+  compliance: []
+
+quality:
+  test_framework: null
+  linter: null
+  type_checking: null
+  coverage_target: null
+
+constraints:
+  must_use: [markdown, pandoc, xelatex]
+  must_avoid: []
+  budget: null
+  timeline: null
+  team_size: null
+
+needs:
+  - "Court-formatted PDF generation (GR 14 compliance)"
+  - "Document version tracking for legal filings"
+
+context: |
+  This is a legal case management workspace, not a software project.
+  All documents are Markdown, converted to court-formatted PDFs via
+  Pandoc + xelatex (Arial 12pt, 3-inch top margin, double-spaced).
+
+  Active case: LUPA appeal (Case 26-2-00111-08) in Cowlitz County
+  Superior Court challenging Conditions 15-22 of campground permits.
+
+  Agent rules: editing mode by default (no new legal arguments),
+  administrative record is closed (no new facts), neutral tone required.
+
+tags: [legal, documentation, court-filings, pandoc]

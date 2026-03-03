@@ -1,0 +1,59 @@
+# The Outlived — Tavern Profile
+# =============================
+# Game or creative project with brand identity and design system.
+
+id: project-theoutlived
+name: "The Outlived"
+description: |
+  Creative project with brand identity and design system documentation.
+  Runs as a Gas Town rig with full multi-agent infrastructure.
+repo: github.com/outdoorsea/theoutlived
+created_at: 2025-01-01T00:00:00Z
+updated_at: 2026-03-03T00:00:00Z
+contributed_by: jeremy
+contributed_by_type: overseer
+
+facets:
+  platform: null
+  languages: []
+  frameworks: []
+  runtime: null
+  build_system: null
+  package_manager: null
+
+architecture:
+  style: null
+  components: []
+  data_stores: []
+  protocols: []
+  deployment: null
+  ci_cd: null
+
+security:
+  auth_method: none
+  encryption: none
+  multi_tenant: false
+  sensitive_data: []
+  compliance: []
+
+quality:
+  test_framework: null
+  linter: null
+  type_checking: null
+  coverage_target: null
+
+constraints:
+  must_use: []
+  must_avoid: []
+  budget: null
+  timeline: null
+  team_size: null
+
+needs: []
+
+context: |
+  Gas Town rig with crew member "morty" who has brand identity and
+  design system documentation. Profile is sparse — needs fleshing out
+  once the project's technical direction is clearer.
+
+tags: [creative, brand-identity]
