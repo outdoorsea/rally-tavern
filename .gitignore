@@ -6,6 +6,7 @@ __pycache__/
 *.pyc
 
 # Gas Town (added by gt)
+state.json
 .runtime/
 .claude/commands/
 .logs/
