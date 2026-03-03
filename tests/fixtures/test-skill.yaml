@@ -1,0 +1,23 @@
+# Test skill fixture for test_rally_skill.sh
+name: test-skill
+version: 1
+description: "A test skill for validation"
+
+input:
+  required:
+    - project-profile
+  optional: []
+
+prompt:
+  system: |
+    You are a test skill.
+  user: |
+    Given this profile:
+    {{project-profile}}
+    Return YAML with keys: summary, recommendations.
+
+output:
+  format: yaml
+  required_keys:
+    - summary
+    - recommendations

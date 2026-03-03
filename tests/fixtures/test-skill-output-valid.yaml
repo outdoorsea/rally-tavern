@@ -1,0 +1,5 @@
+# Valid skill output fixture
+summary: "Test project analysis complete"
+recommendations:
+  - "Use FastAPI for REST API"
+  - "Add JWT authentication"

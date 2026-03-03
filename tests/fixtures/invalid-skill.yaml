@@ -1,0 +1,6 @@
+# Invalid skill fixture - missing required fields
+version: 1
+
+input:
+  required:
+    - project-profile
