@@ -1,0 +1,98 @@
+# iOS SwiftUI Stack Defaults
+# Opinionated stack for iOS applications
+#
+# Usage: rally defaults ios-swiftui
+
+name: ios-swiftui
+display_name: iOS SwiftUI Application
+description: |
+  Native iOS application with SwiftUI, MVVM architecture,
+  and protocol-oriented service layer.
+
+platform: ios
+category: mobile
+
+framework:
+  name: SwiftUI
+  version: ">=5.0"
+  rationale: |
+    Declarative UI framework, modern Swift concurrency,
+    deep platform integration. Standard for new iOS apps.
+
+language:
+  name: Swift
+  version: ">=5.9"
+  minimum_ios: "17.0"
+
+architecture:
+  pattern: MVVM
+  rationale: |
+    Natural fit for SwiftUI's data-driven views.
+    ViewModels own state and business logic, Views are declarative.
+  layers:
+    - Views         # SwiftUI views (declarative, no business logic)
+    - ViewModels    # State management, business logic orchestration
+    - Services      # Business logic, protocol-defined interfaces
+    - Repositories  # Data access, protocol-defined persistence
+
+data_layer:
+  local:
+    name: SwiftData
+    rationale: Native persistence, tight SwiftUI integration.
+    fallback: Core Data  # For complex migration needs
+  networking:
+    name: URLSession
+    rationale: Built-in, async/await support, no third-party dependency.
+  caching:
+    name: NSCache
+    rationale: Built-in memory cache, automatic eviction.
+
+testing:
+  runner: XCTest
+  ui_testing: XCUITest
+  plugins:
+    - swift-snapshot-testing  # Point-Free snapshot tests
+  coverage_target: 70
+
+linting:
+  formatter: SwiftFormat
+  linter: SwiftLint
+  rationale: Industry standard Swift code quality tools.
+
+dependency_management:
+  tool: Swift Package Manager
+  rationale: First-party, integrated with Xcode.
+
+project_structure:
+  directories:
+    - App/                    # App entry point, configuration
+    - Features/               # Feature modules
+    - Features/<Name>/Views/
+    - Features/<Name>/ViewModels/
+    - Core/                   # Shared utilities
+    - Core/Services/          # Service protocols and implementations
+    - Core/Repositories/      # Repository protocols and implementations
+    - Core/Models/            # Domain models
+    - Core/Extensions/        # Swift extensions
+    - Resources/              # Assets, localization
+    - Tests/
+    - Tests/Unit/
+    - Tests/UI/
+
+recommended_packages:
+  - name: swift-dependencies
+    purpose: Dependency injection (Point-Free)
+  - name: swift-composable-architecture
+    purpose: State management (optional, for complex apps)
+
+design_patterns:
+  - protocol_oriented_services: true
+  - repository_pattern: true
+  - async_await: true
+  - observable_macro: true  # @Observable for iOS 17+
+
+security_defaults:
+  - keychain_for_secrets: true
+  - certificate_pinning: recommended
+  - app_transport_security: strict
+  - biometric_auth: optional

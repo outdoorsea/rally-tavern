@@ -1,0 +1,113 @@
+# Security Controls Defaults
+# Baseline security controls for all Rally projects
+#
+# These controls are referenced during planning to ensure
+# minimum security posture regardless of stack choice.
+
+name: security-controls
+version: "1.0"
+description: |
+  Default security controls applied to all projects.
+  Stack-specific defaults may override or extend these.
+
+# Controls organized by OWASP Top 10 (2021) categories
+
+controls:
+
+  # A01:2021 - Broken Access Control
+  access_control:
+    authentication: required
+    authorization: role_based
+    session_management: framework_default
+    principles:
+      - Deny by default
+      - Enforce server-side, never client-only
+      - Log access control failures
+
+  # A02:2021 - Cryptographic Failures
+  cryptography:
+    transport: tls_1_2_minimum
+    secrets_storage: environment_variables
+    password_hashing: bcrypt_or_argon2
+    encryption_at_rest: recommended
+    principles:
+      - Never store secrets in code or config files
+      - Use established libraries, never roll your own
+      - Rotate keys on a defined schedule
+
+  # A03:2021 - Injection
+  injection:
+    sql: orm_parameterized_queries
+    xss: framework_auto_escaping
+    command: avoid_shell_execution
+    principles:
+      - Use parameterized queries exclusively
+      - Validate and sanitize all user input
+      - Use allowlists over denylists
+
+  # A04:2021 - Insecure Design
+  insecure_design:
+    threat_modeling: during_planning
+    security_review: before_merge
+    principles:
+      - Security is a design concern, not an afterthought
+      - Use security-auditor skill during planning phase
+      - Document trust boundaries
+
+  # A05:2021 - Security Misconfiguration
+  misconfiguration:
+    default_credentials: disallowed
+    error_messages: no_stack_traces_in_production
+    unnecessary_features: disabled
+    principles:
+      - Minimal attack surface
+      - Separate dev/staging/production configs
+      - Automate security configuration checks
+
+  # A06:2021 - Vulnerable Components
+  vulnerable_components:
+    dependency_scanning: recommended
+    update_policy: patch_within_30_days
+    principles:
+      - Pin dependency versions
+      - Monitor for CVEs in dependencies
+      - Remove unused dependencies
+
+  # A07:2021 - Authentication Failures
+  authentication:
+    multi_factor: recommended_for_admin
+    password_policy: minimum_12_characters
+    brute_force_protection: rate_limiting
+    principles:
+      - Use established auth libraries
+      - Implement account lockout
+      - Log authentication failures
+
+  # A08:2021 - Data Integrity Failures
+  data_integrity:
+    input_validation: schema_based
+    ci_cd_security: signed_commits_recommended
+    principles:
+      - Validate all input at system boundaries
+      - Use checksums for critical data
+      - Verify third-party integrations
+
+  # A09:2021 - Logging and Monitoring
+  logging:
+    access_logs: required
+    error_logs: required
+    security_events: required
+    pii_in_logs: prohibited
+    principles:
+      - Log security-relevant events
+      - Never log sensitive data (passwords, tokens, PII)
+      - Structured logging format (JSON)
+
+  # A10:2021 - Server-Side Request Forgery
+  ssrf:
+    url_validation: allowlist_preferred
+    internal_network: blocked_by_default
+    principles:
+      - Validate and sanitize all URLs
+      - Use allowlists for permitted domains
+      - Disable unnecessary URL schemes
