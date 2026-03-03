@@ -1,0 +1,95 @@
+# Python Web Stack Defaults
+# Opinionated stack for Python web applications
+#
+# Usage: rally defaults python-web
+
+name: python-web
+display_name: Python Web Application
+description: |
+  Full-stack Python web application with async API,
+  PostgreSQL persistence, and modern tooling.
+
+platform: python
+category: web
+
+framework:
+  name: FastAPI
+  version: ">=0.110"
+  rationale: |
+    Async-first, automatic OpenAPI docs, Pydantic validation,
+    excellent performance. Industry standard for new Python APIs.
+
+language:
+  name: Python
+  version: ">=3.12"
+
+database:
+  name: PostgreSQL
+  version: ">=16"
+  orm: SQLAlchemy
+  orm_version: ">=2.0"
+  rationale: |
+    SQLAlchemy 2.0 with typed models, async support.
+    PostgreSQL for JSONB, full-text search, row-level security.
+
+migrations:
+  name: Alembic
+  version: ">=1.13"
+  rationale: Tight SQLAlchemy integration, autogenerate support.
+
+testing:
+  runner: pytest
+  runner_version: ">=8.0"
+  plugins:
+    - pytest-asyncio
+    - pytest-cov
+    - httpx  # async test client for FastAPI
+  coverage_target: 80
+
+linting:
+  formatter: Ruff
+  formatter_version: ">=0.4"
+  rationale: |
+    Replaces Black, isort, flake8, and pyflakes.
+    10-100x faster, single tool for formatting and linting.
+  config:
+    line_length: 88
+    target_version: "py312"
+
+type_checking:
+  tool: mypy
+  strict: true
+
+dependency_management:
+  tool: uv
+  rationale: Fast, reliable Python package management.
+
+project_structure:
+  layout: src
+  directories:
+    - src/app/           # Application package
+    - src/app/api/       # Route handlers
+    - src/app/models/    # SQLAlchemy models
+    - src/app/services/  # Business logic
+    - src/app/schemas/   # Pydantic schemas
+    - tests/             # Test suite
+    - tests/unit/
+    - tests/integration/
+    - migrations/        # Alembic migrations
+
+recommended_packages:
+  - name: pydantic
+    purpose: Data validation and serialization
+  - name: httpx
+    purpose: Async HTTP client
+  - name: python-dotenv
+    purpose: Environment variable management
+  - name: uvicorn
+    purpose: ASGI server
+
+security_defaults:
+  - cors_configured: true
+  - rate_limiting: true
+  - input_validation: pydantic
+  - sql_injection_prevention: orm_only
+  - secrets_management: environment_variables

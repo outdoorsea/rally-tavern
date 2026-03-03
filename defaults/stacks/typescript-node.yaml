@@ -1,0 +1,108 @@
+# TypeScript Node Stack Defaults
+# Opinionated stack for TypeScript server applications
+#
+# Usage: rally defaults typescript-node
+
+name: typescript-node
+display_name: TypeScript Node.js Application
+description: |
+  Server-side TypeScript application with type-safe ORM,
+  modern runtime, and fast tooling.
+
+platform: node
+category: web
+
+framework:
+  name: Fastify
+  version: ">=5.0"
+  rationale: |
+    High performance, excellent TypeScript support, schema-based
+    validation, plugin architecture. Faster than Express.
+  alternative:
+    name: Express
+    version: ">=5.0"
+    when: Team familiarity or ecosystem compatibility needs.
+
+language:
+  name: TypeScript
+  version: ">=5.4"
+  runtime: Node.js
+  runtime_version: ">=22"
+
+database:
+  name: PostgreSQL
+  version: ">=16"
+  orm: Prisma
+  orm_version: ">=6.0"
+  rationale: |
+    Type-safe database client, auto-generated types from schema,
+    excellent migration tooling, visual studio integration.
+
+testing:
+  runner: Vitest
+  runner_version: ">=2.0"
+  rationale: |
+    Vite-native, fast execution, ESM-first, Jest-compatible API.
+    Built-in coverage, watch mode, and TypeScript support.
+  plugins:
+    - supertest  # HTTP assertion library
+  coverage_target: 80
+
+linting:
+  formatter: Prettier
+  linter: ESLint
+  linter_version: ">=9.0"  # Flat config
+  rationale: |
+    Prettier for formatting (no debates), ESLint flat config
+    for linting rules. typescript-eslint for type-aware rules.
+  config:
+    semi: true
+    single_quote: true
+    print_width: 100
+
+type_checking:
+  tool: tsc
+  strict: true
+  config:
+    strict: true
+    noUncheckedIndexedAccess: true
+    exactOptionalPropertyTypes: true
+
+dependency_management:
+  tool: pnpm
+  rationale: Fast, disk-efficient, strict dependency resolution.
+  alternative:
+    name: npm
+    when: Simplicity preferred or CI constraints.
+
+project_structure:
+  layout: src
+  directories:
+    - src/                  # Application source
+    - src/routes/           # Route handlers
+    - src/services/         # Business logic
+    - src/models/           # Domain types and interfaces
+    - src/middleware/        # Request middleware
+    - src/utils/            # Shared utilities
+    - prisma/               # Prisma schema and migrations
+    - tests/                # Test suite
+    - tests/unit/
+    - tests/integration/
+
+recommended_packages:
+  - name: zod
+    purpose: Runtime schema validation
+  - name: pino
+    purpose: Structured logging (Fastify default)
+  - name: dotenv
+    purpose: Environment variable management
+  - name: tsx
+    purpose: TypeScript execution for development
+
+security_defaults:
+  - cors_configured: true
+  - rate_limiting: true
+  - input_validation: zod
+  - sql_injection_prevention: orm_only
+  - helmet: true  # HTTP security headers
+  - secrets_management: environment_variables
