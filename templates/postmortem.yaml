@@ -1,0 +1,26 @@
+id: postmortem-CHANGEME
+title: TITLE - What Happened
+date: YYYY-MM-DD
+contributed_by: YOURNAME
+contributor_type: overseer  # overseer or mayor
+
+context: |
+  What were you trying to do?
+  What happened?
+
+stop:
+  - Thing we should stop doing
+  - Another thing to stop
+
+start:
+  - Thing we should start doing
+  - Another thing to start
+
+continue:
+  - Thing that worked well
+  - Keep doing this
+
+outcome: |
+  What was the result after applying these lessons?
+
+tags: []

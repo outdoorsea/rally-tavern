@@ -1,0 +1,12 @@
+.DS_Store
+*.log
+.env
+node_modules/
+__pycache__/
+*.pyc
+
+# Gas Town (added by gt)
+.runtime/
+.claude/commands/
+.logs/
+.beads/

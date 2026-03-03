@@ -1,0 +1,14 @@
+repo: steveyegge/gastown
+url: https://github.com/steveyegge/gastown
+category: ai-agents
+contributed_by: rally-tavern
+why: |
+  Multi-agent orchestration for Claude Code/Codex.
+  Mayor coordinates Polecats, hooks persist state.
+use_for:
+  - Multi-agent coding workflows
+  - Persistent agent memory across sessions
+  - Work distribution with convoys
+related:
+  - steveyegge/beads
+tags: [agents, orchestration, claude]

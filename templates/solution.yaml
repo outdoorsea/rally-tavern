@@ -1,0 +1,13 @@
+id: CHANGEME
+problem: What problem does this solve?
+solution: |
+  Clear, copy-paste-able solution.
+  
+  ```language
+  # Code example
+  ```
+works_with: [framework1, framework2]
+contributed_by: YOURNAME
+verified_by: []
+tags: []
+created_at: TIMESTAMP

@@ -1,0 +1,19 @@
+id: gas-town-beads-workflow
+title: Gas Town Beads Workflow
+contributed_by: rally-tavern
+created_at: 2026-02-25T00:00:00Z
+verified_by: []
+codebase_type: gas-town
+summary: |
+  Best practices for using Beads with Gas Town for multi-agent work.
+details: |
+  1. Use hash-based IDs (bd-abc12) to prevent merge conflicts
+  2. Set issue_prefix per rig to namespace beads
+  3. Use bd ready to find unblocked work
+  4. Claim atomically with bd claim before starting
+  5. Use hooks for persistent state across sessions
+gotchas:
+  - Don't use hyphens in rig names (use underscores)
+  - Dolt server must be running for full persistence
+  - Compact old beads periodically to save context
+tags: [gas-town, beads, workflow, multi-agent]

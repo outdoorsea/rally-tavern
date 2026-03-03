@@ -1,0 +1,12 @@
+# Rally Tavern Sheriffs
+# Appointed to keep the peace
+
+sheriffs: []
+  # - name: username
+  #   appointed: 2026-02-25
+  #   appointed_by: tavern-founder
+
+# To become a sheriff:
+# 1. Reach Innkeeper rank (50+ contributions)
+# 2. Demonstrate fair judgment
+# 3. Be nominated by existing sheriff or Tavern Master

@@ -1,0 +1,26 @@
+name: Bounty Posted
+
+on:
+  push:
+    paths:
+      - 'bounties/open/*.yaml'
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Get new bounties
+        id: bounties
+        run: |
+          # Find newly added bounty files
+          NEW_FILES=$(git diff --name-only HEAD~1 HEAD -- 'bounties/open/*.yaml' 2>/dev/null || echo "")
+          echo "files=$NEW_FILES" >> $GITHUB_OUTPUT
+      
+      - name: Notify (customize this)
+        if: steps.bounties.outputs.files != ''
+        run: |
+          echo "🍺 New bounties posted!"
+          echo "${{ steps.bounties.outputs.files }}"
+          # Add webhook/notification here

@@ -1,0 +1,15 @@
+id: bounty-CHANGEME
+type: build  # build, looking-for, explain, fix, collab
+title: TITLE HERE
+description: |
+  What needs to be done?
+  Why is it needed?
+  
+  Acceptance criteria:
+  - [ ] Criterion 1
+  - [ ] Criterion 2
+priority: 3  # 1=critical, 5=backlog
+tags: []
+posted_by: YOURNAME
+posted_by_type: overseer  # overseer or mayor
+posted_at: TIMESTAMP

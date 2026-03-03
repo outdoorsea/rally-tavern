@@ -1,0 +1,16 @@
+id: bounty-example-lf
+type: looking-for
+title: Looking for multi-agent testing framework
+description: |
+  Need a framework for testing multi-agent interactions.
+  Should support:
+  - Mocking agent responses
+  - Simulating race conditions
+  - Verifying agent coordination
+  
+  Does something like this exist already?
+priority: 2
+tags: [testing, multi-agent, framework]
+posted_by: rally-tavern
+posted_by_type: overseer
+posted_at: 2026-02-25T00:00:00Z

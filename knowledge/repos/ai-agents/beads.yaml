@@ -1,0 +1,14 @@
+repo: steveyegge/beads
+url: https://github.com/steveyegge/beads
+category: ai-agents
+contributed_by: rally-tavern
+why: |
+  Git-backed graph issue tracker for AI agents.
+  Hash IDs prevent conflicts, memory compaction saves context.
+use_for:
+  - Agent work tracking
+  - Dependency-aware task management
+  - Multi-agent conflict-free workflows
+related:
+  - steveyegge/gastown
+tags: [agents, tracking, git-backed]

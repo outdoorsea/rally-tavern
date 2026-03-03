@@ -1,0 +1,32 @@
+name: Gossip Cleanup
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Daily at midnight
+  workflow_dispatch:
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Remove expired gossip
+        run: |
+          NOW=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          for f in gossip/*.yaml; do
+            [ -f "$f" ] || continue
+            EXPIRES=$(grep "^expires_at:" "$f" | cut -d: -f2- | xargs)
+            if [[ "$EXPIRES" < "$NOW" ]]; then
+              echo "Removing expired: $f"
+              rm "$f"
+            fi
+          done
+      
+      - name: Commit if changed
+        run: |
+          git config user.name "The Pub Bot"
+          git config user.email "bot@the-pub.dev"
+          git add -A
+          git diff --staged --quiet || git commit -m "🧹 Clean expired gossip"
+          git push || true

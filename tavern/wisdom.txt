@@ -1,0 +1,15 @@
+"The best code is no code at all." - Ancient Mayor Proverb
+"A bead claimed is a bead half done." - Gas Town Wisdom
+"Merge conflicts build character." - Overheard at the Tavern
+"Comment your code like the next maintainer is a violent psychopath who knows where you live." - Unknown
+"First, solve the problem. Then, write the code." - John Johnson
+"The Overseer who plans is the Overseer who prevails." - Rally Tavern Motto
+"A Mayor without gossip is a Mayor without context." - Tavern Regular
+"Ship it and fix it beats plan it forever." - Startup Wisdom
+"Tests are love letters to your future self." - Anonymous
+"Every post mortem prevents ten future failures." - Innkeeper's Rule
+"Claim your area or someone else will." - Coordination 101
+"The best bounty is one that already exists." - Looking-For Philosophy
+"Git push and pray is not a deployment strategy." - DevOps Elder
+"A well-documented failure is worth more than an undocumented success." - The Storyteller
+"When in doubt, check the gossip." - Rally Tavern Saying

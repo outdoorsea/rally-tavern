@@ -1,0 +1,17 @@
+id: multi-agent-context-sharing
+title: Multi-Agent Context Sharing
+contributed_by: rally-tavern
+created_at: 2026-02-25T00:00:00Z
+verified_by: []
+context: Rally Tavern development
+lesson: |
+  When multiple agents work on related tasks, they need shared context.
+  Without it, agents duplicate work or make conflicting decisions.
+solution: |
+  Use Rally Tavern gossip for ephemeral shared context.
+  Use knowledge/ for permanent collective intelligence.
+  Include context field in bounties with relevant intel.
+references:
+  - Gas Town hooks for persistent agent state
+  - Beads for work tracking
+tags: [multi-agent, context, coordination]
