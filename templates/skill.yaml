@@ -1,0 +1,36 @@
+# Rally Skill Definition Template
+# Place skill files in skills/<name>.yaml
+#
+# Skills are YAML definitions containing structured prompts and output schemas.
+# The skill runner feeds the skill definition + project profile to Claude,
+# validates the output matches required_keys, and saves it.
+
+# Skill metadata
+name: ""                   # Unique skill identifier (e.g., product-manager)
+version: 1                 # Schema version
+description: ""            # What this skill produces
+
+# Input specification
+input:
+  required:
+    - project-profile      # Always present: path to project-profile.yaml
+  optional: []             # Additional inputs (e.g., previous-analysis)
+
+# Prompt sent to Claude
+prompt:
+  system: |
+    # Role and constraints for the skill
+    # Define what persona and rules the LLM should follow
+  user: |
+    # User prompt with template variables
+    # {{project-profile}} is replaced with profile contents
+    # {{context}} is replaced with pipeline context (if --context given)
+
+# Output specification
+output:
+  format: yaml             # Output format (yaml)
+  required_keys: []        # Keys that must be present in output
+  # Example:
+  #   - problem_statement
+  #   - success_metrics
+  #   - mvp_scope

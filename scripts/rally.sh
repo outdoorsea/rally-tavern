@@ -5,6 +5,8 @@
 # Commands:
 #   init [path]           Create project-profile.yaml interactively
 #   validate <path>       Validate a project-profile.yaml
+#   skill <action>        Skill runner (run, list, show, validate)
+#   defaults <action>     View/apply stack defaults
 #   help                  Show this help
 
 source "$(dirname "$0")/../lib/common.sh"
@@ -19,6 +21,12 @@ case "$COMMAND" in
   validate)
     exec "$TAVERN_ROOT/scripts/rally-validate-profile.sh" "$@"
     ;;
+  skill)
+    exec "$TAVERN_ROOT/scripts/rally-skill.sh" "$@"
+    ;;
+  defaults)
+    exec "$TAVERN_ROOT/scripts/rally-defaults.sh" "$@"
+    ;;
   help|--help|-h)
     echo "Rally - Agent-first planning and skill orchestration"
     echo ""
@@ -27,12 +35,16 @@ case "$COMMAND" in
     echo "Commands:"
     echo "  init [path]           Create project-profile.yaml interactively"
     echo "  validate <path>       Validate a project-profile.yaml"
+    echo "  skill <action>        Skill runner (run, list, show, validate)"
+    echo "  defaults <action>     View/apply stack defaults"
     echo "  help                  Show this help"
     echo ""
     echo "Examples:"
     echo "  rally init                          # Create profile in current dir"
     echo "  rally init ./myproject/profile.yaml # Create at specific path"
     echo "  rally validate project-profile.yaml # Validate existing profile"
+    echo "  rally skill list                    # List available skills"
+    echo "  rally skill run pm --profile p.yaml # Run a skill"
     ;;
   *)
     log_error "Unknown command: $COMMAND"
