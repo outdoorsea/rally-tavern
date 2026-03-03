@@ -1,0 +1,62 @@
+# Valid OSS Researcher output fixture
+analysis_date: "2026-03-03"
+project_name: "test-project"
+candidates:
+  - capability: "web-framework"
+    packages:
+      - name: "FastAPI"
+        version: "0.110.0"
+        license: "MIT"
+        license_risk: low
+        maturity_score: 4
+        maintenance:
+          last_commit: "2026-02-28"
+          open_issues: 342
+          contributors: 580
+          bus_factor: medium
+        fit_notes: "Excellent async support, matches project requirements"
+      - name: "Flask"
+        version: "3.1.0"
+        license: "BSD-3-Clause"
+        license_risk: low
+        maturity_score: 5
+        maintenance:
+          last_commit: "2026-02-15"
+          open_issues: 12
+          contributors: 700
+          bus_factor: high
+        fit_notes: "Mature, well-documented, large ecosystem"
+    recommendation: adopt
+    recommended_package: "FastAPI"
+    rationale: "Better async support for API-first project"
+  - capability: "authentication"
+    packages:
+      - name: "python-jose"
+        version: "3.3.0"
+        license: "MIT"
+        license_risk: low
+        maturity_score: 3
+        maintenance:
+          last_commit: "2025-08-10"
+          open_issues: 45
+          contributors: 22
+          bus_factor: low
+        fit_notes: "JWT support, but maintenance is slowing"
+    recommendation: evaluate
+    recommended_package: "python-jose"
+    rationale: "Only viable option but maintenance health is concerning"
+license_summary:
+  permissive_count: 3
+  copyleft_count: 0
+  unknown_count: 0
+  overall_risk: low
+  notes: "All candidates use permissive licenses — no compatibility concerns"
+recommendations:
+  - action: adopt
+    capability: "web-framework"
+    package: "FastAPI"
+    reason: "Battle-tested, excellent async, permissive license"
+  - action: evaluate
+    capability: "authentication"
+    package: "python-jose"
+    reason: "Functional but monitor maintenance trajectory"
