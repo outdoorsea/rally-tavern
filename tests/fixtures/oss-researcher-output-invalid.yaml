@@ -1,0 +1,4 @@
+# Invalid OSS Researcher output — missing required keys
+analysis_date: "2026-03-03"
+project_name: "test-project"
+# Missing: candidates, license_summary, recommendations

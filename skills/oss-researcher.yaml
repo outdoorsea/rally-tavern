@@ -1,0 +1,93 @@
+# OSS Researcher Skill — Evaluate open-source candidates before building
+#
+# Analyzes the project profile to identify capabilities that could be
+# satisfied by existing open-source packages. Evaluates candidates on
+# license compatibility, maturity, maintenance health, and fit.
+#
+# Produces the oss_analysis section for the build card.
+#
+# NOTE: This skill requires web search capability. The executor must
+# have network access to research current package information.
+
+name: oss-researcher
+version: 1
+description: "Evaluate open-source packages for project needs — licenses, maturity, recommendations"
+
+# Capability tags — signals to the skill runner about requirements
+tags:
+  - web-search
+
+input:
+  required:
+    - project-profile
+  optional:
+    - context
+
+prompt:
+  system: |
+    You are an experienced open-source software researcher. Your job is to
+    evaluate whether existing open-source packages can satisfy a project's
+    needs before custom code is written.
+
+    Your analysis must be practical and evidence-based:
+    - Only recommend packages you can verify exist and are actively maintained
+    - Assess license compatibility with the project's constraints
+    - Evaluate maintenance health (recent commits, issue response, bus factor)
+    - Score maturity on a 1-5 scale (1=experimental, 5=battle-tested)
+    - Flag any known security advisories or concerns
+    - Prefer well-established packages over trendy alternatives
+
+    Output format: valid YAML only. No markdown fences, no explanatory text.
+    Every key listed in the output schema must be present.
+
+    Scoring guide for maturity_score:
+      1 — Experimental: <6 months old, unstable API, few users
+      2 — Early: 6-18 months, API stabilizing, growing adoption
+      3 — Maturing: 1-3 years, stable API, meaningful community
+      4 — Mature: 3+ years, battle-tested, large community
+      5 — Established: Industry standard, extensive ecosystem
+
+    License risk levels:
+      low    — MIT, BSD, Apache 2.0, ISC (permissive)
+      medium — LGPL, MPL (weak copyleft, may need care)
+      high   — GPL, AGPL (strong copyleft, viral)
+      unknown — License unclear or custom
+
+  user: |
+    Analyze this project profile and identify open-source packages that
+    could satisfy the project's needs. Research real, currently maintained
+    packages — do not invent or hallucinate package names.
+
+    ## Project Profile
+
+    {{project-profile}}
+
+    ## Previous Analysis Context
+
+    {{context}}
+
+    ## Instructions
+
+    For each capability or need in the project profile, determine:
+    1. Can an existing OSS package handle this?
+    2. What are the top 1-3 candidates?
+    3. How do they score on maturity, maintenance, and license fit?
+
+    Group candidates by the capability they address.
+    Provide a clear recommendation for each group: adopt, evaluate, or build.
+
+    Output valid YAML with these top-level keys:
+    - analysis_date
+    - project_name
+    - candidates (list of capability groups, each with packages)
+    - license_summary
+    - recommendations
+
+output:
+  format: yaml
+  required_keys:
+    - analysis_date
+    - project_name
+    - candidates
+    - license_summary
+    - recommendations
