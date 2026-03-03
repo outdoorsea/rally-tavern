@@ -6,6 +6,7 @@
 #   init [path]           Create project-profile.yaml interactively
 #   validate <path>       Validate a project-profile.yaml
 #   skill <action>        Skill runner (run, list, show, validate)
+#   plan <profile>        Generate build card from project profile
 #   defaults <action>     View/apply stack defaults
 #   help                  Show this help
 
@@ -24,6 +25,9 @@ case "$COMMAND" in
   skill)
     exec "$TAVERN_ROOT/scripts/rally-skill.sh" "$@"
     ;;
+  plan)
+    exec "$TAVERN_ROOT/scripts/rally-plan.sh" "$@"
+    ;;
   defaults)
     exec "$TAVERN_ROOT/scripts/rally-defaults.sh" "$@"
     ;;
@@ -36,6 +40,7 @@ case "$COMMAND" in
     echo "  init [path]           Create project-profile.yaml interactively"
     echo "  validate <path>       Validate a project-profile.yaml"
     echo "  skill <action>        Skill runner (run, list, show, validate)"
+    echo "  plan <profile>        Generate build card from project profile"
     echo "  defaults <action>     View/apply stack defaults"
     echo "  help                  Show this help"
     echo ""
@@ -45,6 +50,7 @@ case "$COMMAND" in
     echo "  rally validate project-profile.yaml # Validate existing profile"
     echo "  rally skill list                    # List available skills"
     echo "  rally skill run pm --profile p.yaml # Run a skill"
+    echo "  rally plan project-profile.yaml     # Generate build card"
     ;;
   *)
     log_error "Unknown command: $COMMAND"

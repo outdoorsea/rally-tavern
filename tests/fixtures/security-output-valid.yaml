@@ -1,0 +1,32 @@
+summary: "Test Project has a medium security risk profile. JWT authentication and PostgreSQL are solid foundations, but input validation and rate limiting need attention."
+risk_level: medium
+attack_vectors:
+  - name: "SQL Injection"
+    description: "Malicious SQL through user input fields"
+    severity: high
+    owasp_category: A03
+    affected_components:
+      - api
+      - database
+    likelihood: low
+required_controls:
+  - control: "Parameterized queries"
+    description: "Use SQLAlchemy ORM for all database access"
+    priority: must-have
+    owasp_category: A03
+    addresses:
+      - "SQL Injection"
+owasp_alignment:
+  - category: A03
+    name: "Injection"
+    relevance: "API accepts user input that reaches the database"
+    status: needs-attention
+    controls:
+      - "Parameterized queries"
+threat_component_map:
+  - component: api
+    threats:
+      - "SQL Injection"
+    controls:
+      - "Parameterized queries"
+compliance_notes: []

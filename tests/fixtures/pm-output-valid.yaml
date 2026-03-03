@@ -1,0 +1,13 @@
+problem_statement: "Test Project is a FastAPI web application providing RESTful API services with JWT authentication and PostgreSQL storage for small teams on a startup budget."
+success_metrics:
+  - "API responds to authenticated requests within 200ms p95"
+  - "All endpoints require valid JWT tokens"
+  - "Data persists across server restarts via PostgreSQL"
+acceptance_criteria:
+  - "User can authenticate and receive a JWT token"
+  - "CRUD operations work on all primary entities"
+  - "Unauthorized requests return 401"
+non_goals:
+  - "Mobile app support"
+  - "Real-time WebSocket features"
+  - "Multi-language internationalization"
