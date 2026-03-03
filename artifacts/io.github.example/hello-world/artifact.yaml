@@ -1,0 +1,36 @@
+# Example Artifact Manifest
+# This is a placeholder demonstrating the artifact.yaml schema.
+# Replace with a real artifact or delete this example namespace.
+
+schema_version: 1
+
+# --- Identity ---
+name: hello-world
+namespace: io.github.example
+version: "0.1.0"
+description: "Example artifact demonstrating the registry structure"
+
+# --- Capabilities ---
+provides:
+  - capability: example
+    style: minimal
+
+# --- Compatibility ---
+compatibility:
+  platforms: []           # No platform restriction
+  frameworks: []          # No framework restriction
+  languages: []           # No language restriction
+
+# --- Trust & Provenance ---
+trust_tier: experimental  # experimental | community | verified
+contributed_by: rally-tavern
+created_at: "2026-03-03"
+
+# --- Dependencies ---
+requires: []              # Other artifact names this depends on
+
+# --- Entry Points ---
+entrypoints:
+  install: skills/install.yaml    # Skill to run on install (optional)
+  configure: null                 # Skill to run for configuration (optional)
+  test: acceptance/test.sh        # Acceptance test script (optional)
