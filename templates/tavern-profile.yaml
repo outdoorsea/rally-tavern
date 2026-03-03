@@ -1,0 +1,83 @@
+# Tavern Profile Template
+# =======================
+# Persistent context about a project — feeds into Rally skills,
+# mol-idea-to-plan, and agent decision-making.
+#
+# Usage:
+#   Copy this template to your project root as tavern-profile.yaml
+#   Fill in what you know. Leave unknowns as null — profiles grow over time.
+#   Publish to Rally Tavern to share with the community.
+#
+# Convention: snake_case fields, kebab-case values, ISO 8601 dates.
+
+# --- Identity ---
+id: project-CHANGEME           # kebab-case project slug
+name: "Project Name"
+description: |
+  One-paragraph summary of what this project does,
+  who it's for, and why it exists.
+repo: null                     # e.g., github.com/org/repo
+created_at: TIMESTAMP          # ISO 8601
+updated_at: TIMESTAMP
+contributed_by: YOURNAME
+contributed_by_type: overseer  # overseer or mayor
+
+# --- Facets ---
+# Core technology choices. Used by skills for context-aware recommendations.
+facets:
+  platform: null               # web, mobile, desktop, cli, library, service
+  languages: []                # e.g., [go, python, typescript]
+  frameworks: []               # e.g., [flask, react, cobra]
+  runtime: null                # e.g., node-22, python-3.13, go-1.25
+  build_system: null           # e.g., make, npm, cargo, gradle
+  package_manager: null        # e.g., pip, npm, go-modules, cargo
+
+# --- Architecture ---
+architecture:
+  style: null                  # monolith, microservices, cli-tool, library, monorepo
+  components: []               # top-level modules/packages (freeform list)
+  data_stores: []              # e.g., [postgres, redis, sqlite, dolt]
+  protocols: []                # e.g., [grpc, rest, websocket, cli]
+  deployment: null             # e.g., docker, systemd, lambda, local-binary
+  ci_cd: null                  # e.g., github-actions, jenkins, none
+
+# --- Auth & Security ---
+security:
+  auth_method: null            # e.g., oauth2, api-key, session, none
+  encryption: null             # e.g., fernet, aes-256, tls-only, none
+  multi_tenant: false
+  sensitive_data: []           # e.g., [api-keys, credentials, pii]
+  compliance: []               # e.g., [hipaa, soc2, gdpr]
+
+# --- Quality ---
+quality:
+  test_framework: null         # e.g., pytest, vitest, go-test, jest
+  linter: null                 # e.g., ruff, eslint, golangci-lint
+  type_checking: null          # e.g., mypy, typescript, none
+  coverage_target: null        # e.g., 80
+
+# --- Constraints ---
+# Hard boundaries that skills must respect.
+constraints:
+  must_use: []                 # e.g., [postgres, cobra] — non-negotiable deps
+  must_avoid: []               # e.g., [mongodb, graphql] — explicitly rejected
+  budget: null                 # token/cost budget if relevant
+  timeline: null               # e.g., "MVP by Q2 2026"
+  team_size: null              # number of contributors (human + agent)
+
+# --- Needs ---
+# Capabilities the project requires. Skills use these to recommend
+# components, identify gaps, and prioritize planning.
+needs:
+  - null                       # e.g., "user authentication with SSO"
+                               # e.g., "real-time notifications"
+                               # e.g., "PDF report generation"
+
+# --- Context ---
+# Freeform notes for skills. Anything that doesn't fit above.
+context: |
+  Additional context about the project: history, prior decisions,
+  known technical debt, team preferences, related projects.
+
+# --- Tags ---
+tags: []                       # e.g., [multi-agent, cli, infrastructure]
