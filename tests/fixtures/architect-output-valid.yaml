@@ -1,0 +1,41 @@
+architecture_risks:
+  - risk: "Single database becomes bottleneck under load"
+    severity: medium
+    mitigation: "Add connection pooling and read replicas"
+    affected_components:
+      - database
+      - api
+mitigation_strategies:
+  - strategy: "Connection pooling"
+    addresses_risks:
+      - "Single database becomes bottleneck under load"
+    implementation: "Use SQLAlchemy connection pool with pool_size=10"
+    priority: high
+entity_model:
+  - entity: User
+    attributes:
+      - id
+      - email
+      - password_hash
+    relationships:
+      - target: Session
+        type: one-to-many
+        description: "User has many sessions"
+integration_map:
+  - system: "PostgreSQL"
+    direction: bidirectional
+    protocol: other
+    data_exchanged: "All application data"
+    failure_mode: "Application returns 503"
+abstraction_boundaries:
+  - boundary: "Database layer"
+    layer: infrastructure
+    isolates: "PostgreSQL specifics"
+    interface: "SQLAlchemy ORM models"
+component_structure:
+  - component: api
+    responsibility: "HTTP request handling"
+    depends_on:
+      - database
+    exposes: "REST endpoints"
+    suggested_path: "src/api/"
