@@ -1,0 +1,144 @@
+# Rally Facet Vocabulary
+# Canonical values for project-profile.yaml fields
+# Schema version: 1
+
+schema_version: 1
+
+platform:
+  - python-web
+  - python-api
+  - python-cli
+  - node-web
+  - node-api
+  - node-cli
+  - typescript-web
+  - typescript-api
+  - ios-swiftui
+  - ios-uikit
+  - android-kotlin
+  - android-compose
+  - flutter
+  - react-native
+  - go-api
+  - go-cli
+  - rust-api
+  - rust-cli
+  - java-spring
+  - dotnet-web
+  - static-site
+  - browser-extension
+
+language:
+  - python
+  - javascript
+  - typescript
+  - swift
+  - kotlin
+  - go
+  - rust
+  - java
+  - csharp
+  - ruby
+  - php
+  - dart
+  - elixir
+
+framework:
+  - fastapi
+  - flask
+  - django
+  - express
+  - fastify
+  - nextjs
+  - remix
+  - svelte
+  - vue
+  - react
+  - angular
+  - swiftui
+  - uikit
+  - spring-boot
+  - gin
+  - actix
+  - axum
+  - rails
+  - laravel
+  - phoenix
+
+auth:
+  - none
+  - session
+  - jwt
+  - oauth2
+  - api-key
+  - multi
+
+database:
+  - none
+  - sqlite
+  - postgres
+  - mysql
+  - mongo
+  - redis
+  - dynamodb
+  - firestore
+  - supabase
+  - multi
+
+api_style:
+  - none
+  - rest
+  - graphql
+  - grpc
+  - websocket
+  - multi
+
+deployment:
+  - local
+  - docker
+  - cloud-vm
+  - serverless
+  - k8s
+  - edge
+  - vercel
+  - fly-io
+  - railway
+
+ui:
+  - none
+  - web-spa
+  - web-ssr
+  - mobile-native
+  - cli
+  - tui
+  - desktop
+
+budget:
+  - free
+  - startup
+  - enterprise
+
+timeline:
+  - hack
+  - sprint
+  - quarter
+  - long-term
+
+team_size:
+  - solo
+  - small
+  - medium
+  - large
+
+compliance:
+  - none
+  - HIPAA
+  - SOC2
+  - GDPR
+  - PCI-DSS
+  - FedRAMP
+
+hosting:
+  - self-hosted
+  - cloud
+  - hybrid

@@ -1,0 +1,45 @@
+# Rally Project Profile - Test Fixture (valid)
+# Used by test_rally_profile.sh
+
+schema_version: 1
+
+project:
+  name: "Test Project"
+  slug: "test-project"
+  description: "A test project for validation"
+  repo: ""
+
+platform: "python-web"
+language: "python"
+framework: "fastapi"
+stack_preset: ""
+
+facets:
+  auth: "jwt"
+  database: "postgres"
+  api_style: "rest"
+  deployment: "docker"
+  ui: "web-spa"
+  realtime: false
+  multi_tenant: false
+  file_storage: false
+  search: false
+  queue: false
+  caching: false
+  i18n: false
+
+constraints:
+  budget: "startup"
+  timeline: "sprint"
+  team_size: "small"
+  compliance: []
+  hosting: "cloud"
+
+priorities:
+  speed_to_market: 2
+  scalability: 3
+  security: 2
+  maintainability: 4
+  developer_experience: 1
+
+notes: "Test fixture for validation"

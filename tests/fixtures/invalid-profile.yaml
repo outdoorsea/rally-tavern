@@ -1,0 +1,45 @@
+# Rally Project Profile - Test Fixture (invalid)
+# Used by test_rally_profile.sh
+
+schema_version: 1
+
+project:
+  name: ""
+  slug: "INVALID SLUG!"
+  description: ""
+  repo: ""
+
+platform: ""
+language: ""
+framework: ""
+stack_preset: ""
+
+facets:
+  auth: "bogus-auth"
+  database: "postgres"
+  api_style: "rest"
+  deployment: "docker"
+  ui: "web-spa"
+  realtime: false
+  multi_tenant: false
+  file_storage: false
+  search: false
+  queue: false
+  caching: false
+  i18n: false
+
+constraints:
+  budget: "startup"
+  timeline: "sprint"
+  team_size: "small"
+  compliance: []
+  hosting: "cloud"
+
+priorities:
+  speed_to_market: 9
+  scalability: 3
+  security: 2
+  maintainability: 4
+  developer_experience: 1
+
+notes: ""
