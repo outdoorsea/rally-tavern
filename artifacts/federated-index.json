@@ -1,0 +1,90 @@
+{
+  "generated_at": "2026-03-04T17:26:51Z",
+  "rigs": {
+    "lilypad_chat": {
+      "worker": "lilypad",
+      "count": 0,
+      "artifacts": []
+    },
+    "meety_me": {
+      "worker": "chuck",
+      "count": 0,
+      "artifacts": []
+    },
+    "rally_tavern": {
+      "worker": "max",
+      "count": 3,
+      "artifacts": [
+        {
+          "id": "io.github.example/hello-world",
+          "name": "hello-world",
+          "namespace": "io.github.example",
+          "version": "0.1.0",
+          "description": "Example artifact demonstrating the registry structure",
+          "artifactType": "unknown",
+          "trust": "experimental",
+          "tags": [],
+          "tokenSavingsEstimate": 0,
+          "path": "io.github.example/hello-world"
+        },
+        {
+          "id": "io.github.rally-tavern/ios-swift-auth-settings-starter",
+          "name": "ios-swift-auth-settings-starter",
+          "namespace": "io.github.rally-tavern",
+          "version": "0.1.0",
+          "description": "iOS Swift starter with email/password auth flow, settings page with UserDefaults persistence, and XCTest suite",
+          "artifactType": "starter-template",
+          "trust": "experimental",
+          "tags": [
+            "swift",
+            "ios",
+            "swiftui",
+            "auth",
+            "settings",
+            "userdefaults",
+            "starter"
+          ],
+          "tokenSavingsEstimate": 35000,
+          "path": "io.github.rally-tavern/ios-swift-auth-settings-starter"
+        },
+        {
+          "id": "io.github.rally-tavern/python-fastapi-sso-starter",
+          "name": "python-fastapi-sso-starter",
+          "namespace": "io.github.rally-tavern",
+          "version": "0.1.0",
+          "description": "FastAPI starter with email/password auth, Google & Facebook OAuth SSO, PostgreSQL, and Alembic migrations",
+          "artifactType": "starter-template",
+          "trust": "experimental",
+          "tags": [
+            "python",
+            "fastapi",
+            "auth",
+            "oauth2",
+            "sso",
+            "postgres",
+            "alembic",
+            "starter"
+          ],
+          "tokenSavingsEstimate": 45000,
+          "path": "io.github.rally-tavern/python-fastapi-sso-starter"
+        }
+      ]
+    },
+    "theoutlived": {
+      "worker": "morty",
+      "count": 0,
+      "artifacts": []
+    },
+    "vitalitek": {
+      "worker": "cardi",
+      "count": 0,
+      "artifacts": []
+    },
+    "wandering_river": {
+      "worker": "batsquatch",
+      "count": 0,
+      "artifacts": []
+    }
+  },
+  "total": 3
+}

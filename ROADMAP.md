@@ -260,11 +260,20 @@ Tools: `tavern.searchArtifacts`, `tavern.getArtifact`,
 `tavern.instantiateArtifact`, `tavern.listBounties`, `tavern.claimBounty`,
 `tavern.submitReview`.
 
-### Federation (P3)
+### Federation (P3) — Groundwork Done
 
-| Bead | What |
-|------|------|
-| rt-6ovc | Cross-tavern artifact sharing with trust policies |
+| Bead | What | Status |
+|------|------|--------|
+| rt-6ovc | Cross-tavern artifact sharing with trust policies | Groundwork done |
+
+**Federation groundwork (March 2026):**
+- `ARTIFACT_DIR_OVERRIDE` added to all 3 canonical scripts (artifact.sh, artifacts-search.sh, artifacts-json.sh)
+- `artifact-federated-search.sh` — cross-rig ranked search with `source_rig` annotation
+- `artifact-federated-index.sh` — aggregates all rig indexes into `federated-index.json`
+- Shim scripts deployed to vitalitek, theoutlived, meety_me (delegate to rally_tavern canonical scripts)
+- Each rig has its own `artifacts/` directory and namespace
+- CLAUDE.md updated in all spoke rigs with artifact system documentation
+- `CONTRIBUTING-ARTIFACTS.md` published with naming conventions, trust tiers, and acceptance test requirements
 
 ---
 
