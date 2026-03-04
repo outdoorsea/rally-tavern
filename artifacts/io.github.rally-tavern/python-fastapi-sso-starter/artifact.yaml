@@ -1,0 +1,77 @@
+schema_version: 1
+
+name: python-fastapi-sso-starter
+namespace: io.github.rally-tavern
+version: "0.1.0"
+description: "FastAPI starter with email/password auth, Google & Facebook OAuth SSO, PostgreSQL, and Alembic migrations"
+
+provides:
+  - capability: user-authentication
+    style: sso-oauth2
+  - capability: database-migrations
+    style: alembic
+  - capability: api-server
+    style: fastapi
+
+compatibility:
+  platforms: [python-web]
+  frameworks: [fastapi]
+  languages: [python]
+
+trust_tier: experimental
+contributed_by: rally-tavern
+created_at: "2026-03-03T00:00:00Z"
+
+spec:
+  artifactType: starter-template
+  audience: both
+  packaging:
+    format: directory
+    rootPath: "."
+  entrypoints:
+    setup: "pip install -r requirements.txt"
+    run: "uvicorn app.main:app --reload"
+    test: "pytest"
+
+requiredSecrets:
+  - name: DATABASE_URL
+    description: "PostgreSQL connection string"
+    required: true
+  - name: SECRET_KEY
+    description: "JWT signing key"
+    required: true
+  - name: GOOGLE_CLIENT_ID
+    description: "Google OAuth client ID"
+    required: true
+  - name: GOOGLE_CLIENT_SECRET
+    description: "Google OAuth client secret"
+    required: true
+  - name: FACEBOOK_APP_ID
+    description: "Facebook OAuth app ID"
+    required: false
+  - name: FACEBOOK_APP_SECRET
+    description: "Facebook OAuth app secret"
+    required: false
+
+acceptance:
+  commands:
+    - "pytest tests/"
+    - "curl -s http://localhost:8000/health | grep ok"
+  criteria:
+    - "Health endpoint returns 200"
+    - "All tests pass"
+    - "User registration creates account"
+    - "Login returns JWT token"
+    - "Google OAuth redirect works"
+
+scoring:
+  tokenSavingsEstimate: 45000
+
+tags: [python, fastapi, auth, oauth2, sso, postgres, alembic, starter]
+
+requires: []
+
+entrypoints:
+  install: skills/install/SKILL.md
+  configure: null
+  test: acceptance/run.sh
