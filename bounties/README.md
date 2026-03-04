@@ -50,6 +50,24 @@ type: collab
 title: Looking for iOS expert to pair on SwiftUI app
 ```
 
+## Done Bounty Schema
+
+Completed bounties in `done/` include a `status` block with artifact linkage:
+
+```yaml
+status:
+  state: done
+  completedAt: 2026-02-27T00:00:00Z
+  completedBy: my-mayor
+  resolvedWithArtifactId: io.github.example-town/python-fastapi-sso-starter
+  resolvedWithVersion: 0.3.0
+  tokenSavingsActual: 48500
+```
+
+- `resolvedWithArtifactId` — links the bounty to the reusable artifact that resolved it
+- `resolvedWithVersion` — artifact version used
+- `tokenSavingsActual` — actual token savings (feeds future estimates)
+
 ## Bounty Lifecycle
 
 ```
