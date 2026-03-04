@@ -49,7 +49,26 @@ for manifest in "$ARTIFACTS_DIR"/*/*/artifact.yaml; do
   artifact_type=$(yq -r '.spec.artifactType // "unknown"' "$manifest" 2>/dev/null || echo "unknown")
   trust=$(yq -r '.trust_tier // .trust.level // "experimental"' "$manifest")
   tags_raw=$(yq -r '(.tags // .metadata.tags // []) | .[]' "$manifest" 2>/dev/null || echo "")
-  token_savings=$(yq -r '.scoring.tokenSavingsEstimate // 0' "$manifest" 2>/dev/null || echo "0")
+  # Read token savings (supports both structured and flat formats)
+  token_savings=$(yq -r '.scoring.tokenSavingsEstimate.estimatedSavingsTokens // null' "$manifest" 2>/dev/null)
+  if [ "$token_savings" = "null" ] || [ -z "$token_savings" ]; then
+    token_savings=$(yq -r '.scoring.tokenSavingsEstimate // 0' "$manifest" 2>/dev/null || echo "0")
+    case "$token_savings" in *baselineTokens*|*{*) token_savings=0;; esac
+  fi
+
+  # Read usage metrics from .usage.jsonl
+  artifact_dir=$(dirname "$manifest")
+  usage_file="$artifact_dir/.usage.jsonl"
+  use_count=0
+  total_actual_saved=0
+  if [ -f "$usage_file" ]; then
+    while IFS= read -r uline; do
+      [ -z "$uline" ] && continue
+      use_count=$((use_count + 1))
+      utokens=$(echo "$uline" | jq -r '.tokensSaved // 0' 2>/dev/null || echo "0")
+      total_actual_saved=$((total_actual_saved + utokens))
+    done < "$usage_file"
+  fi
 
   # Combine searchable text
   searchable="$name $desc $tags_raw $artifact_type $namespace"
@@ -76,17 +95,29 @@ for manifest in "$ARTIFACTS_DIR"/*/*/artifact.yaml; do
     experimental) score=$((score + 0));;
   esac
 
-  # 3. Token savings bonus (normalized: 1 point per 10k tokens)
-  if [ "$token_savings" -gt 0 ] 2>/dev/null; then
-    bonus=$((token_savings / 10000))
+  # 3. Token savings bonus (actual > estimated)
+  # Prefer actual usage data when available
+  effective_savings=$token_savings
+  if [ "$total_actual_saved" -gt 0 ] && [ "$use_count" -gt 0 ]; then
+    effective_savings=$((total_actual_saved / use_count))
+  fi
+  if [ "$effective_savings" -gt 0 ] 2>/dev/null; then
+    bonus=$((effective_savings / 10000))
     [ $bonus -gt 10 ] && bonus=10
     score=$((score + bonus))
+  fi
+
+  # 4. Use count bonus (more usage = more trusted, 2 points per use, cap 10)
+  if [ "$use_count" -gt 0 ] 2>/dev/null; then
+    use_bonus=$((use_count * 2))
+    [ $use_bonus -gt 10 ] && use_bonus=10
+    score=$((score + use_bonus))
   fi
 
   # Collect result with score for sorting
   tags_json=$(yq -r '(.tags // .metadata.tags // []) | @json' "$manifest" 2>/dev/null || echo "[]")
 
-  results+=("$score|$namespace/$name|$version|$artifact_type|$trust|$token_savings|$desc|$tags_json")
+  results+=("$score|$namespace/$name|$version|$artifact_type|$trust|$token_savings|$desc|$tags_json|$use_count|$total_actual_saved")
 done
 
 # Sort by score descending
@@ -99,9 +130,15 @@ count=0
 for entry in "${sorted[@]}"; do
   [ $count -ge "$LIMIT" ] && break
 
-  IFS='|' read -r score id version atype trust savings desc tags <<< "$entry"
+  IFS='|' read -r score id version atype trust savings desc tags use_count total_actual <<< "$entry"
 
   [ $count -gt 0 ] && echo ","
+
+  # Calculate avg if we have actual usage
+  avg_actual=0
+  if [ "${use_count:-0}" -gt 0 ] 2>/dev/null && [ "${total_actual:-0}" -gt 0 ] 2>/dev/null; then
+    avg_actual=$((total_actual / use_count))
+  fi
 
   cat <<ENTRY
   {
@@ -110,6 +147,11 @@ for entry in "${sorted[@]}"; do
     "artifactType": "$atype",
     "trust": "$trust",
     "tokenSavingsEstimate": $savings,
+    "usage": {
+      "useCount": ${use_count:-0},
+      "totalTokensSaved": ${total_actual:-0},
+      "avgTokensSaved": $avg_actual
+    },
     "description": "$desc",
     "tags": $tags,
     "score": $score

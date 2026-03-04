@@ -57,7 +57,11 @@ acceptance:
     - "Login returns JWT token"
     - "Google OAuth redirect works"
 scoring:
-  tokenSavingsEstimate: 45000
+  tokenSavingsEstimate:
+    baselineTokens: 60000
+    withArtifactTokens: 15000
+    estimatedSavingsTokens: 45000
+    method: "manual estimate"
 tags: [python, fastapi, auth, oauth2, sso, postgres, alembic, starter]
 requires: []
 entrypoints:

@@ -11,3 +11,6 @@ state.json
 .claude/commands/
 .logs/
 .beads/
+
+# Artifact usage telemetry (local runtime data)
+.usage.jsonl

@@ -35,6 +35,51 @@ find_artifact_dir() {
   return 1
 }
 
+# Read token savings estimate from artifact.yaml (supports both flat and structured formats)
+read_token_savings() {
+  local manifest="$1"
+  local savings
+  # Try structured format first: scoring.tokenSavingsEstimate.estimatedSavingsTokens
+  savings=$(yq -r '.scoring.tokenSavingsEstimate.estimatedSavingsTokens // null' "$manifest" 2>/dev/null)
+  if [ "$savings" != "null" ] && [ -n "$savings" ]; then
+    echo "$savings"
+    return
+  fi
+  # Fall back to flat format: scoring.tokenSavingsEstimate (integer)
+  savings=$(yq -r '.scoring.tokenSavingsEstimate // 0' "$manifest" 2>/dev/null || echo "0")
+  # Guard against getting the whole object when it's structured
+  case "$savings" in
+    *baselineTokens*|*{*) echo "0";;
+    *) echo "$savings";;
+  esac
+}
+
+# Read usage metrics from .usage.jsonl for an artifact directory
+read_usage_metrics() {
+  local artifact_dir="$1"
+  local usage_file="$artifact_dir/.usage.jsonl"
+
+  if [ ! -f "$usage_file" ]; then
+    echo "0|0|0"
+    return
+  fi
+
+  local use_count=0 total_saved=0 avg_saved=0
+  while IFS= read -r line; do
+    [ -z "$line" ] && continue
+    use_count=$((use_count + 1))
+    local tokens
+    tokens=$(echo "$line" | jq -r '.tokensSaved // 0' 2>/dev/null || echo "0")
+    total_saved=$((total_saved + tokens))
+  done < "$usage_file"
+
+  if [ $use_count -gt 0 ]; then
+    avg_saved=$((total_saved / use_count))
+  fi
+
+  echo "${use_count}|${total_saved}|${avg_saved}"
+}
+
 # Rebuild .index.json from all artifact.yaml files
 rebuild_index() {
   require_yq
@@ -53,7 +98,14 @@ rebuild_index() {
     artifact_type=$(yq -r '.spec.artifactType // "unknown"' "$manifest" 2>/dev/null || echo "unknown")
     trust=$(yq -r '.trust_tier // .trust.level // "experimental"' "$manifest")
     tags=$(yq -r '(.tags // .metadata.tags // []) | @json' "$manifest" 2>/dev/null || echo "[]")
-    token_savings=$(yq -r '.scoring.tokenSavingsEstimate // 0' "$manifest" 2>/dev/null || echo "0")
+    local token_savings
+    token_savings=$(read_token_savings "$manifest")
+
+    # Read usage metrics
+    local artifact_dir usage_metrics use_count total_tokens_saved avg_tokens_saved
+    artifact_dir=$(dirname "$manifest")
+    usage_metrics=$(read_usage_metrics "$artifact_dir")
+    IFS='|' read -r use_count total_tokens_saved avg_tokens_saved <<< "$usage_metrics"
 
     cat >> "$INDEX" <<ENTRY
   {
@@ -66,6 +118,11 @@ rebuild_index() {
     "trust": "$trust",
     "tags": $tags,
     "tokenSavingsEstimate": $token_savings,
+    "usage": {
+      "useCount": $use_count,
+      "totalTokensSaved": $total_tokens_saved,
+      "avgTokensSaved": $avg_tokens_saved
+    },
     "path": "$(dirname "$manifest" | sed "s|$ARTIFACTS_DIR/||")"
   }
 ENTRY
@@ -127,7 +184,11 @@ spec:
   audience: "both"
 
 scoring:
-  tokenSavingsEstimate: 0
+  tokenSavingsEstimate:
+    baselineTokens: 0
+    withArtifactTokens: 0
+    estimatedSavingsTokens: 0
+    method: ""
 
 tags: []
 
@@ -599,20 +660,105 @@ cmd_validate() {
   fi
 }
 
+cmd_record_usage() {
+  local id="" tokens_saved=0 used_by=""
+
+  while [[ $# -gt 0 ]]; do
+    case $1 in
+      --tokens-saved) tokens_saved="$2"; shift 2;;
+      --used-by) used_by="$2"; shift 2;;
+      *) id="$1"; shift;;
+    esac
+  done
+
+  [ -z "$id" ] && die "Usage: artifact.sh record-usage <namespace/name> --tokens-saved N [--used-by CONTEXT]"
+
+  local dir
+  dir=$(find_artifact_dir "$id") || die "Artifact not found: $id"
+
+  local usage_file="$dir/.usage.jsonl"
+  local timestamp
+  timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+
+  # Append usage entry as JSONL
+  local entry="{\"timestamp\":\"$timestamp\",\"tokensSaved\":$tokens_saved"
+  [ -n "$used_by" ] && entry="$entry,\"usedBy\":\"$used_by\""
+  entry="$entry}"
+
+  echo "$entry" >> "$usage_file"
+
+  # Rebuild index to reflect new usage stats
+  rebuild_index
+
+  # Show current usage summary
+  local usage_metrics use_count total_saved avg_saved
+  usage_metrics=$(read_usage_metrics "$dir")
+  IFS='|' read -r use_count total_saved avg_saved <<< "$usage_metrics"
+
+  echo "✓ Usage recorded for $id"
+  echo "  Tokens saved: $tokens_saved"
+  [ -n "$used_by" ] && echo "  Used by: $used_by"
+  echo "  Total uses: $use_count"
+  echo "  Total tokens saved: $total_saved"
+  echo "  Avg tokens saved: $avg_saved"
+}
+
+cmd_usage_stats() {
+  local id="$1"
+  [ -z "$id" ] && die "Usage: artifact.sh usage-stats <namespace/name>"
+
+  local dir
+  dir=$(find_artifact_dir "$id") || die "Artifact not found: $id"
+
+  local usage_file="$dir/.usage.jsonl"
+  if [ ! -f "$usage_file" ]; then
+    echo "📊 No usage data for $id"
+    return
+  fi
+
+  local usage_metrics use_count total_saved avg_saved
+  usage_metrics=$(read_usage_metrics "$dir")
+  IFS='|' read -r use_count total_saved avg_saved <<< "$usage_metrics"
+
+  require_yq
+  local token_savings
+  token_savings=$(read_token_savings "$dir/artifact.yaml")
+
+  echo "📊 Usage Stats: $id"
+  echo ""
+  echo "  Estimated savings: $token_savings tokens/use"
+  echo "  Total uses: $use_count"
+  echo "  Total tokens saved: $total_saved"
+  echo "  Avg tokens saved: $avg_saved"
+  echo ""
+  echo "  Recent usage:"
+  tail -5 "$usage_file" | while IFS= read -r line; do
+    local ts tokens by
+    ts=$(echo "$line" | jq -r '.timestamp // ""' 2>/dev/null)
+    tokens=$(echo "$line" | jq -r '.tokensSaved // 0' 2>/dev/null)
+    by=$(echo "$line" | jq -r '.usedBy // ""' 2>/dev/null)
+    printf "    %s  %s tokens" "$ts" "$tokens"
+    [ -n "$by" ] && printf "  (%s)" "$by"
+    echo ""
+  done
+}
+
 # --- Dispatch ---
 
 case "$ACTION" in
-  create)      cmd_create "$@";;
-  register)    cmd_register "$@";;
-  update)      cmd_update "$@";;
-  show)        cmd_show "$@";;
-  list)        cmd_list "$@";;
-  instantiate) cmd_instantiate "$@";;
-  deprecate)   cmd_deprecate "$@";;
-  validate)    cmd_validate "$@";;
-  fingerprint) cmd_fingerprint "$@";;
-  duplicates)  cmd_duplicates "$@";;
-  reindex)     rebuild_index; echo "✓ Index rebuilt: $INDEX";;
+  create)       cmd_create "$@";;
+  register)     cmd_register "$@";;
+  update)       cmd_update "$@";;
+  show)         cmd_show "$@";;
+  list)         cmd_list "$@";;
+  instantiate)  cmd_instantiate "$@";;
+  deprecate)    cmd_deprecate "$@";;
+  validate)     cmd_validate "$@";;
+  fingerprint)  cmd_fingerprint "$@";;
+  duplicates)   cmd_duplicates "$@";;
+  record-usage) cmd_record_usage "$@";;
+  usage-stats)  cmd_usage_stats "$@";;
+  reindex)      rebuild_index; echo "✓ Index rebuilt: $INDEX";;
   help|*)
     echo "Usage: artifact.sh <command> [args]"
     echo ""
@@ -627,6 +773,8 @@ case "$ACTION" in
     echo "  validate [path]                               Validate artifact manifest"
     echo "  fingerprint <id>                              Generate content and interface hashes"
     echo "  duplicates <id> [--content-only|--interface-only]  Find duplicate artifacts"
+    echo "  record-usage <id> --tokens-saved N [--used-by CTX]  Record artifact usage"
+    echo "  usage-stats <id>                              Show usage statistics"
     echo "  reindex                                       Rebuild .index.json"
     echo ""
     echo "Artifact types: starter-template, module, skill, mcp-server, playbook"
