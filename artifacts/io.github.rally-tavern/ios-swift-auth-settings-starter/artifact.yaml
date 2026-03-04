@@ -1,10 +1,8 @@
 schema_version: 1
-
 name: ios-swift-auth-settings-starter
 namespace: io.github.rally-tavern
 version: "0.1.0"
 description: "iOS Swift starter with email/password auth flow, settings page with UserDefaults persistence, and XCTest suite"
-
 provides:
   - capability: user-authentication
     style: email-password
@@ -12,16 +10,13 @@ provides:
     style: userdefaults
   - capability: ios-app-scaffold
     style: swiftui
-
 compatibility:
   platforms: [ios]
   frameworks: [swiftui]
   languages: [swift]
-
 trust_tier: experimental
 contributed_by: rally-tavern
 created_at: "2026-03-03T00:00:00Z"
-
 spec:
   artifactType: starter-template
   audience: both
@@ -32,7 +27,6 @@ spec:
     setup: "xcodebuild -scheme {{project_name}} -destination 'platform=iOS Simulator,name=iPhone 16' build"
     run: "open {{project_name}}.xcodeproj"
     test: "xcodebuild test -scheme {{project_name}} -destination 'platform=iOS Simulator,name=iPhone 16'"
-
 acceptance:
   commands:
     - "xcodebuild build -scheme {{project_name}} -destination 'platform=iOS Simulator,name=iPhone 16'"
@@ -43,15 +37,14 @@ acceptance:
     - "Login view renders email and password fields"
     - "Settings page persists preferences via UserDefaults"
     - "Auth state transitions between logged-in and logged-out"
-
 scoring:
   tokenSavingsEstimate: 35000
-
 tags: [swift, ios, swiftui, auth, settings, userdefaults, starter]
-
 requires: []
-
 entrypoints:
   install: skills/install/SKILL.md
   configure: null
   test: acceptance/run.sh
+fingerprints:
+  contentSha256: 30d6c60b116c37cdd4f196bc0ec4e6c90db794b6e8979142991a5025f11d9ffc
+  interfaceSha256: 7d40571f08bc4fbc63e114fe900f26c00f00f596c788174c60629d91777e8c32

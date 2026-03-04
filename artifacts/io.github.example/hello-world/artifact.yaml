@@ -3,34 +3,31 @@
 # Replace with a real artifact or delete this example namespace.
 
 schema_version: 1
-
 # --- Identity ---
 name: hello-world
 namespace: io.github.example
 version: "0.1.0"
 description: "Example artifact demonstrating the registry structure"
-
 # --- Capabilities ---
 provides:
   - capability: example
     style: minimal
-
 # --- Compatibility ---
 compatibility:
-  platforms: []           # No platform restriction
-  frameworks: []          # No framework restriction
-  languages: []           # No language restriction
-
+  platforms: [] # No platform restriction
+  frameworks: [] # No framework restriction
+  languages: [] # No language restriction
 # --- Trust & Provenance ---
-trust_tier: experimental  # experimental | community | verified
+trust_tier: experimental # experimental | community | verified
 contributed_by: rally-tavern
 created_at: "2026-03-03"
-
 # --- Dependencies ---
-requires: []              # Other artifact names this depends on
-
+requires: [] # Other artifact names this depends on
 # --- Entry Points ---
 entrypoints:
-  install: skills/install.yaml    # Skill to run on install (optional)
-  configure: null                 # Skill to run for configuration (optional)
-  test: acceptance/test.sh        # Acceptance test script (optional)
+  install: skills/install.yaml # Skill to run on install (optional)
+  configure: null # Skill to run for configuration (optional)
+  test: acceptance/test.sh # Acceptance test script (optional)
+fingerprints:
+  contentSha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  interfaceSha256: 90d35ba16d8b2a2b80b367c3cbb2b3a82d80bfb05b82d7097594ca78e8632b59
