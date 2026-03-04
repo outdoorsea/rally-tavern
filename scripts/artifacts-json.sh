@@ -59,8 +59,31 @@ for manifest in "$ARTIFACTS_DIR"/*/*/artifact.yaml; do
   artifact_type=$(yq -r '.spec.artifactType // "unknown"' "$manifest" 2>/dev/null || echo "unknown")
   trust=$(yq -r '.trust_tier // .trust.level // "experimental"' "$manifest")
   tags_json=$(yq -r '(.tags // .metadata.tags // []) | @json' "$manifest" 2>/dev/null || echo "[]")
-  token_savings=$(yq -r '.scoring.tokenSavingsEstimate // 0' "$manifest" 2>/dev/null || echo "0")
+  # Read token savings (supports both structured and flat formats)
+  token_savings=$(yq -r '.scoring.tokenSavingsEstimate.estimatedSavingsTokens // null' "$manifest" 2>/dev/null)
+  if [ "$token_savings" = "null" ] || [ -z "$token_savings" ]; then
+    token_savings=$(yq -r '.scoring.tokenSavingsEstimate // 0' "$manifest" 2>/dev/null || echo "0")
+    case "$token_savings" in *baselineTokens*|*{*) token_savings=0;; esac
+  fi
   created_at=$(yq -r '.created_at // .provenance.createdAt // ""' "$manifest" 2>/dev/null || echo "")
+
+  # Read usage metrics
+  artifact_dir=$(dirname "$manifest")
+  usage_file="$artifact_dir/.usage.jsonl"
+  use_count=0
+  total_actual_saved=0
+  avg_saved=0
+  if [ -f "$usage_file" ]; then
+    while IFS= read -r uline; do
+      [ -z "$uline" ] && continue
+      use_count=$((use_count + 1))
+      utokens=$(echo "$uline" | jq -r '.tokensSaved // 0' 2>/dev/null || echo "0")
+      total_actual_saved=$((total_actual_saved + utokens))
+    done < "$usage_file"
+    if [ $use_count -gt 0 ]; then
+      avg_saved=$((total_actual_saved / use_count))
+    fi
+  fi
 
   # --- Apply filters ---
 
@@ -104,6 +127,11 @@ for manifest in "$ARTIFACTS_DIR"/*/*/artifact.yaml; do
       "tags": $tags_json,
       "trust": "$trust",
       "tokenSavingsEstimate": $token_savings,
+      "usage": {
+        "useCount": $use_count,
+        "totalTokensSaved": $total_actual_saved,
+        "avgTokensSaved": $avg_saved
+      },
       "createdAt": "$created_at"
     }
 ENTRY

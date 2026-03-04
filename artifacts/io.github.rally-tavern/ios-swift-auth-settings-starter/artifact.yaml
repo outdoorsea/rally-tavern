@@ -38,7 +38,11 @@ acceptance:
     - "Settings page persists preferences via UserDefaults"
     - "Auth state transitions between logged-in and logged-out"
 scoring:
-  tokenSavingsEstimate: 35000
+  tokenSavingsEstimate:
+    baselineTokens: 50000
+    withArtifactTokens: 15000
+    estimatedSavingsTokens: 35000
+    method: "manual estimate"
 tags: [swift, ios, swiftui, auth, settings, userdefaults, starter]
 requires: []
 entrypoints:

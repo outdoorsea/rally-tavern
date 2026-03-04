@@ -57,7 +57,11 @@ acceptance:
 
 # --- Scoring ---
 scoring:
-  tokenSavingsEstimate: 0       # Estimated tokens saved vs. building from scratch
+  tokenSavingsEstimate:
+    baselineTokens: 0           # Tokens needed to build from scratch (LLM-built)
+    withArtifactTokens: 0       # Tokens needed when using this artifact
+    estimatedSavingsTokens: 0   # baselineTokens - withArtifactTokens
+    method: ""                  # How estimate was derived (e.g., "median of 5 agent runs")
 
 # --- Fingerprints ---
 fingerprints:
