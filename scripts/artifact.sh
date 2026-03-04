@@ -133,6 +133,15 @@ tags: []
 
 requires: []
 
+fingerprints:
+  contentSha256: ""
+  interfaceSha256: ""
+
+relationships:
+  duplicates: []
+  supersedes: []
+  supersededBy: null
+
 entrypoints:
   install: null
   configure: null
@@ -216,6 +225,23 @@ cmd_update() {
           yq -i ".trust.level = \"$2\"" "$dir/artifact.yaml"
         echo "  trust → $2"
         shift 2;;
+      --supersedes)
+        local target_id="$2"
+        yq -i ".relationships.supersedes += [\"$target_id\"]" "$dir/artifact.yaml"
+        # Mark the other artifact as superseded
+        local target_dir
+        if target_dir=$(find_artifact_dir "$target_id" 2>/dev/null); then
+          yq -i ".relationships.supersededBy = \"$id\"" "$target_dir/artifact.yaml"
+          git add "$target_dir/artifact.yaml"
+          echo "  supersedes → $target_id (marked supersededBy=$id)"
+        else
+          echo "  supersedes → $target_id (target not found locally)"
+        fi
+        shift 2;;
+      --duplicates)
+        yq -i ".relationships.duplicates += [\"$2\"]" "$dir/artifact.yaml"
+        echo "  duplicates → $2"
+        shift 2;;
       *) shift;;
     esac
   done
@@ -251,6 +277,30 @@ cmd_show() {
   echo ""
   echo "   Path: $dir"
   echo ""
+
+  # Show fingerprints if present
+  local content_fp interface_fp
+  content_fp=$(yq -r '.fingerprints.contentSha256 // ""' "$dir/artifact.yaml" 2>/dev/null)
+  interface_fp=$(yq -r '.fingerprints.interfaceSha256 // ""' "$dir/artifact.yaml" 2>/dev/null)
+  if [ -n "$content_fp" ] || [ -n "$interface_fp" ]; then
+    echo "   Fingerprints:"
+    [ -n "$content_fp" ] && echo "     content:   ${content_fp:0:16}..."
+    [ -n "$interface_fp" ] && echo "     interface: ${interface_fp:0:16}..."
+    echo ""
+  fi
+
+  # Show relationships if present
+  local supersedes superseded_by duplicates_list
+  supersedes=$(yq -r '(.relationships.supersedes // []) | .[]' "$dir/artifact.yaml" 2>/dev/null)
+  superseded_by=$(yq -r '.relationships.supersededBy // ""' "$dir/artifact.yaml" 2>/dev/null)
+  duplicates_list=$(yq -r '(.relationships.duplicates // []) | .[]' "$dir/artifact.yaml" 2>/dev/null)
+  if [ -n "$supersedes" ] || [ -n "$superseded_by" ] || [ -n "$duplicates_list" ]; then
+    echo "   Relationships:"
+    [ -n "$supersedes" ] && echo "$supersedes" | while read -r s; do echo "     supersedes: $s"; done
+    [ -n "$superseded_by" ] && echo "     supersededBy: $superseded_by"
+    [ -n "$duplicates_list" ] && echo "$duplicates_list" | while read -r d; do echo "     duplicates: $d"; done
+    echo ""
+  fi
 
   # Show directory contents
   echo "   Contents:"
@@ -377,6 +427,137 @@ cmd_deprecate() {
   [ -n "$superseded_by" ] && echo "  Superseded by: $superseded_by"
 }
 
+cmd_fingerprint() {
+  local id="$1"
+  [ -z "$id" ] && die "Usage: artifact.sh fingerprint <namespace/name>"
+
+  local dir
+  dir=$(find_artifact_dir "$id") || die "Artifact not found: $id"
+
+  require_yq
+
+  # --- Content fingerprint ---
+  # Hash normalized template files (exclude comments, normalize whitespace)
+  local content_hash=""
+  if [ -d "$dir/templates" ] && [ "$(find "$dir/templates" -type f 2>/dev/null | wc -l | xargs)" -gt 0 ]; then
+    content_hash=$(find "$dir/templates" -type f | sort | while read -r f; do
+      # Normalize: strip comment lines (# and //), collapse whitespace, trim
+      sed -e '/^[[:space:]]*#/d' -e '/^[[:space:]]*\/\//d' \
+          -e 's/[[:space:]]\{2,\}/ /g' -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' \
+          -e '/^$/d' "$f"
+    done | shasum -a 256 | cut -d' ' -f1)
+  else
+    content_hash="empty-no-templates"
+  fi
+
+  # --- Interface fingerprint ---
+  # Hash declared interfaces: entrypoints, requiredSecrets, acceptance criteria
+  local interface_input=""
+
+  # Entrypoints (from both top-level and spec.entrypoints)
+  local ep_top ep_spec
+  ep_top=$(yq -r '(.entrypoints // {}) | to_entries | sort_by(.key) | .[] | "\(.key)=\(.value)"' "$dir/artifact.yaml" 2>/dev/null || echo "")
+  ep_spec=$(yq -r '(.spec.entrypoints // {}) | to_entries | sort_by(.key) | .[] | "\(.key)=\(.value)"' "$dir/artifact.yaml" 2>/dev/null || echo "")
+  interface_input+="entrypoints:${ep_top}${ep_spec}"
+
+  # Required secrets
+  local secrets
+  secrets=$(yq -r '(.requiredSecrets // []) | sort_by(.name) | .[] | "\(.name):\(.required // false)"' "$dir/artifact.yaml" 2>/dev/null || echo "")
+  interface_input+="requiredSecrets:${secrets}"
+
+  # Acceptance criteria
+  local criteria
+  criteria=$(yq -r '(.acceptance.criteria // []) | sort | .[]' "$dir/artifact.yaml" 2>/dev/null || echo "")
+  interface_input+="acceptanceCriteria:${criteria}"
+
+  # Provides (capabilities)
+  local provides
+  provides=$(yq -r '(.provides // []) | sort_by(.capability) | .[] | "\(.capability):\(.style)"' "$dir/artifact.yaml" 2>/dev/null || echo "")
+  interface_input+="provides:${provides}"
+
+  local interface_hash
+  interface_hash=$(printf '%s' "$interface_input" | shasum -a 256 | cut -d' ' -f1)
+
+  # Write fingerprints to manifest
+  yq -i ".fingerprints.contentSha256 = \"$content_hash\"" "$dir/artifact.yaml"
+  yq -i ".fingerprints.interfaceSha256 = \"$interface_hash\"" "$dir/artifact.yaml"
+
+  git add "$dir/artifact.yaml"
+
+  echo "✓ Fingerprinted: $id"
+  echo "  contentSha256:   $content_hash"
+  echo "  interfaceSha256: $interface_hash"
+}
+
+cmd_duplicates() {
+  local id=""
+  local check_content=true
+  local check_interface=true
+
+  while [[ $# -gt 0 ]]; do
+    case $1 in
+      --content-only) check_interface=false; shift;;
+      --interface-only) check_content=false; shift;;
+      *) id="$1"; shift;;
+    esac
+  done
+
+  [ -z "$id" ] && die "Usage: artifact.sh duplicates <namespace/name> [--content-only|--interface-only]"
+
+  local dir
+  dir=$(find_artifact_dir "$id") || die "Artifact not found: $id"
+
+  require_yq
+
+  local target_content target_interface
+  target_content=$(yq -r '.fingerprints.contentSha256 // ""' "$dir/artifact.yaml")
+  target_interface=$(yq -r '.fingerprints.interfaceSha256 // ""' "$dir/artifact.yaml")
+
+  [ -z "$target_content" ] && [ -z "$target_interface" ] && die "No fingerprints found. Run: artifact.sh fingerprint $id"
+
+  echo "🔍 Checking for duplicates of: $id"
+  echo ""
+
+  local found=0
+  for manifest in "$ARTIFACTS_DIR"/*/*/artifact.yaml; do
+    [ -f "$manifest" ] || continue
+
+    local other_id other_content other_interface
+    local other_name other_ns
+    other_name=$(yq -r '.name // .metadata.id // ""' "$manifest")
+    other_ns=$(yq -r '.namespace // ""' "$manifest")
+    other_id="${other_ns}/${other_name}"
+
+    # Skip self
+    [ "$other_id" = "$id" ] && continue
+
+    other_content=$(yq -r '.fingerprints.contentSha256 // ""' "$manifest")
+    other_interface=$(yq -r '.fingerprints.interfaceSha256 // ""' "$manifest")
+
+    local match_type=""
+    if $check_content && [ -n "$target_content" ] && [ "$target_content" != "empty-no-templates" ] && \
+       [ "$other_content" = "$target_content" ]; then
+      match_type="content"
+    fi
+    if $check_interface && [ -n "$target_interface" ] && [ "$other_interface" = "$target_interface" ]; then
+      [ -n "$match_type" ] && match_type="content+interface" || match_type="interface"
+    fi
+
+    if [ -n "$match_type" ]; then
+      echo "  ⚠️  $other_id — match: $match_type"
+      found=$((found + 1))
+    fi
+  done
+
+  if [ $found -eq 0 ]; then
+    echo "  ✓ No duplicates found"
+  else
+    echo ""
+    echo "  Found $found potential duplicate(s)"
+    echo "  Use: artifact.sh update <id> --supersedes <other-id>"
+  fi
+}
+
 cmd_validate() {
   local path="${1:-.}"
   [ -f "$path/artifact.yaml" ] || die "No artifact.yaml found in: $path"
@@ -429,6 +610,8 @@ case "$ACTION" in
   instantiate) cmd_instantiate "$@";;
   deprecate)   cmd_deprecate "$@";;
   validate)    cmd_validate "$@";;
+  fingerprint) cmd_fingerprint "$@";;
+  duplicates)  cmd_duplicates "$@";;
   reindex)     rebuild_index; echo "✓ Index rebuilt: $INDEX";;
   help|*)
     echo "Usage: artifact.sh <command> [args]"
@@ -442,6 +625,8 @@ case "$ACTION" in
     echo "  instantiate <id> --into <dir> [--set k=v]     Copy artifact into target"
     echo "  deprecate <id> [--superseded-by NEW_ID]       Mark artifact as deprecated"
     echo "  validate [path]                               Validate artifact manifest"
+    echo "  fingerprint <id>                              Generate content and interface hashes"
+    echo "  duplicates <id> [--content-only|--interface-only]  Find duplicate artifacts"
     echo "  reindex                                       Rebuild .index.json"
     echo ""
     echo "Artifact types: starter-template, module, skill, mcp-server, playbook"

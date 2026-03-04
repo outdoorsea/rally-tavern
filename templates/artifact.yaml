@@ -61,8 +61,15 @@ scoring:
 
 # --- Fingerprints ---
 fingerprints:
-  contentSha256: ""             # SHA-256 hash of artifact contents
-  interfaceSha256: ""           # SHA-256 hash of public interface (API surface)
+  contentSha256: ""             # SHA-256 hash of normalized template files
+  interfaceSha256: ""           # SHA-256 hash of declared interfaces
+                                # (entrypoints, requiredSecrets, acceptance criteria, provides)
+
+# --- Relationships ---
+relationships:
+  duplicates: []                # IDs of artifacts this duplicates (same problem, same approach)
+  supersedes: []                # IDs of artifacts this replaces (evolution)
+  supersededBy: null            # ID of artifact that replaced this one
 
 # --- Trust ---
 trust:
