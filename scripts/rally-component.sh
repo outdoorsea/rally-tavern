@@ -259,7 +259,11 @@ cmd_list() {
     echo "  Total: $count component(s)"
   else
     # Standard listing via artifact.sh
-    exec "$ARTIFACT_SH" list "${passthrough_args[@]}"
+    if [[ ${#passthrough_args[@]} -gt 0 ]]; then
+      exec "$ARTIFACT_SH" list "${passthrough_args[@]}"
+    else
+      exec "$ARTIFACT_SH" list
+    fi
   fi
 }
 
