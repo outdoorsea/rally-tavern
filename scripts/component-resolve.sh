@@ -310,7 +310,7 @@ else
     [[ $count -ge $LIMIT ]] && break
     IFS='|' read -r score id version atype trust savings desc caps use_count cap_matches <<< "$entry"
 
-    local trust_icon="🔴"
+    trust_icon="🔴"
     case "$trust" in
       verified) trust_icon="🟢";;
       community) trust_icon="🟡";;
