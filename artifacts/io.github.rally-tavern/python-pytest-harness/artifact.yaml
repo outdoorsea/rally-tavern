@@ -1,0 +1,82 @@
+schema_version: 1
+
+name: python-pytest-harness
+namespace: io.github.rally-tavern
+version: "0.1.0"
+description: "Pytest test harness with fixtures, factories, and coverage for Python web projects"
+
+provides:
+  - capability: test-harness
+    style: pytest
+  - capability: test-fixtures
+    style: factory-pattern
+  - capability: coverage-reporting
+    style: pytest-cov
+
+compatibility:
+  platforms:
+    - python-web
+    - python-api
+    - python-cli
+  frameworks:
+    - fastapi
+    - flask
+    - django
+  languages:
+    - python
+
+trust_tier: experimental
+contributed_by: rally-tavern
+created_at: "2026-03-05T00:00:00Z"
+
+spec:
+  artifactType: module
+  audience: both
+  packaging:
+    format: directory
+    rootPath: "."
+  entrypoints:
+    setup: "pip install -r requirements-test.txt"
+    test: "pytest tests/ -v --cov"
+
+requiredSecrets: []
+
+acceptance:
+  commands:
+    - "python -c 'import pytest; print(pytest.__version__)'"
+  criteria:
+    - "Pytest discovers and runs test files"
+    - "Fixtures provide database session and test client"
+    - "Coverage report generates successfully"
+
+scoring:
+  tokenSavingsEstimate:
+    baselineTokens: 30000
+    withArtifactTokens: 8000
+    estimatedSavingsTokens: 22000
+    method: manual
+
+tags:
+  - python
+  - pytest
+  - testing
+  - fixtures
+  - coverage
+  - factory
+  - harness
+
+requires: []
+
+fingerprints:
+  contentSha256: ""
+  interfaceSha256: ""
+
+relationships:
+  duplicates: []
+  supersedes: []
+  supersededBy: null
+
+entrypoints:
+  install: null
+  configure: null
+  test: acceptance/test.sh

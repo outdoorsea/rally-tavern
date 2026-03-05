@@ -8,6 +8,8 @@
 #   skill <action>        Skill runner (run, list, show, validate)
 #   plan <profile>        Generate build card from project profile
 #   defaults <action>     View/apply stack defaults
+#   component <action>    Component management (validate, search, resolve, list)
+#   resolve <profile>     Resolve components for a project profile
 #   help                  Show this help
 
 source "$(dirname "$0")/../lib/common.sh"
@@ -31,6 +33,12 @@ case "$COMMAND" in
   defaults)
     exec "$TAVERN_ROOT/scripts/rally-defaults.sh" "$@"
     ;;
+  component)
+    exec "$TAVERN_ROOT/scripts/rally-component.sh" "$@"
+    ;;
+  resolve)
+    exec "$TAVERN_ROOT/scripts/component-resolve.sh" "$@"
+    ;;
   help|--help|-h)
     echo "Rally - Agent-first planning and skill orchestration"
     echo ""
@@ -42,6 +50,8 @@ case "$COMMAND" in
     echo "  skill <action>        Skill runner (run, list, show, validate)"
     echo "  plan <profile>        Generate build card from project profile"
     echo "  defaults <action>     View/apply stack defaults"
+    echo "  component <action>    Component management (validate, new, search, list, resolve)"
+    echo "  resolve <profile>     Resolve components for a project profile"
     echo "  help                  Show this help"
     echo ""
     echo "Examples:"
@@ -51,6 +61,9 @@ case "$COMMAND" in
     echo "  rally skill list                    # List available skills"
     echo "  rally skill run pm --profile p.yaml # Run a skill"
     echo "  rally plan project-profile.yaml     # Generate build card"
+    echo "  rally component validate ./my-comp  # Validate component manifest"
+    echo "  rally component list --capability user-authentication"
+    echo "  rally resolve project-profile.yaml  # Find matching components"
     ;;
   *)
     log_error "Unknown command: $COMMAND"

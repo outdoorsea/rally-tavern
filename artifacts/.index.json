@@ -52,5 +52,23 @@
     },
     "path": "io.github.rally-tavern/python-fastapi-sso-starter"
   }
+,
+  {
+    "id": "io.github.rally-tavern/python-pytest-harness",
+    "name": "python-pytest-harness",
+    "namespace": "io.github.rally-tavern",
+    "version": "0.1.0",
+    "description": "Pytest test harness with fixtures, factories, and coverage for Python web projects",
+    "artifactType": "module",
+    "trust": "experimental",
+    "tags": ["python","pytest","testing","fixtures","coverage","factory","harness"],
+    "tokenSavingsEstimate": 22000,
+    "usage": {
+      "useCount": 0,
+      "totalTokensSaved": 0,
+      "avgTokensSaved": 0
+    },
+    "path": "io.github.rally-tavern/python-pytest-harness"
+  }
 
 ]
