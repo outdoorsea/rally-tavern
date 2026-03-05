@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "rally-tavern": {
+      "command": "node",
+      "args": ["dist/index.js"],
+      "cwd": "<path-to-rally-tavern>/mcp-server",
+      "env": {
+        "RALLY_TAVERN_ROOT": "<path-to-rally-tavern>"
+      }
+    }
+  }
+}
