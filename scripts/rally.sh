@@ -10,6 +10,10 @@
 #   defaults <action>     View/apply stack defaults
 #   component <action>    Component management (validate, search, resolve, list)
 #   resolve <profile>     Resolve components for a project profile
+#   receipt <action>      Build receipt capture and history
+#   feedback <action>     Feedback loop analysis from receipts
+#   tasks <action>        Task generation from build cards
+#   dispatch <build-card> Dispatch tasks to Mayor convoy system
 #   help                  Show this help
 
 source "$(dirname "$0")/../lib/common.sh"
@@ -39,6 +43,18 @@ case "$COMMAND" in
   resolve)
     exec "$TAVERN_ROOT/scripts/component-resolve.sh" "$@"
     ;;
+  receipt)
+    exec "$TAVERN_ROOT/scripts/rally-receipt.sh" "$@"
+    ;;
+  feedback)
+    exec "$TAVERN_ROOT/scripts/rally-feedback.sh" "$@"
+    ;;
+  tasks)
+    exec "$TAVERN_ROOT/scripts/rally-tasks.sh" "$@"
+    ;;
+  dispatch)
+    exec "$TAVERN_ROOT/scripts/rally-dispatch.sh" "$@"
+    ;;
   help|--help|-h)
     echo "Rally - Agent-first planning and skill orchestration"
     echo ""
@@ -52,6 +68,10 @@ case "$COMMAND" in
     echo "  defaults <action>     View/apply stack defaults"
     echo "  component <action>    Component management (validate, new, search, list, resolve)"
     echo "  resolve <profile>     Resolve components for a project profile"
+    echo "  receipt <action>      Build receipt capture and history"
+    echo "  feedback <action>     Feedback loop analysis from receipts"
+    echo "  tasks <action>        Task generation from build cards"
+    echo "  dispatch <build-card> Dispatch tasks to Mayor convoy system"
     echo "  help                  Show this help"
     echo ""
     echo "Examples:"
@@ -64,6 +84,10 @@ case "$COMMAND" in
     echo "  rally component validate ./my-comp  # Validate component manifest"
     echo "  rally component list --capability user-authentication"
     echo "  rally resolve project-profile.yaml  # Find matching components"
+    echo "  rally receipt generate              # Capture build metrics"
+    echo "  rally feedback analyze              # Analyze build patterns"
+    echo "  rally tasks generate build-card.yaml  # Generate tasks from build card"
+    echo "  rally dispatch build-card.yaml      # Dispatch tasks to Mayor"
     ;;
   *)
     log_error "Unknown command: $COMMAND"
