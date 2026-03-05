@@ -17,3 +17,6 @@ state.json
 
 # Federation remote caches (local clones)
 .federation/
+
+# Rally runtime data (receipts, feedback analysis, dispatch)
+.rally/
