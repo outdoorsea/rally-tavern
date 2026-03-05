@@ -1,0 +1,38 @@
+# Federation Configuration
+# Controls cross-tavern artifact sharing via upstream/downstream relationships
+#
+# Upstreams: remote sources to pull artifacts from
+# Downstreams: targets to push artifacts to
+#
+# Trust policies:
+#   require-sheriff-approved  - Only import artifacts with sheriff approval
+#   require-security-scan     - Run local security scan, accept any trust level
+#   accept-verified           - Only import verified-trust artifacts
+#   accept-community          - Import community or verified artifacts
+#   accept-all                - Import any artifact (use with caution)
+
+upstreams:
+  # Example: a public artifact registry
+  # - name: public-tavern
+  #   url: https://github.com/example/tavern-artifacts
+  #   trustPolicy: require-sheriff-approved
+  #   autoSync: false
+  #   syncInterval: daily
+  #   allowedNamespaces: []       # Empty = all namespaces allowed
+  #   excludedNamespaces: []      # Namespaces to never import
+
+downstreams:
+  # Example: an internal team's tavern
+  # - name: internal-tavern
+  #   url: https://github.com/example/internal-artifacts
+  #   allowedNamespaces: []       # Empty = all namespaces allowed
+  #   requireTrust: community     # Minimum trust level to push
+
+# Default trust policy for imports without explicit policy
+defaultTrustPolicy: require-security-scan
+
+# Whether to reset trust to experimental on import (safest)
+resetTrustOnImport: true
+
+# Provenance tracking: always record where artifacts came from
+trackProvenance: true
