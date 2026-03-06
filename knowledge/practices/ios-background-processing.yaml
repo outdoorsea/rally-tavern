@@ -1,0 +1,96 @@
+id: practice-ios-background-processing
+title: iOS - Background Processing Reliability Patterns
+contributed_by: mayor
+contributor_type: mayor
+created_at: 2026-03-06T00:00:00Z
+verified_by: []
+codebase_type: swift-ios
+
+summary: |
+  BGTaskScheduler tasks must be marked complete via real completion callbacks, not
+  asyncAfter timeouts. HealthKit sync should use HKObserverQuery (push-based) not
+  polling timers. Don't run multiple overlapping sync managers simultaneously.
+
+details: |
+  ## BGTask Completion
+
+  The most common mistake is marking BGAppRefreshTask/BGProcessingTask complete via
+  a hardcoded asyncAfter delay rather than waiting for the actual work to finish:
+
+    BAD: DispatchQueue.main.asyncAfter(deadline: .now() + 25) {
+           task.setTaskCompleted(success: true)  // work may still be running!
+         }
+
+  iOS uses task completion to schedule future background wakeups. If you signal
+  complete too early, iOS may suspend the process while sync is still in flight.
+  If you signal it late or never, iOS kills the process and deprioritizes future
+  wakeups.
+
+  GOOD: pass a completion handler into the sync operation and call
+  task.setTaskCompleted(success:) from within that handler. Add a safety timeout
+  that calls setTaskCompleted(success: false) only if the handler hasn't fired.
+
+  ## HealthKit: Use Observer Queries, Not Timers
+
+  Polling HealthKit on a timer is wasteful and unreliable. iOS provides push-based
+  delivery via HKObserverQuery + enableBackgroundDelivery:
+  - App is woken in background when new health data arrives
+  - Combine with HKAnchoredObjectQuery for incremental (anchor-based) sync
+  - No timer needed — iOS does the scheduling
+
+  ## Don't Run Multiple Sync Managers
+
+  Having 2-3 independent managers that all call the same underlying sync function
+  creates race conditions, duplicate uploads, and unpredictable state. Use a single
+  BackgroundCoordinator with:
+  - A single atomic isSyncing flag (use Swift actor or NSLock)
+  - A circuit breaker to back off on repeated failures
+  - Explicit foreground vs background sync strategy selection
+
+  ## Location: Use Significant Change, Not Standard Updates
+
+  For always-on background location, use:
+  - startMonitoringSignificantLocationChanges() — low power, wakes app on ~500m moves
+  - startMonitoringVisits() — arrival/departure at significant locations
+  - Standard startUpdatingLocation() kills battery and is throttled heavily in background
+
+examples: |
+  ```swift
+  // ✅ BGTask with real completion callback
+  private func handleBackgroundRefresh(task: BGAppRefreshTask) {
+      scheduleAppRefresh() // reschedule next
+
+      var isComplete = false
+      let timeout = DispatchWorkItem {
+          if !isComplete {
+              task.setTaskCompleted(success: false)
+          }
+      }
+      DispatchQueue.main.asyncAfter(deadline: .now() + 25, execute: timeout)
+
+      BackgroundSyncManager.shared.startBackgroundSync { success in
+          isComplete = true
+          timeout.cancel()
+          task.setTaskCompleted(success: success)
+      }
+  }
+
+  // ✅ HKObserverQuery push-based HealthKit sync
+  func enableBackgroundDelivery(for type: HKSampleType) {
+      let query = HKObserverQuery(sampleType: type, predicate: nil) { _, completion, error in
+          guard error == nil else { completion(); return }
+          self.syncIncrementalData(for: type) { completion() }
+      }
+      healthStore.execute(query)
+      healthStore.enableBackgroundDelivery(for: type, frequency: .immediate) { _, _ in }
+  }
+  ```
+
+gotchas:
+  - BGAppRefreshTask has ~30 seconds; BGProcessingTask has minutes but requires network/power flags
+  - setTaskCompleted must be called before the task's expirationHandler fires, or iOS penalizes future scheduling
+  - HKObserverQuery + enableBackgroundDelivery requires HealthKit background delivery entitlement in Xcode
+  - Multiple CLLocationManager instances in one app share device GPS — creating 3 managers doesn't give you 3x accuracy, just 3x confusion
+  - SyncScheduler + AutoSyncManager running simultaneously can both call syncAllHealthData() concurrently — HealthDataManager needs a re-entrancy guard
+
+tags: [ios, swift, background-processing, healthkit, location, bgtask, reliability]

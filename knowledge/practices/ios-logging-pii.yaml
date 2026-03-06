@@ -1,0 +1,77 @@
+id: practice-ios-logging-pii
+title: iOS - Persistent Logging Must Sanitize PII Before Storage or Transmission
+contributed_by: mayor
+contributor_type: mayor
+created_at: 2026-03-06T00:00:00Z
+verified_by: []
+codebase_type: swift-ios
+
+summary: |
+  When replacing raw print() calls with a persistent logger that writes to disk or
+  ships to a backend, always audit for PII in existing log messages first. Common
+  violations: auth tokens in "Starting sync with token: X", GPS coords in location
+  logs, health values, device names.
+
+details: |
+  The migration from print() to a persistent logger seems safe because print() already
+  outputs to the Xcode console. But print() is ephemeral — it disappears when the
+  process ends. A persistent logger writes to disk (survives kills, accessible in
+  backups) and potentially ships to a server. That changes the threat model.
+
+  Common PII found in print()/log statements in iOS apps:
+  - Auth tokens: "Bearer eyJ..." in API call logs
+  - Passwords: logged during auth debugging, never cleaned up
+  - GPS coordinates: lat/lon in location update logs
+  - Health values: "Uploaded 95 bpm heart rate" — exact values are health data
+  - User names: from UIDevice.current.name ("John's iPhone") or profile data
+  - Email: logged in "Logged in as user@example.com"
+
+  Mitigation strategy:
+  1. Define a log sanitizer that strips/redacts sensitive patterns
+  2. Categorize logs by sensitivity (category: sync|location|health|api|app)
+  3. Apply different retention and shipping rules per category:
+     - app/sync: can ship to backend freely
+     - location: ship coordinates as fuzzy (round to 2 decimal places) or omit
+     - health: never ship raw values — ship event type only ("steps sync: N points")
+     - api: strip Bearer tokens from URLs and headers before logging
+  4. Review all existing print() calls before migrating — don't blindly wrap in logger
+
+  Also: never use user email as a Sentry/crash reporting userId. Use a hashed or
+  anonymous identifier to avoid PII in your crash reporting service.
+
+examples: |
+  ```swift
+  // ❌ BAD — logs raw health value and token
+  print("Uploading heart rate: \(value) bpm, token: \(authToken)")
+
+  // ✅ GOOD — sanitized
+  DebugLogger.shared.info("Uploading \(type.rawValue): \(count) points",
+                          category: .health)
+
+  // Sanitizer example
+  struct LogSanitizer {
+      static func sanitize(_ message: String) -> String {
+          var result = message
+          // Redact Bearer tokens
+          result = result.replacingOccurrences(
+              of: #"Bearer [A-Za-z0-9\-_\.]+\.[A-Za-z0-9\-_\.]+\.[A-Za-z0-9\-_\.]+"#,
+              with: "Bearer [REDACTED]",
+              options: .regularExpression
+          )
+          return result
+      }
+  }
+
+  // Sentry: use anonymous ID, not email
+  let user = Sentry.User()
+  user.userId = anonymousUserID  // SHA-256 or UUID stored in Keychain
+  // user.email = email  ← never do this
+  ```
+
+gotchas:
+  - UIDevice.current.name is personal (often "John's iPhone") — use UIDevice.current.model instead for device context in crash reporters
+  - GPS coordinates logged at full precision (6 decimal places) are as sensitive as health data — fuzz or omit in shipped logs
+  - Test the sanitizer against your actual log corpus, not just hypothetical inputs
+  - Log rotation and shipping are separate concerns — you can persist locally without shipping, or ship without full persistence
+
+tags: [ios, swift, logging, pii, security, gdpr, sentry, privacy]
