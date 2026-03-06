@@ -1,0 +1,9 @@
+{
+  "name": "rally-skills",
+  "version": "1.0.0",
+  "description": "Rally Tavern planning skills for Gas Town: architect, product-manager, security-auditor, test-engineer, ux-designer, abstraction-auditor, component-librarian, oss-researcher",
+  "author": {
+    "name": "rally-tavern",
+    "email": "rally-tavern@example.com"
+  }
+}
