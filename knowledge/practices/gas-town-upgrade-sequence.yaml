@@ -1,0 +1,79 @@
+id: gas-town-upgrade-sequence
+title: Gas Town Package Upgrade Sequence
+contributed_by: overseer
+contributor_type: overseer
+created_at: 2026-03-06T00:00:00Z
+verified_by: []
+codebase_type: gas-town
+
+summary: |
+  The correct order to upgrade gastown, dolt, and beads without breaking your town.
+
+details: |
+  Upgrading Gas Town packages requires a specific sequence. Skipping steps leaves
+  agents running stale binaries or the town in a misconfigured state.
+
+  ## Correct Sequence
+
+  1. Upgrade packages via Homebrew:
+     ```bash
+     brew upgrade gastown dolt beads
+     ```
+     Note: upgrading beads may also pull a new gastown version as a dependency.
+
+  2. Run the post-install migration:
+     ```bash
+     gt upgrade
+     ```
+     This runs `gt doctor --fix` internally, then syncs: formulas, CLAUDE.md,
+     hooks, and daemon.json lifecycle defaults. It is idempotent — safe to run
+     multiple times.
+
+  3. Restart all agents to pick up new binaries and config:
+     ```bash
+     gt up --restore
+     ```
+
+  4. Verify everything came up:
+     ```bash
+     gt agents
+     gt version
+     ```
+
+  ## Why Order Matters
+
+  - `brew upgrade` only replaces the binary on disk.
+  - `gt upgrade` propagates config changes to all settings.json files, syncs
+    formulas, and repairs structural drift. Without it, agents may run with
+    stale hook configs or outdated formulas.
+  - `gt up --restore` is required after config changes. Agents cache settings
+    at startup — a running agent does not pick up new settings.json.
+
+  ## Automation
+
+  The `brew-upgrades` Deacon plugin (available in the gastown repo's plugins/
+  directory) automates this entire sequence daily.
+
+examples: |
+  ```bash
+  # Full manual upgrade
+  brew upgrade gastown dolt beads
+  gt upgrade
+  gt up --restore
+  gt agents  # verify all came up
+
+  # Check what's outdated before upgrading
+  brew outdated gastown dolt beads
+  ```
+
+gotchas:
+  - gt up --restore may report failures if agent tmux sessions already exist
+    from a prior run — check gt agents to confirm they're actually running.
+  - If gt upgrade recommends a restart but you skip gt up --restore, agents
+    will silently run with stale Claude settings until next restart.
+  - dolt server stays up during upgrades — no need to stop/start it unless
+    dolt itself has a breaking schema change (check CHANGELOG).
+  - After a major gastown version jump, always run gt upgrade even if you
+    skipped minor versions — it's designed to be cumulative.
+
+tags: [gas-town, upgrades, maintenance, brew, gastown, dolt, beads]

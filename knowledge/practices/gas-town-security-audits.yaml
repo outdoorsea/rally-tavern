@@ -1,0 +1,114 @@
+id: gas-town-security-audits
+title: Security Audits in Gas Town
+contributed_by: overseer
+contributor_type: overseer
+created_at: 2026-03-06T00:00:00Z
+verified_by: []
+codebase_type: gas-town
+
+summary: |
+  Three layers of security coverage for Gas Town workspaces: passive, active, and periodic.
+
+details: |
+  Gas Town provides three distinct security mechanisms. Use all three for coverage
+  at different granularities and timings.
+
+  ## Layer 1: Passive — shiny-secure formula
+
+  For any polecat work, use `shiny-secure` instead of `shiny` when slinging.
+  It wraps every implement and submit step with pre/post security scans
+  automatically via the `security-audit` aspect.
+
+  ```bash
+  gt formula run shiny-secure --rig my-project --issue hq-abc12
+  ```
+
+  The `security-audit` aspect inserts steps before and after implement/submit:
+  - Pre-scan: review scope for secrets/creds, check deps for known vulns
+  - Post-scan: SAST on new code, OWASP Top 10 check, secrets scan
+
+  This is the lowest-friction option — no extra configuration required.
+
+  ## Layer 2: On-demand — mol-dog-security formula
+
+  For targeted audits of a specific rig (e.g., after onboarding new code, before
+  a release, or when investigating an alert):
+
+  ```bash
+  gt formula run mol-dog-security --rig my-project
+  ```
+
+  The security dog runs four steps:
+  1. setup — resolves scan root (prefers crew dir / main branch)
+  2. scan-secrets — hardcoded API keys, passwords, committed .env files
+  3. scan-deps — pip-audit, npm audit, govulncheck (uses whatever's installed)
+  4. scan-code — SQL injection, XSS, insecure deserialization, debug flags
+
+  Findings are created as P1/P2 beads and the Mayor is notified.
+
+  ## Layer 3: Automated — security-sweep plugin
+
+  The `security-sweep` Deacon plugin (cooldown: 168h) scans all rigs weekly.
+  Install it from the gastown repo's plugins/ directory:
+
+  ```bash
+  mkdir ~/gt/plugins/security-sweep
+  # add plugin.md
+  ```
+
+  Or copy from https://github.com/steveyegge/gastown/tree/main/plugins/security-sweep
+
+  ## What Gets Scanned
+
+  | Category | Tools / Patterns |
+  |----------|-----------------|
+  | Hardcoded secrets | git grep for password=, api_key=, sk-, ghp_, AKIA |
+  | Committed .env files | git ls-files *.env (excluding .env.example) |
+  | Python vulns | pip-audit (if installed) |
+  | Node vulns | npm audit high/critical (if npm present) |
+  | SQL injection | String-formatted queries passed to execute/query |
+  | XSS | innerHTML, v-html, dangerouslySetInnerHTML, Jinja `\| safe` |
+  | Debug flags | DEBUG=True outside dev config paths |
+
+  Only git-tracked files are scanned. Build artifacts, vendor/, and node_modules/
+  are excluded.
+
+  ## Triage
+
+  All findings become beads labeled `category:security`. View with:
+
+  ```bash
+  bd list --label category:security          # all rigs
+  bd list --label category:security,rig:foo  # specific rig
+  ```
+
+  P1 findings (hardcoded secrets, SQLi) should be addressed immediately.
+  P2 findings (vulnerable deps, XSS) should be addressed in the current sprint.
+  P3 findings (debug flags) are informational.
+
+examples: |
+  ```bash
+  # Passive: use secure workflow for all new polecat work
+  gt formula run shiny-secure --rig my-project --issue hq-abc12
+
+  # On-demand: audit a specific rig now
+  gt formula run mol-dog-security --rig my-project
+
+  # Check all security findings across town
+  bd list --label category:security
+
+  # Manually trigger the weekly sweep early
+  gt plugin run security-sweep --force
+  ```
+
+gotchas:
+  - The dep scanners (pip-audit, npm audit) only run if the tools are installed.
+    Install pip-audit with `pip install pip-audit` for Python projects.
+  - git grep only scans tracked files — untracked files (new files not yet
+    staged) are not scanned. Run `git add -N .` first if you want full coverage.
+  - Some secret patterns have false positives in test/example files. The scanner
+    filters these out but review findings before acting.
+  - security-audit aspect (shiny-secure) runs inline during polecat work and
+    may slow down the workflow. Use it for sensitive codebases.
+
+tags: [gas-town, security, secrets, owasp, sast, audit, polecats, plugins]
