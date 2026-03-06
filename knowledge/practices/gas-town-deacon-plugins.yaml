@@ -1,0 +1,117 @@
+id: gas-town-deacon-plugins
+title: Gas Town Deacon Plugin System
+contributed_by: jeremy
+contributor_type: overseer
+created_at: 2026-03-06T00:00:00Z
+verified_by: []
+codebase_type: gas-town
+
+summary: |
+  How to use and write Deacon plugins for automated town maintenance.
+
+details: |
+  Gas Town ships a plugin system that lets the Deacon run recurring automation
+  tasks during its patrol cycle. Plugins live in ~/gt/plugins/ (town-level) or
+  <rig>/plugins/ (rig-level) as directories containing a plugin.md file with
+  TOML frontmatter.
+
+  ## Plugin Format
+
+  ```
+  +++
+  name = "my-plugin"
+  description = "What this plugin does"
+  version = 1
+
+  [gate]
+  type = "cooldown"   # or: cron, condition, event, manual
+  duration = "1h"     # for cooldown gate
+
+  [tracking]
+  labels = ["plugin:my-plugin", "category:maintenance"]
+  digest = true
+
+  [execution]
+  timeout = "5m"
+  notify_on_failure = true
+  severity = "medium"   # low, medium, high, critical
+  +++
+
+  # Plugin Title
+
+  Instructions for the Deacon dog agent...
+  ```
+
+  ## Gate Types
+
+  - `cooldown` — run if enough time has passed since last run (most common)
+  - `cron` — run on a cron schedule (e.g., "0 3 * * *")
+  - `condition` — run if a shell command exits 0
+  - `event` — run on events (startup, heartbeat)
+  - `manual` — never auto-run, only via `gt plugin run <name> --force`
+
+  ## Official Plugins (in gastown repo's plugins/ directory)
+
+  The gastown GitHub repo ships several ready-to-use plugins:
+
+  | Plugin | Cooldown | Purpose |
+  |--------|----------|---------|
+  | stuck-agent-dog | 5m | Detects/restarts crashed polecats & deacon |
+  | github-sheriff | 5m | Creates beads for CI failures on open PRs |
+  | session-hygiene | 30m | Kills zombie/orphaned tmux sessions |
+  | compactor-dog | 30m | Monitors Dolt commit growth |
+  | dolt-archive | 1h | JSONL snapshots + offsite git/dolt push |
+  | quality-review | 6h | Per-worker merge quality trend analysis |
+  | brew-upgrades | 24h | Auto-upgrades gastown/dolt/beads |
+  | gt-doctor | 1h | Runs gt upgrade / doctor --fix |
+  | security-sweep | 168h | Weekly security scan across all rigs |
+
+  Copy any of these into ~/gt/plugins/ and they activate immediately on the
+  next Deacon patrol cycle.
+
+  ## Writing Your Own
+
+  Plugins are markdown files with TOML frontmatter. The body is instructions
+  for a Deacon dog agent (Claude) to follow, with bash code blocks showing
+  exactly what to run. Follow the same conventions as the official plugins:
+  - Always record a result wisp with `bd create ... --ephemeral`
+  - Always escalate on failure with `gt escalate`
+  - Use `2>/dev/null || true` on non-critical commands to prevent early exit
+
+  ## Commands
+
+  ```bash
+  gt plugin list                    # See all discovered plugins
+  gt plugin show <name>             # Show plugin details
+  gt plugin run <name> --force      # Manually trigger (bypass gate)
+  gt plugin history                 # See execution history
+  ```
+
+examples: |
+  ```bash
+  # Install all official plugins from the gastown repo
+  cp -r $(brew --prefix gastown)/plugins/* ~/gt/plugins/
+
+  # Or just one
+  mkdir ~/gt/plugins/stuck-agent-dog
+  # ... create plugin.md
+
+  # Verify discovered
+  gt plugin list
+
+  # Test a plugin manually
+  gt plugin run brew-upgrades --dry-run
+  gt plugin run brew-upgrades --force
+  ```
+
+gotchas:
+  - Plugin version must be an integer (1), not a string ("1") — TOML parser
+    will fail with an incompatible types error.
+  - Town-level plugins (~/gt/plugins/) apply to all rigs. Rig-level plugins
+    only run in context of that rig.
+  - Deacon must be running for plugins to execute automatically. Use
+    `gt deacon status` to verify.
+  - Plugins run as dog agents — they have full Claude Code capabilities but
+    operate within the Dog contract (observe/report, don't modify production).
+
+tags: [gas-town, plugins, deacon, automation, maintenance, dog-agents]
