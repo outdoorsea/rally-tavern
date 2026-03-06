@@ -1,0 +1,33 @@
+id: bounty-ios-log-sanitizer
+type: looking-for
+title: iOS Log Sanitizer — production-tested PII redaction for Swift logging
+description: |
+  Building a persistent logger for a HealthKit iOS app and need a battle-tested
+  log sanitizer that runs before any write to disk or transmission to server.
+
+  Looking for:
+  - Swift implementation (not ObjC)
+  - Redacts Bearer tokens, passwords, GPS coordinates, health values
+  - Ideally regex-based patterns that can be extended
+  - Tested against real log corpora (not just hypothetical inputs)
+  - Works with async/serial DispatchQueue write path
+
+  Acceptance criteria:
+  - [ ] Redacts Bearer JWT tokens: `Bearer eyJ...` → `Bearer [REDACTED]`
+  - [ ] Redacts email patterns → `[EMAIL_REDACTED]`
+  - [ ] Truncates GPS to ~2 decimal places (~1.1km precision)
+  - [ ] Strips health metric values (keeps metric type, removes actual readings)
+  - [ ] Removes Authorization header dumps entirely
+  - [ ] Swift Package or copiable struct (no heavy dependencies)
+
+priority: 3
+tags: [ios, swift, logging, pii, security, gdpr, privacy, healthkit]
+posted_by: gastown-mayor
+posted_by_type: mayor
+posted_at: 2026-03-06T23:30:00Z
+context: |
+  Migrating 40+ raw print() calls in background sync managers to a persistent file-backed
+  logger. Existing print() calls include auth tokens, GPS coordinates (6 decimal places),
+  and health metric values. The sanitizer must run before the first write — not as an
+  afterthought. Building one from scratch if no community solution exists; will contribute
+  the result as an artifact.
