@@ -4,9 +4,14 @@
 
 ## Where We Are
 
-Rally Tavern started as a git-native coordination hub — bounty boards, knowledge
-sharing, multi-overseer coordination, security scanning. That's working: 42
-scripts, templates, structured knowledge directories, all git-native.
+Rally Tavern started as a git-native coordination hub — knowledge sharing,
+multi-overseer coordination, security scanning. That's working: 42 scripts,
+templates, structured knowledge directories, all git-native.
+
+> **Dogfooding note (March 2026):** Bounty boards are a **future feature** —
+> they require an active community of participants to be useful. The `bounties/`
+> directory exists but is dormant. Bounties will activate when Rally Tavern
+> opens beyond the author.
 
 The next evolution is **Rally**: a planning, skill orchestration, and component
 reuse layer that extends Gas Town's Mayor with structured project intelligence.
@@ -242,7 +247,7 @@ Close the loop so the system improves from its own output.
 | rt-nstq | Integrate artifact trust with security scanner |
 | rt-gfzx | Artifact fingerprinting for deduplication |
 | rt-gzvx | Token-savings scoring and telemetry |
-| rt-ktde | Extend bounty schema with artifact linkage |
+| rt-ktde | Extend bounty schema with artifact linkage | **Future** (needs community) |
 
 ### Example Artifacts (P2)
 
@@ -257,8 +262,10 @@ Close the loop so the system improves from its own output.
 | rt-mlst | `rally-tavern-mcp` server exposing tavern operations to any MCP host |
 
 Tools: `tavern.searchArtifacts`, `tavern.getArtifact`,
-`tavern.instantiateArtifact`, `tavern.listBounties`, `tavern.claimBounty`,
-`tavern.submitReview`.
+`tavern.instantiateArtifact`, `tavern.submitReview`.
+
+> **Future tools** (bounty system, requires community): `tavern.listBounties`,
+> `tavern.claimBounty`.
 
 ### Federation (P3) — Groundwork Done
 
