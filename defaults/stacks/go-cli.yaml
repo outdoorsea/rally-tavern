@@ -1,0 +1,98 @@
+# Go CLI Stack Defaults
+# Opinionated stack for Go command-line tools
+#
+# Usage: rally defaults go-cli
+
+name: go-cli
+display_name: Go CLI Tool
+description: |
+  Command-line tool in Go with persistent storage,
+  structured commands, and modern tooling.
+
+platform: go
+category: cli
+
+language:
+  name: Go
+  version: ">=1.22"
+
+framework:
+  name: Cobra
+  version: ">=1.8"
+  rationale: |
+    De facto standard for Go CLIs. Hierarchical commands,
+    automatic help generation, shell completions, POSIX-compliant flags.
+
+storage:
+  primary:
+    name: SQLite (via Dolt or mattn/go-sqlite3)
+    rationale: |
+      Local-first, no server required. Dolt adds git-native versioning
+      for data that needs history. Plain SQLite for simple persistence.
+  alternative:
+    name: Dolt
+    rationale: |
+      Dolt provides a MySQL-compatible SQL interface with git-native
+      branching and merging. Ideal for tools managing versioned data.
+
+testing:
+  runner: go test
+  flags: "-race -cover ./..."
+  coverage_target: 80
+  libraries:
+    - name: testify
+      purpose: Assertions and mock support
+
+linting:
+  tool: golangci-lint
+  version: ">=1.57"
+  rationale: |
+    Runs dozens of linters in one pass. Fast, configurable, CI-friendly.
+  config:
+    enable:
+      - errcheck
+      - govet
+      - staticcheck
+      - gosec
+      - revive
+
+project_structure:
+  layout: standard
+  directories:
+    - cmd/            # Cobra command definitions (one file per command)
+    - internal/       # Private packages (not importable externally)
+    - internal/store/ # Storage layer (SQLite/Dolt)
+    - internal/config/# Configuration loading
+    - pkg/            # Public packages (importable by other tools)
+    - scripts/        # Build and release scripts
+
+build:
+  tool: make
+  targets:
+    - build
+    - test
+    - lint
+    - install
+
+release:
+  tool: goreleaser
+  rationale: |
+    Cross-compiles for Linux/macOS/Windows, generates checksums,
+    publishes GitHub releases and Homebrew taps automatically.
+
+recommended_packages:
+  - name: github.com/spf13/cobra
+    purpose: CLI framework
+  - name: github.com/spf13/viper
+    purpose: Configuration management (env, flags, files)
+  - name: github.com/stretchr/testify
+    purpose: Test assertions
+  - name: github.com/charmbracelet/bubbletea
+    purpose: TUI components (optional, for interactive UIs)
+  - name: github.com/charmbracelet/lipgloss
+    purpose: Terminal styling (optional)
+
+security_defaults:
+  - input_validation: explicit
+  - secrets_management: environment_variables
+  - no_hardcoded_credentials: true
