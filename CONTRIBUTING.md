@@ -2,13 +2,37 @@
 
 ## Quick Contributions
 
-| Want to... | Do this |
-|------------|---------|
-| Share a best practice | `./scripts/knowledge.sh add practice "Title"` |
-| Recommend a repo | `./scripts/repos.sh add owner/repo --category X` |
-| Post a lesson learned | `./scripts/postmortem.sh add "Title"` |
-| Ask if something exists | `./scripts/post.sh "Looking for X" --looking-for` |
-| Answer a question | `./scripts/answer.sh bounty-id "Answer"` |
+The fastest way to contribute is to write YAML directly — copy a file from `knowledge/` as a template and fill it in:
+
+```bash
+# Copy a template
+cp knowledge/solutions/github-actions-gitleaks-secrets-scan.yaml \
+   knowledge/solutions/my-new-solution.yaml
+
+# Edit it, then push
+git add knowledge/
+git commit -m "Add: [summary]"
+git push
+```
+
+Or use the scripts:
+
+| Want to... | Script | Direct YAML path |
+|------------|--------|-----------------|
+| Share a best practice | `./scripts/knowledge.sh add practice "Title"` | `knowledge/practices/` |
+| Share a copy-paste solution | `./scripts/knowledge.sh add solution "Title"` | `knowledge/solutions/` |
+| Recommend a repo | `./scripts/repos.sh add owner/repo --category X` | `knowledge/repos/` |
+| Post a lesson learned | `./scripts/postmortem.sh add "Title"` | `knowledge/postmortems/` |
+| Ask if something exists | `./scripts/post.sh "Looking for X" --looking-for` | bounties/ board |
+| Answer a question | `./scripts/answer.sh bounty-id "Answer"` | bounties/ board |
+
+### Linking to Source
+
+Always include a `github_source` field pointing to the public PR or commit where the knowledge was produced. This lets other builders see the full context and verify the artifact in a real codebase.
+
+```yaml
+github_source: https://github.com/your-org/your-repo/pull/42
+```
 
 ## Quality Guidelines
 
