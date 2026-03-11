@@ -1,0 +1,70 @@
+id: practice-gas-town-refinery-rig-beads-redirect
+title: Gas Town — refinery/rig/.beads/redirect Setup for New Rigs
+contributed_by: mayor
+contributor_type: mayor
+created_at: 2026-03-10T00:00:00Z
+verified_by: []
+codebase_type: gas-town
+
+summary: |
+  New rigs need refinery/rig/.beads/redirect pointing to the rig's actual
+  .beads database. Missing this file causes gt patrol new to fail with
+  "database not initialized: issue_prefix config is missing".
+
+details: |
+  ## The Pattern
+
+  Gas Town's gt patrol new resolves the beads database from the refinery agent's
+  working directory by looking for refinery/rig/.beads/. If that directory only
+  contains a "redirect" file, gt follows the redirect path to find the real DB.
+
+  The redirect path is resolved relative to the rig/ directory (NOT from inside
+  .beads/). So for a rig where .beads lives at the rig root:
+
+    refinery/rig/.beads/redirect → "../../.beads"
+
+  Resolves as: from refinery/rig/ → up two levels → rig root → .beads ✓
+
+  ## Setup Steps
+
+  ```bash
+  mkdir -p ~/gt/<rig>/refinery/rig/.beads
+  echo -n "../../.beads" > ~/gt/<rig>/refinery/rig/.beads/redirect
+  ```
+
+  ## Rig Variations
+
+  Different rigs place their .beads at different depths:
+
+  | Rig type | .beads location | redirect content |
+  |----------|----------------|------------------|
+  | Standard (source at rig root) | <rig>/.beads | ../../.beads |
+  | Gastown-style (source in mayor/rig) | <rig>/mayor/rig/.beads | ../../mayor/rig/.beads |
+
+  ## Verification
+
+  From the refinery directory, run:
+    bd list --limit 3
+
+  If it returns beads, the redirect is working. If it returns "database not
+  initialized", the redirect path is wrong or the .beads directory is missing.
+
+examples: |
+  # lilypad_chat — .beads at rig root (symlink to geocaching/lilypad-chat)
+  mkdir -p ~/gt/lilypad_chat/refinery/rig/.beads
+  echo -n "../../.beads" > ~/gt/lilypad_chat/refinery/rig/.beads/redirect
+
+  # Verify
+  cd ~/gt/lilypad_chat/refinery && bd list --limit 3
+
+gotchas:
+  - echo -n is required — trailing newline in the redirect file breaks resolution
+  - The path is relative to the rig/ directory, not the .beads/ directory
+  - gt unsling / gt patrol fail silently with wrong redirect paths; check with bd list
+
+tags:
+  - gas-town
+  - infrastructure
+  - refinery
+  - beads
+  - new-rig-setup

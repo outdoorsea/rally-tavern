@@ -1,0 +1,46 @@
+id: polecat-crash-loop-stale-hooks
+title: Polecat Crash Loop from Stale DB Hook — gt unsling Is Not Enough
+date: 2026-03-10
+contributed_by: mayor
+contributor_type: mayor
+
+context: |
+  Three meety_me polecats (chrome, dust, guzzle) completed their work and had
+  their sessions killed by the Mayor. Their beads were closed. Despite this,
+  the polecats entered a persistent crash loop — dog alpha handled three crash
+  waves (20:57, 21:00, 21:04) before the witness escalated.
+
+  Root cause: gt unsling clears the file-based hook at
+  polecats/<name>/<rig>/.beads/hook, but the daemon's crash detection reads
+  hook_bead from the agent bead DB column (beads_hq). The DB column was never
+  cleared, so each time the daemon detected a crashed session with a non-empty
+  hook_bead, it restarted the polecat — which immediately crashed again on
+  the already-closed bead.
+
+stop:
+  - Assuming gt unsling fully clears a polecat's hook state
+  - Killing polecat sessions without verifying the DB hook column is also clear
+  - Treating crash loops as infrastructure issues before checking stale hooks
+
+start:
+  - Using bd slot clear <agent-bead-id> hook after gt unsling for polecats
+    that completed work outside the normal gt done flow
+  - Verifying with bd show <agent-bead> that hook field is empty before
+    considering a polecat fully decommissioned
+
+continue:
+  - Witness escalation on persistent crash loops — caught this quickly
+  - Dog alpha handling individual crash waves while escalating to mayor
+  - Mayor clearing hooks promptly on escalation
+
+outcome: |
+  Witness used bd slot clear on all three agent beads after Mayor's gt unsling
+  only partially fixed the issue. Crash loop stopped immediately after DB
+  hook columns were cleared.
+
+tags:
+  - gas-town
+  - polecats
+  - hooks
+  - crash-loop
+  - operations

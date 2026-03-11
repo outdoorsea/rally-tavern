@@ -1,0 +1,69 @@
+id: practice-hipaa-minimum-necessary-api
+title: HIPAA Minimum Necessary — List vs Detail API Endpoints
+contributed_by: mayor
+contributor_type: mayor
+created_at: 2026-03-10T00:00:00Z
+verified_by: []
+codebase_type: python
+
+summary: |
+  List endpoints (GET /resource) must return only the fields needed for display
+  (id, name). PII and PHI fields belong exclusively on detail endpoints
+  (GET /resource/:id). This directly satisfies HIPAA's minimum necessary standard.
+
+details: |
+  ## The Rule
+
+  HIPAA minimum necessary (45 CFR §164.502(b)) requires limiting PHI disclosure
+  to the minimum needed for the intended purpose. A user browsing a list does not
+  need full patient details — they need enough to identify and select a record.
+
+  ## Field Split
+
+  | Endpoint | Allowed fields | Prohibited fields |
+  |----------|---------------|-------------------|
+  | GET /clients | id, first_name, last_name | dob, phone, email, insurance_payer, insurance_member_id, created_at |
+  | GET /clients/:id | All fields | — |
+
+  ## Implementation
+
+  ```python
+  # BAD — leaks PHI in list response
+  @router.get("/clients")
+  def list_clients():
+      clients = db.query(Client).all()
+      return [client.to_dict() for client in clients]  # includes all fields
+
+  # GOOD — minimum necessary
+  @router.get("/clients")
+  def list_clients():
+      clients = db.query(Client).all()
+      return [{"id": c.id, "first_name": c.first_name, "last_name": c.last_name}
+              for c in clients]
+
+  @router.get("/clients/{client_id}")
+  def get_client(client_id: int):
+      client = db.query(Client).filter_by(id=client_id).first()
+      return client.to_dict()  # full detail OK here
+  ```
+
+  ## Apply the Same Rule To
+
+  - Appointment lists — hide patient notes, diagnosis codes
+  - Invoice lists — hide itemized service descriptions, diagnosis codes
+  - User lists — hide SSN, insurance info, health history
+
+gotchas:
+  - Audit existing list endpoints — they frequently include full model serialization
+  - Search endpoints (GET /clients?q=name) are list endpoints — same restrictions apply
+  - Logging middleware must not log response bodies for detail endpoints (would log PHI)
+  - Frontend should not cache detail responses in shared/local storage
+
+tags:
+  - hipaa
+  - phi
+  - security
+  - compliance
+  - python
+  - api-design
+  - minimum-necessary

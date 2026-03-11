@@ -1,0 +1,53 @@
+id: swift-sendable-nsmutablearray-box
+problem: |
+  Swift 6 strict concurrency: "Mutation of captured var in concurrently-executing
+  code" or "Variable captured by a sendable closure was mutated after capture"
+  when using NotificationCenter.addObserver(forName:) and storing the token in a
+  local var to remove it from inside the closure.
+
+  nonisolated(unsafe) suppresses warnings only on stored properties — it does NOT
+  work on local variables.
+solution: |
+  Wrap the observer token in an NSMutableArray (a reference type). The closure
+  captures the box by reference, reads the token from it, and removes the observer.
+  No mutation of a captured variable — just mutation of the box's contents.
+
+  ```swift
+  // BEFORE (triggers Swift 6 warning):
+  var observer: NSObjectProtocol?
+  observer = NotificationCenter.default.addObserver(
+      forName: .someNotification,
+      object: nil,
+      queue: .main
+  ) { _ in
+      if let token = observer {           // ⚠️ captured var mutated
+          NotificationCenter.default.removeObserver(token)
+      }
+      doWork()
+  }
+
+  // AFTER (no warning):
+  let observerBox = NSMutableArray()
+  observerBox.add(NotificationCenter.default.addObserver(
+      forName: .someNotification,
+      object: nil,
+      queue: .main
+  ) { _ in
+      if let token = observerBox.firstObject as? NSObjectProtocol {
+          NotificationCenter.default.removeObserver(token)
+      }
+      doWork()
+  })
+  ```
+
+works_with: [swift, swift-6, uikit, swiftui, ios, macos]
+contributed_by: mayor
+verified_by: []
+tags:
+  - swift
+  - swift6
+  - concurrency
+  - sendable
+  - notification-center
+  - ios
+created_at: 2026-03-10T00:00:00Z
