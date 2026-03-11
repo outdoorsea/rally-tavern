@@ -583,6 +583,72 @@ These are valuable but the system is useful without them.
 
 ## Design Decisions & Rationale
 
+### Characters
+
+Rally Tavern has two named characters rooted in its Revolutionary War namesake:
+
+**🍺 Barkeep** — the `rally_tavern` Mayor persona
+The Barkeep tends the knowledge base. When agents interact with rally_tavern (searching,
+contributing, approving), they are interacting with the Barkeep. The rally_tavern Mayor
+adopts this identity. Gives the repo personality — you're asking the Barkeep, not querying
+a database.
+
+**📜 Historian** — the knowledge approval role
+When a rig Mayor nominates a knowledge artifact (two-stage approval flow), the Historian
+evaluates it before it enters the permanent record. The Historian is the rally_tavern Mayor
+acting in review mode. Named for the Revolutionary War role of preserving ideas for
+posterity — the Barkeep served the revolutionaries; the Historian made sure their work
+survived.
+
+These characters appear in:
+- CLI output from `rally` scripts (`The Historian has reviewed...`)
+- The rally_tavern Mayor's CLAUDE.md identity
+- README and docs
+- Approval/rejection messages in the two-stage workflow
+
+---
+
+### Human Clarification Answers (PRD Gate — 2026-03-11)
+
+| Question | Decision |
+|----------|----------|
+| rally_tavern location | `$GT_ROOT/rally_tavern/` — conventional path, graceful degradation if absent |
+| `rally` CLI language | Bash + grep/yq — matches existing 44 scripts, zero new dependencies |
+| Search scope (v1) | Knowledge only (practices, solutions, postmortems, learned) — artifact search stays separate |
+| AFTER phase trigger | Agent self-nominates at `gt done` — polecat marks bead knowledge-worthy at completion |
+| Approval routing | Two-stage: rig Mayor nominates → rally_tavern Mayor accepts |
+| CLI form | `rally search` (bolt-on), NOT `gt rally search` (would require Gas Town source changes) |
+
+---
+
+### Architectural Constraints
+
+**Bolt-on only — no Gas Town source changes**
+Rally must not require modifications to Gas Town (`gt`) or Beads (`bd`) source code.
+All Gas Town interaction is via public CLI commands only (`gt sling`, `gt convoy`, `bd create`, etc.).
+Rally is deployed by dropping its repo alongside a Gas Town workspace.
+If a feature requires a Gas Town change, it is out of scope until a formal partnership exists.
+
+**Wasteland compatibility — complement, don't compete**
+The Wasteland (Yegge, March 2026) federates Gas Towns via a global Wanted Board, passbook
+reputation, and Dolt-backed trust ledger. Rally must not duplicate these:
+
+- **No global reputation system** — Rally's "Tavern Ranks" are local/fun only. Wasteland owns
+  portable reputation. Rally ranks must not be positioned as a competing credential.
+- **Bounty board = local triage scope** — Rally bounties are a local/team queue. The Wasteland
+  Wanted Board is global work distribution. Rally's bounty board should include a future
+  `rally wasteland publish` hook but must not claim to be a global board.
+- **Build receipts include optional Wasteland attribution** — When a Wanted item is completed
+  via Rally, the `build_receipt.yaml` can carry the Wasteland task ID for traceability.
+- **Component manifests use open format** — Manifest schema must not use GT-internal types.
+  Design for eventual DoltHub/Wasteland registry federation without schema changes.
+
+**Skills ≠ Gas Town Formulas**
+Gas Town already has formulas (e.g., `mol-idea-to-plan`). Rally skills are structured
+planning prompts with validated output schemas — not execution orchestrators. The distinction
+must be clear in docs and naming: skills analyse and produce artifacts; formulas execute
+multi-step pipelines. Rally skills feed *into* Gas Town formulas, not replace them.
+
 ### Why YAML over JSON?
 - Human-readable, git-diff-friendly, supports comments
 - Matches existing Rally Tavern conventions (bounties, knowledge, templates)
@@ -600,6 +666,27 @@ These are valuable but the system is useful without them.
 - Git provides versioning, search, and distribution for free
 - Federation (cross-town sharing) is a future enhancement
 - Avoids premature infrastructure
+
+### Why not Dolt (now)?
+Rally Tavern is git-native YAML. Dolt was considered and deferred:
+
+**For:**
+- Wasteland uses Dolt — native Dolt would make federation trivial
+- Already running Dolt for beads (zero new infrastructure)
+- SQL queries beat grep-through-YAML at scale
+- Concurrent multi-Mayor writes → row-level merge (no git conflicts)
+- DoltHub as community hub with data PRs
+
+**Against:**
+- "No server required" is the current Rally pitch — Dolt breaks it for new adopters
+- GitHub rendering disappears; contributor friction increases
+- Wasteland's actual data schema is not yet published (March 2026 — two days old)
+- Converting 500 entries after the Wasteland schema is known is a one-day migration
+
+**Decision:** Keep YAML now. Design the YAML schema so every field maps 1:1 to a Dolt
+table column. Add `rally dolt sync` as a post-MVP Phase 6 feature (after Wasteland
+schema is public). This preserves the simple fork-and-go story while leaving the
+federation door open.
 
 ### How do skills actually run?
 Skills are YAML definitions containing structured prompts and output schemas.

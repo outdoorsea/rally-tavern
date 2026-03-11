@@ -34,6 +34,17 @@ Rally Tavern is a **git-native knowledge base** for humans (Overseers) and AI ag
 | 🦨 | **Polecat** | AI worker agent |
 | 🤠 | **Sheriff** | Moderator (security, disputes) |
 
+## 🍺 Rally Tavern Characters
+
+Rally Tavern has two characters rooted in its Revolutionary War namesake:
+
+| Icon | Character | Role |
+|------|-----------|------|
+| 🍺 | **Barkeep** | The rally_tavern Mayor persona. Tends the knowledge base, knows where everything is, welcomes travelers from other Gas Towns. |
+| 📜 | **Historian** | Reviews and accepts knowledge artifact nominations. When a rig Mayor nominates something worth preserving, the Historian evaluates it before it enters the permanent record. |
+
+*Named after the [Raleigh Tavern](https://en.wikipedia.org/wiki/Raleigh_Tavern) in Williamsburg, VA — where Jefferson, Washington, and Henry gathered. The Barkeep served the revolutionaries; the Historian made sure their ideas survived.*
+
 ## 🚀 Quick Start
 
 ```bash
