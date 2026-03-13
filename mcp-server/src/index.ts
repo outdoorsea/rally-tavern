@@ -265,6 +265,190 @@ server.tool(
   }
 );
 
+// --- Knowledge Tools ---
+
+server.tool(
+  "tavern.search",
+  "Search the Rally Tavern knowledge base by keyword, tag, codebase type, or platform",
+  {
+    query: z.string().optional().describe("Free-text search query"),
+    tag: z.string().optional().describe("Filter by tag"),
+    codebase: z
+      .string()
+      .optional()
+      .describe("Filter by codebase_type (e.g. gas-town, python-fastapi)"),
+    platform: z
+      .string()
+      .optional()
+      .describe("Filter by platform (e.g. ios-swiftui, react-native)"),
+  },
+  async ({ query, tag, codebase, platform }) => {
+    const args: string[] = [];
+    if (tag) args.push("--tag", tag);
+    if (codebase) args.push("--codebase", codebase);
+    if (platform) args.push("--platform", platform);
+    if (query) args.push(query);
+
+    if (args.length === 0) {
+      // No filters — list all knowledge
+      const { stdout } = await runScript("knowledge.sh", ["list"]);
+      return { content: [{ type: "text" as const, text: stdout }] };
+    }
+
+    const { stdout } = await runScript("knowledge.sh", ["search", ...args]);
+
+    if (!stdout.trim()) {
+      return {
+        content: [{ type: "text" as const, text: "No knowledge entries found matching your query." }],
+      };
+    }
+
+    // knowledge.sh search returns file paths — read each match and return summaries
+    const files = stdout.trim().split("\n").filter(Boolean);
+    const results: string[] = [];
+
+    for (const file of files.slice(0, 20)) {
+      try {
+        const { stdout: content } = await execFileAsync("cat", [
+          resolve(TAVERN_ROOT, file),
+        ], { timeout: 5_000 });
+        results.push(`--- ${file}\n${content}`);
+      } catch {
+        results.push(`--- ${file} (could not read)`);
+      }
+    }
+
+    return {
+      content: [
+        {
+          type: "text" as const,
+          text: `Found ${files.length} result(s):\n\n${results.join("\n")}`,
+        },
+      ],
+    };
+  }
+);
+
+server.tool(
+  "tavern.lookup",
+  "Get a single knowledge entry by its category and ID (e.g. practices/gas-town-beads-workflow)",
+  {
+    id: z
+      .string()
+      .describe(
+        "Knowledge entry path: category/id (e.g. practices/gas-town-beads-workflow, solutions/swift-sendable-nsmutablearray-box, learned/multi-agent-context-sharing)"
+      ),
+  },
+  async ({ id }) => {
+    const filePath = resolve(TAVERN_ROOT, "knowledge", `${id}.yaml`);
+    try {
+      const { stdout } = await execFileAsync("cat", [filePath], {
+        timeout: 5_000,
+      });
+      return { content: [{ type: "text" as const, text: stdout }] };
+    } catch {
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: `Knowledge entry not found: ${id}\n\nUse tavern.search to find available entries.`,
+          },
+        ],
+      };
+    }
+  }
+);
+
+server.tool(
+  "tavern.nominate",
+  "Nominate a knowledge contribution to the Rally Tavern knowledge base for review",
+  {
+    category: z
+      .enum(["practice", "solution", "learned"])
+      .describe("Knowledge category"),
+    title: z.string().describe("Short title for the knowledge entry"),
+    summary: z.string().describe("One-sentence summary"),
+    tags: z
+      .string()
+      .optional()
+      .describe("Comma-separated tags (e.g. swift,ios,concurrency)"),
+    codebaseType: z
+      .string()
+      .optional()
+      .describe("Codebase type (e.g. go-cobra, python-fastapi, general)"),
+    problem: z
+      .string()
+      .optional()
+      .describe("Problem description (for solutions)"),
+    solution: z
+      .string()
+      .optional()
+      .describe("Solution text (for solutions)"),
+    lesson: z
+      .string()
+      .optional()
+      .describe("Lesson text (for learned entries)"),
+    context: z
+      .string()
+      .optional()
+      .describe("Context of discovery (for learned entries)"),
+    details: z
+      .string()
+      .optional()
+      .describe("Full details (multiline)"),
+    dryRun: z
+      .boolean()
+      .optional()
+      .default(false)
+      .describe("If true, print what would be sent without actually sending"),
+  },
+  async ({
+    category,
+    title,
+    summary,
+    tags,
+    codebaseType,
+    problem,
+    solution,
+    lesson,
+    context,
+    details,
+    dryRun,
+  }) => {
+    const args: string[] = [
+      "--category", category,
+      "--title", title,
+      "--summary", summary,
+    ];
+    if (tags) args.push("--tags", tags);
+    if (codebaseType) args.push("--codebase-type", codebaseType);
+    if (problem) args.push("--problem", problem);
+    if (solution) args.push("--solution", solution);
+    if (lesson) args.push("--lesson", lesson);
+    if (context) args.push("--context", context);
+    if (details) args.push("--details", details);
+    if (dryRun) args.push("--dry-run");
+
+    try {
+      const { stdout, stderr } = await execFileAsync("gt", [
+        "rally", "nominate", ...args,
+      ], {
+        cwd: TAVERN_ROOT,
+        env: process.env,
+        timeout: 30_000,
+      });
+      const output = stdout + (stderr ? "\n" + stderr : "");
+      return { content: [{ type: "text" as const, text: output }] };
+    } catch (err: unknown) {
+      const error = err as { stdout?: string; stderr?: string; message?: string };
+      const output = (error.stdout ?? "") + "\n" + (error.stderr ?? error.message ?? "Unknown error");
+      return {
+        content: [{ type: "text" as const, text: `Nomination failed:\n${output}` }],
+      };
+    }
+  }
+);
+
 // --- Trust Tools ---
 
 server.tool(

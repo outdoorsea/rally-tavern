@@ -20,3 +20,6 @@ state.json
 
 # Rally runtime data (receipts, feedback analysis, dispatch)
 .rally/
+
+# Gas Town (added by gt)
+.claude/
