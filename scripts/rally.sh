@@ -14,6 +14,7 @@
 #   feedback <action>     Feedback loop analysis from receipts
 #   tasks <action>        Task generation from build cards
 #   dispatch <build-card> Dispatch tasks to Mayor convoy system
+#   knowledge-push        Find relevant knowledge for a bead's tags/title
 #   help                  Show this help
 
 source "$(dirname "$0")/../lib/common.sh"
@@ -55,6 +56,9 @@ case "$COMMAND" in
   dispatch)
     exec "$TAVERN_ROOT/scripts/rally-dispatch.sh" "$@"
     ;;
+  knowledge-push)
+    exec "$TAVERN_ROOT/scripts/knowledge-push.sh" "$@"
+    ;;
   help|--help|-h)
     echo "Rally - Agent-first planning and skill orchestration"
     echo ""
@@ -72,6 +76,7 @@ case "$COMMAND" in
     echo "  feedback <action>     Feedback loop analysis from receipts"
     echo "  tasks <action>        Task generation from build cards"
     echo "  dispatch <build-card> Dispatch tasks to Mayor convoy system"
+    echo "  knowledge-push        Find relevant knowledge for a bead's tags/title"
     echo "  help                  Show this help"
     echo ""
     echo "Examples:"
@@ -88,6 +93,7 @@ case "$COMMAND" in
     echo "  rally feedback analyze              # Analyze build patterns"
     echo "  rally tasks generate build-card.yaml  # Generate tasks from build card"
     echo "  rally dispatch build-card.yaml      # Dispatch tasks to Mayor"
+    echo "  rally knowledge-push --tags 'gas-town,hooks' # Find relevant knowledge"
     ;;
   *)
     log_error "Unknown command: $COMMAND"

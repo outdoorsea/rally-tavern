@@ -273,6 +273,51 @@ else
   fi
 
   log_success "Dispatch manifest: $dispatch_manifest"
+
+  # --- Knowledge Push: generate context for dispatched work ---
+  knowledge_push_script="$TAVERN_ROOT/scripts/knowledge-push.sh"
+  if [[ -x "$knowledge_push_script" ]]; then
+    knowledge_dir="${OUTPUT_DIR}/knowledge"
+    mkdir -p "$knowledge_dir"
+    knowledge_count=0
+
+    # Collect all unique task titles for keyword extraction
+    all_titles=""
+    for key in "${!phase_tasks[@]}"; do
+      while IFS= read -r task_line; do
+        [[ -z "$task_line" ]] && continue
+        IFS='|' read -r tid ttitle tdesc tcomplexity tdeps <<< "$task_line"
+        [[ -n "$ttitle" ]] && all_titles="${all_titles} ${ttitle}"
+      done <<< "${phase_tasks[$key]}"
+    done
+
+    # Also use convoy phase keys as tags
+    phase_tags=""
+    for phase_entry in "${CONVOY_PHASES[@]}"; do
+      phase_key="${phase_entry%%:*}"
+      [[ -n "${phase_tasks["$phase_key"]:-}" ]] && phase_tags="${phase_tags}${phase_key},"
+    done
+
+    # Generate knowledge context for the dispatch
+    set +e
+    "$knowledge_push_script" \
+      --title "$all_titles" \
+      ${phase_tags:+--tags "${phase_tags%,}"} \
+      --format markdown \
+      --max 5 \
+      > "${knowledge_dir}/dispatch-knowledge.md" 2>/dev/null
+    kp_exit=$?
+    set -e
+
+    if [[ $kp_exit -eq 0 ]] && [[ -s "${knowledge_dir}/dispatch-knowledge.md" ]]; then
+      knowledge_count=$(grep -c "^### " "${knowledge_dir}/dispatch-knowledge.md" 2>/dev/null || echo 0)
+      log_success "Knowledge push: $knowledge_count entries matched → ${knowledge_dir}/dispatch-knowledge.md"
+    else
+      log_info "Knowledge push: no relevant entries found"
+      rm -f "${knowledge_dir}/dispatch-knowledge.md"
+      rmdir "${knowledge_dir}" 2>/dev/null || true
+    fi
+  fi
 fi
 
 log_info "  Convoy phases: $phase_index"
