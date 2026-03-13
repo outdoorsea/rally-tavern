@@ -17,7 +17,7 @@ Rally Tavern is a **git-native knowledge base and planning platform** for humans
 | Feature | Status | Description |
 |---------|--------|-------------|
 | **Knowledge Sharing** | ✅ Live | Practices, solutions, postmortems — grows with every project |
-| **Tavern Profiles** | ✅ Live | 9 per-rig tech stack profiles consumed by planning agents |
+| **Tavern Profiles** | ✅ Live | Per-rig tech stack profiles consumed by planning agents |
 | **Artifact Registry (TCEP)** | ✅ Live | Reusable components with capability matching, trust tiers, and token-savings scoring |
 | **Rally CLI** | ✅ Live | `rally` command for planning, skills, components, feedback, and task generation |
 | **Skill System** | ✅ Live | 8 structured planning skills as a Claude Code plugin |
@@ -144,7 +144,7 @@ Skills output structured YAML, not prose. They feed into build cards for determi
 
 Tavern profiles describe a project's tech stack, architecture, constraints, and needs as structured YAML. They persist project context so agents don't rediscover it every session.
 
-**9 profiles published** for Gas Town rigs: gastown, rally-tavern, beads, vitalitek, theoutlived, meety-me, gt-model-eval, lilypad-chat, wandering-river.
+**3 public profiles published** for open-source Gas Town rigs: gastown, rally-tavern, beads. Private rigs keep their profiles locally.
 
 ```bash
 rally init                              # Create your profile interactively
@@ -327,7 +327,7 @@ rally-tavern/
 ├── plugins/                  # Claude Code plugins
 │   └── rally-skills/         # 8 planning skills
 │       └── skills/
-├── profiles/                 # Per-rig tavern-profile.yaml files (9 rigs)
+├── profiles/                 # Per-rig tavern-profile.yaml files (public rigs)
 ├── scripts/                  # 61 CLI tools
 ├── security/                 # Trust & verification
 ├── skills/                   # Skill YAML definitions

@@ -116,7 +116,7 @@ needs:
 
 When the Mayor fires up `mol-idea-to-plan`, the profile goes in as structured context. No more "what tech stack are we using again?" Every agent in the rig knows the answers before they start.
 
-We've published 9 profiles so far — one for each rig in the Gas Town ecosystem: gastown, beads, rally-tavern, vitalitek, theoutlived, meety-me, gt-model-eval, lilypad-chat, and wandering-river. New rigs get a profile as part of setup.
+Public profiles are published for open-source Gas Town rigs (gastown, beads, rally-tavern). Private rigs keep their profiles locally — they get the same agent benefits without exposing project details. New rigs get a profile as part of setup.
 
 ### Planning Skills
 
@@ -310,7 +310,7 @@ Honest status as of March 2026:
 ### Working Well
 
 - **Knowledge base** — 10 practices, 2 solutions, 2 postmortems, growing steadily
-- **Tavern profiles** — 9 rigs profiled, agents consume them automatically
+- **Tavern profiles** — public rigs profiled, private rigs keep profiles locally
 - **TCEP artifacts** — 5 registered, search and instantiation working
 - **Rally CLI** — 12 subcommands, all operational
 - **Skills** — 8 planning skills, shipped as Claude Code plugin

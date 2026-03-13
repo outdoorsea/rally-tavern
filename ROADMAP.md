@@ -7,13 +7,13 @@
 Rally Tavern started as a git-native coordination hub — knowledge sharing,
 multi-overseer coordination, security scanning. It has grown into a full
 planning, skill orchestration, and component reuse platform: 61 scripts,
-9 rig profiles, 5 artifacts, 8 planning skills, 4 stack defaults, federated
+rig profiles, 5 artifacts, 8 planning skills, 4 stack defaults, federated
 search across rigs, an MCP server, and a Claude Code plugin.
 
 **Current state (March 2026):**
 - Rally CLI (`rally` command) fully operational with 12 subcommands
-- 9 tavern profiles published (gastown, rally-tavern, beads, vitalitek,
-  theoutlived, meety-me, gt-model-eval, lilypad-chat, wandering-river)
+- 3 public tavern profiles published (gastown, rally-tavern, beads);
+  private rigs keep profiles locally
 - Artifact system (TCEP) live — 5 artifacts registered, federated search working
 - 8 planning skills shipped as Claude Code plugin (`plugins/rally-skills/`)
 - 4 stack defaults (python-web, ios-swiftui, typescript-node, go-cli)
@@ -52,15 +52,10 @@ All foundational schemas and infrastructure are in place.
 | Item | Status |
 |------|--------|
 | Profile schema template | Done |
-| gastown profile | Done |
-| rally-tavern profile | Done |
-| beads profile | Done |
-| vitalitek profile | Done |
-| theoutlived profile | Done |
-| meety-me profile | Done |
-| gt-model-eval profile | Done |
-| lilypad-chat profile | Done |
-| wandering-river profile | Done |
+| gastown profile (public) | Done |
+| rally-tavern profile (public) | Done |
+| beads profile (public) | Done |
+| Private rig profiles (local only) | Done |
 
 ### Artifact System (TCEP) — DONE
 
@@ -284,7 +279,7 @@ Stack Defs                                                            Trust/Secu
 ### Done
 
 - [x] Tavern profile schema and template
-- [x] Tavern profiles for 9 Gas Town rigs
+- [x] Tavern profiles for public Gas Town rigs (private rigs keep profiles locally)
 - [x] Stack defaults YAML files (4 stacks)
 - [x] Skill YAML definitions (8 skills as Claude Code plugin)
 - [x] Artifact system live with 5 registered artifacts
