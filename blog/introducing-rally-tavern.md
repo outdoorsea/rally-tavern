@@ -93,30 +93,27 @@ Rally Tavern's answer is the `rally` CLI — a planning, skill orchestration, an
 
 ### Tavern Profiles
 
-Every Gas Town rig gets a `tavern-profile.yaml` — a structured YAML document describing the project's tech stack, architecture, constraints, and needs. Think of it as the project's resume.
+Every Gas Town rig gets a `tavern-profile.yaml` — a structured YAML document describing the project's tech stack and needs. Think of it as the project's card on the board.
 
 ```yaml
 name: my-project
+description: |
+  Multi-tenant web backend with webhook integrations.
 facets:
-  language: python
-  framework: fastapi
-  database: postgresql
-architecture:
-  components: [api-server, worker-queue, admin-ui]
-  data_stores: [postgres, redis]
-  protocols: [rest, websocket]
-constraints:
-  must_avoid: [mongodb, graphql]
-  context: "HIPAA-regulated healthcare app"
+  platform: web
+  languages: [python]
+  frameworks: [fastapi]
+  runtime: python
 needs:
   - user-authentication
   - database-migrations
   - test-harness
+tags: [web, api, multi-tenant]
 ```
 
 When the Mayor fires up `mol-idea-to-plan`, the profile goes in as structured context. No more "what tech stack are we using again?" Every agent in the rig knows the answers before they start.
 
-Public profiles are published for open-source Gas Town rigs (gastown, beads, rally-tavern). Private rigs keep their profiles locally — they get the same agent benefits without exposing project details. New rigs get a profile as part of setup.
+Profiles come in two flavors. **Public profiles** — for open-source repos like gastown, beads, and rally-tavern — are published to the tavern's `profiles/` directory and can include architecture details and repo URLs. **Private profiles** stay in the rig's own repo, never published, and your agents still get the full benefit locally. The pre-commit hook enforces the boundary so sensitive details don't accidentally leak into a published profile.
 
 ### Planning Skills
 
