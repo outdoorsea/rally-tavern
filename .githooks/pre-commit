@@ -17,6 +17,21 @@ if [[ -n "$STAGED" ]]; then
   done
 fi
 
+# Block sensitive data in profiles and public files
+PROFILE_FILES=$(echo "$STAGED" | grep -E '^profiles/' || true)
+if [[ -n "$PROFILE_FILES" ]]; then
+  for file in $PROFILE_FILES; do
+    # Profiles must not contain architecture internals, security details, or PII
+    if grep -qiE "^(architecture|security|quality|constraints|context|repo|contributed_by|created_at|updated_at):" "$file" 2>/dev/null; then
+      echo "❌ Profile privacy violation in: $file"
+      echo "   Profiles must only contain: id, name, description, facets, needs, tags"
+      echo "   Do NOT include: architecture, security, quality, constraints, context,"
+      echo "   repo URLs, contributed_by, or timestamps."
+      exit 1
+    fi
+  done
+fi
+
 # Validate YAML syntax (if yq available)
 if command -v yq &>/dev/null; then
   for file in $STAGED; do
