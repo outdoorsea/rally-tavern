@@ -5,25 +5,22 @@
 ## Where We Are
 
 Rally Tavern started as a git-native coordination hub — knowledge sharing,
-multi-overseer coordination, security scanning. That's working: 42 scripts,
-templates, structured knowledge directories, all git-native.
-
-> **Dogfooding note (March 2026):** Bounty boards are a **future feature** —
-> they require an active community of participants to be useful. The `bounties/`
-> directory exists but is dormant. Bounties will activate when Rally Tavern
-> opens beyond the author.
-
-The next evolution is **Rally**: a planning, skill orchestration, and component
-reuse layer that extends Gas Town's Mayor with structured project intelligence.
+multi-overseer coordination, security scanning. It has grown into a full
+planning, skill orchestration, and component reuse platform: 61 scripts,
+9 rig profiles, 5 artifacts, 8 planning skills, 4 stack defaults, federated
+search across rigs, an MCP server, and a Claude Code plugin.
 
 **Current state (March 2026):**
-- Development plan written (`.specs/plan.md`)
-- Project profile schema created (`templates/tavern-profile.yaml`)
-- Three real profiles written (gastown, rally-tavern, beads)
-- Artifact system (TCEP) being built by polecats — manifest schema and directory
-  structure are the critical-path blockers
-- `mol-idea-to-plan` formula exists in Gas Town — the planning pipeline Rally
-  enhances
+- Rally CLI (`rally` command) fully operational with 12 subcommands
+- 9 tavern profiles published (gastown, rally-tavern, beads, vitalitek,
+  theoutlived, meety-me, gt-model-eval, lilypad-chat, wandering-river)
+- Artifact system (TCEP) live — 5 artifacts registered, federated search working
+- 8 planning skills shipped as Claude Code plugin (`plugins/rally-skills/`)
+- 4 stack defaults (python-web, ios-swiftui, typescript-node, go-cli)
+- Federation deployed to spoke rigs (vitalitek, theoutlived, meety_me)
+- MCP server implemented (`mcp-server/src/index.ts`)
+- Build receipt capture, feedback analysis, and task generation working
+- Knowledge base growing: 10 practices, 2 solutions, 2 postmortems
 
 ---
 
@@ -46,9 +43,9 @@ Rally turns ad-hoc prompting into a deterministic, artifact-driven pipeline:
 
 ---
 
-## Phase 0: Foundation (In Progress)
+## Phase 0: Foundation — DONE
 
-Establish the schemas and infrastructure everything depends on.
+All foundational schemas and infrastructure are in place.
 
 ### Tavern Profiles — DONE
 
@@ -58,64 +55,54 @@ Establish the schemas and infrastructure everything depends on.
 | gastown profile | Done |
 | rally-tavern profile | Done |
 | beads profile | Done |
+| vitalitek profile | Done |
+| theoutlived profile | Done |
+| meety-me profile | Done |
+| gt-model-eval profile | Done |
+| lilypad-chat profile | Done |
+| wandering-river profile | Done |
 
-**Next:** Wire profiles into `mol-idea-to-plan` as `--profile` context so agents
-consume them automatically.
+### Artifact System (TCEP) — DONE
 
-### Artifact System (TCEP) — In Progress
+TCEP (Tavern Component Exchange Protocol) is live with trust levels,
+fingerprinting, token-savings scoring, and federated search.
 
-The component system from the original plan has evolved into TCEP (Tavern
-Component Exchange Protocol), a richer artifact format with trust levels,
-fingerprinting, and token-savings scoring.
+| Bead | What | Status |
+|------|------|--------|
+| rt-rrk9 | Artifact manifest schema | Done |
+| rt-bb7n | `artifacts/` directory structure | Done |
+| rt-h13q | `artifact.sh` management script | Done |
+| rt-04mx | `artifacts-search.sh` ranked discovery | Done |
+| rt-fghg | `artifacts-json.sh` agent endpoint | Done |
 
-| Bead | What | Priority | Status |
-|------|------|----------|--------|
-| rt-rrk9 | Artifact manifest schema | P1 | Open (blocks 8) |
-| rt-bb7n | `artifacts/` directory structure | P1 | Open (blocks 2) |
-| rt-h13q | `artifact.sh` management script | P1 | Blocked by above |
-| rt-04mx | `artifacts-search.sh` ranked discovery | P1 | Blocked by rt-rrk9 |
-| rt-fghg | `artifacts-json.sh` agent endpoint | P1 | Blocked by rt-rrk9 |
+**5 artifacts registered:** python-fastapi-sso-starter, ios-swift-auth-settings-starter,
+python-pytest-harness, react-css-showcase, hello-world (example).
 
-**Artifact types:** starter-template, module, skill, mcp-server, playbook.
+### Stack Defaults — DONE
 
-**TCEP vs original plan:** The original plan had separate "Component Manifest"
-(Feature 11), "Resolution Engine" (Feature 12), and "Component Registry"
-(Feature 13). TCEP consolidates these into a single artifact system with richer
-metadata (trust tiers, fingerprinting, token-savings estimates, provenance
-tracking). The resolution engine becomes artifact search with ranked scoring.
-
-### Stack Defaults
-
-Static YAML files defining opinionated stack recommendations. Lowest complexity
-in the entire plan (1/5). Can be done anytime.
-
-| Stack | Tech |
-|-------|------|
-| Python web | FastAPI + Postgres + Alembic + Pytest + Ruff |
-| iOS | SwiftUI + MVVM + Service layer + Repository protocol |
-| TypeScript Node | Express/Fastify + Prisma + Vitest |
-| Go CLI | Cobra + Dolt/SQLite + go-test + golangci-lint |
+| Stack | Tech | File |
+|-------|------|------|
+| Python web | FastAPI + Postgres + Alembic + Pytest + Ruff | `defaults/stacks/python-web.yaml` |
+| iOS | SwiftUI + MVVM + Service layer + Repository protocol | `defaults/stacks/ios-swiftui.yaml` |
+| TypeScript Node | Express/Fastify + Prisma + Vitest | `defaults/stacks/typescript-node.yaml` |
+| Go CLI | Cobra + Dolt/SQLite + go-test + golangci-lint | `defaults/stacks/go-cli.yaml` |
 
 ---
 
-## Phase 1: Skill System
+## Phase 1: Skill System — DONE
 
-Skills are structured YAML definitions containing prompts and output schemas.
-The skill runner feeds a skill definition + tavern profile to the Mayor,
-validates the output, and saves it. The Mayor IS the execution engine — Rally
-structures what it asks for and validates what it gets back.
+All 8 skills are implemented and ship as a Claude Code plugin (`plugins/rally-skills/`).
 
-### Skill Framework
+### Skill Framework — DONE
 
-| Deliverable | Description |
-|-------------|-------------|
-| Skill definition schema | YAML with structured prompts, input requirements, output schemas |
-| `rally skill run` | Execute a skill against a tavern profile |
-| Output validation | Ensure structured YAML output, not narrative |
-| Skill chaining | Output of one skill feeds input of next |
-| `rally skill list` | Discovery and registry |
+| Deliverable | Status |
+|-------------|--------|
+| Skill definition schema (SKILL.md format) | Done |
+| `rally skill run` | Done |
+| `rally skill list` | Done |
+| Claude Code plugin packaging | Done |
 
-### Core Skills (MVP)
+### All Skills — DONE
 
 | Skill | Purpose | Output Section |
 |-------|---------|---------------|
@@ -123,21 +110,16 @@ structures what it asks for and validates what it gets back.
 | Architect | Architecture risks, entity model, integration map | `architecture_risks` |
 | OSS Researcher | Evaluate packages before building | `oss_analysis` |
 | Security Auditor | Threat modeling, OWASP alignment | `security_review` |
-
-### Additional Skills (Post-MVP)
-
-| Skill | Purpose | Output Section |
-|-------|---------|---------------|
 | UX Designer | Screen inventory, user flows, brand profile | `screens`, `brand_profile` |
 | Test Engineer | Test strategy, coverage targets | `test_strategy` |
-| Librarian | Artifact recommendations from registry | `recommended_components` |
+| Component Librarian | Artifact recommendations from registry | `recommended_components` |
 | Abstraction Auditor | Boundary violation checks (pre-merge gate) | `abstraction_score` |
 
 ### Integration with mol-idea-to-plan
 
 The existing `mol-idea-to-plan` formula already runs a 7-step pipeline (intake →
 PRD review → clarify → plan → plan review → approve → create beads). Rally
-skills can enhance this pipeline by:
+skills enhance this pipeline by:
 
 1. Feeding tavern profiles as structured context at the intake step
 2. Replacing ad-hoc review legs with skill-based analysis
@@ -147,9 +129,9 @@ This is an evolution of the existing formula, not a replacement.
 
 ---
 
-## Phase 2: Build Cards and Planning Mode
+## Phase 2: Build Cards and Planning Mode — DONE
 
-The orchestrator that chains skills into a complete build card.
+The `rally plan` command chains skills into a complete build card.
 
 ### Build Card Schema
 
@@ -200,18 +182,18 @@ execution_plan:
 
 ---
 
-## Phase 3: Execution Bridge
+## Phase 3: Execution Bridge — DONE
 
-Connect Rally planning output to Mayor's convoy system.
+Rally planning output connects to Mayor's convoy system.
 
-### Task Generation
+### Task Generation — DONE
 
 - `rally tasks generate <build-card>` → produces `tasks.yaml`
 - Task categories: PM, UX, Architecture, Test, Implementation
 - Each task has: description, acceptance criteria, dependencies, complexity
 - Tasks are bead-compatible for direct dispatch
 
-### Mayor Integration
+### Mayor Integration — DONE
 
 - `rally dispatch <build-card>` → converts tasks to beads + convoys
 - Groups beads into ordered convoys (PM → UX → Architect → Test → Dev)
@@ -220,60 +202,59 @@ Connect Rally planning output to Mayor's convoy system.
 
 ---
 
-## Phase 4: Feedback Loop
+## Phase 4: Feedback Loop — DONE
 
-Close the loop so the system improves from its own output.
+### Build Receipts — DONE
 
-### Build Receipts
-
-- `build_receipt.yaml` captured after each build
+- `rally receipt generate` captures build metrics after each build
 - Tracks: tokens used, files changed, artifacts used, test pass rate
 - Stored in project directory with history for trend analysis
 
-### Feedback Engine
+### Feedback Engine — DONE
 
-- `rally feedback analyze` — aggregate receipt data
+- `rally feedback analyze` — aggregates receipt data
 - Identifies: frequently reinvented patterns, common risks, reusable candidates
 - Suggests: new artifacts to extract, skill refinements, default updates
 
 ---
 
-## Phase 5: Ecosystem
+## Phase 5: Ecosystem — Mostly Done
 
-### Artifact Trust and Security (P2 beads exist)
-
-| Bead | What |
-|------|------|
-| rt-nstq | Integrate artifact trust with security scanner |
-| rt-gfzx | Artifact fingerprinting for deduplication |
-| rt-gzvx | Token-savings scoring and telemetry |
-| rt-ktde | Extend bounty schema with artifact linkage | **Future** (needs community) |
-
-### Example Artifacts (P2)
-
-| Bead | What |
-|------|------|
-| rt-ylmd | Python FastAPI SSO + iOS Swift starters |
-
-### MCP Server (P3)
-
-| Bead | What |
-|------|------|
-| rt-mlst | `rally-tavern-mcp` server exposing tavern operations to any MCP host |
-
-Tools: `tavern.searchArtifacts`, `tavern.getArtifact`,
-`tavern.instantiateArtifact`, `tavern.submitReview`.
-
-> **Future tools** (bounty system, requires community): `tavern.listBounties`,
-> `tavern.claimBounty`.
-
-### Federation (P3) — Groundwork Done
+### Artifact Trust and Security — DONE
 
 | Bead | What | Status |
 |------|------|--------|
-| rt-6ovc | Cross-tavern artifact sharing with trust policies | Groundwork done |
+| rt-nstq | Integrate artifact trust with security scanner | Done |
+| rt-gfzx | Artifact fingerprinting for deduplication | Done |
+| rt-gzvx | Token-savings scoring and telemetry | Done |
+| rt-ktde | Extend bounty schema with artifact linkage | Done |
 
-**Federation groundwork (March 2026):**
+### Example Artifacts — DONE
+
+| Bead | What | Status |
+|------|------|--------|
+| rt-ylmd | Python FastAPI SSO + iOS Swift starters | Done |
+
+5 artifacts now registered (python-fastapi-sso-starter, ios-swift-auth-settings-starter,
+python-pytest-harness, react-css-showcase, hello-world).
+
+### MCP Server — DONE
+
+| Bead | What | Status |
+|------|------|--------|
+| rt-mlst | `rally-tavern-mcp` server | Done |
+
+Tools: `tavern.searchArtifacts`, `tavern.getArtifact`,
+`tavern.instantiateArtifact`, `tavern.listBounties`, `tavern.claimBounty`,
+`tavern.submitReview`.
+
+### Federation — DONE
+
+| Bead | What | Status |
+|------|------|--------|
+| rt-6ovc | Cross-tavern artifact sharing with trust policies | Done |
+
+**Federation infrastructure (March 2026):**
 - `ARTIFACT_DIR_OVERRIDE` added to all 3 canonical scripts (artifact.sh, artifacts-search.sh, artifacts-json.sh)
 - `artifact-federated-search.sh` — cross-rig ranked search with `source_rig` annotation
 - `artifact-federated-index.sh` — aggregates all rig indexes into `federated-index.json`
@@ -284,66 +265,40 @@ Tools: `tavern.searchArtifacts`, `tavern.getArtifact`,
 
 ---
 
-## Dependency Graph
+## Completion Status
+
+All 5 phases are complete. The full pipeline is operational:
 
 ```
-Phase 0                      Phase 1                Phase 2
-─────────                    ───────                ───────
-Tavern Profiles (DONE)──┐
-                         ├──► Skill Framework──┐
-Stack Defaults           │    │                │
-                         │    ├──► PM Skill ───┤
-Artifact Manifest ───────┤    ├──► Architect ──┤
-  (rt-rrk9, polecats)   │    ├──► OSS ────────┼──► Build Card ──┐
-                         │    └──► Security ───┘    Generation   │
-Artifacts Directory ─────┤                                       │
-  (rt-bb7n, polecats)   │                                       │
-         │               │                          Phase 3      │
-         ▼               │                          ───────      │
-Artifact CLI ────────────┤               Task Generation ◄──────┘
-  (rt-h13q)             │                     │
-         │               │               Mayor Integration
-         ▼               │                     │
-Search + JSON endpoints  │               Phase 4
-                         │               ───────
-                         │          Build Receipts
-                         │                │
-                         │          Feedback Loop
-                         │
-                         │          Phase 5
-                         │          ───────
-                         └──────► MCP Server
-                                  Federation
-                                  Trust/Security
-                                  Example Artifacts
+Phase 0 ✅    Phase 1 ✅    Phase 2 ✅    Phase 3 ✅    Phase 4 ✅    Phase 5 ✅
+──────────    ──────────    ──────────    ──────────    ──────────    ──────────
+Profiles      Skills (8)    Build Cards   Task Gen      Receipts      MCP Server
+Artifacts     Plugin        rally plan    Dispatch      Feedback      Federation
+Stack Defs                                                            Trust/Security
 ```
 
 ---
 
-## Dogfooding Plan
+## Dogfooding Status
 
-Rally should be used on real Gas Town work as soon as possible.
-
-### Immediate (no tooling needed)
+### Done
 
 - [x] Tavern profile schema and template
-- [x] Tavern profiles for gastown, rally-tavern, beads (in `profiles/`)
+- [x] Tavern profiles for 9 Gas Town rigs
+- [x] Stack defaults YAML files (4 stacks)
+- [x] Skill YAML definitions (8 skills as Claude Code plugin)
+- [x] Artifact system live with 5 registered artifacts
+- [x] Federation deployed to spoke rigs
+- [x] Cross-rig artifact and knowledge search working
+- [x] Build receipt capture and feedback analysis
+
+### In Progress
+
 - [ ] Copy profiles to each rig's own repo as `tavern-profile.yaml`
 - [ ] Reference profiles from rig CLAUDE.md files so agents always have context
-- [ ] Pass profiles as `--context` to `mol-idea-to-plan` runs
-
-### Short-term (light tooling)
-
-- [ ] Stack defaults YAML files (trivial to create)
-- [ ] Skill YAML definitions — usable as structured prompts even without the
-  skill runner
 - [ ] `--profile` flag on `mol-idea-to-plan` formula for automatic profile loading
-
-### Medium-term (needs artifact system)
-
-- [ ] Publish first artifacts once TCEP manifest lands (rt-rrk9)
-- [ ] Test artifact instantiation on a real project
-- [ ] Validate search/ranking against real agent workflows
+- [ ] Test artifact instantiation on real projects at scale
+- [ ] Promote artifacts from experimental to community tier
 
 ### Validation criteria
 

@@ -5,7 +5,7 @@ Get started with Rally Tavern in 2 minutes.
 ## 1. Clone
 
 ```bash
-git clone https://github.com/outdoorsea/rally-tavern
+git clone https://github.com/YOUR-ORG/rally-tavern
 cd rally-tavern
 ```
 
@@ -21,20 +21,33 @@ cd rally-tavern
 ./scripts/mayor.sh register "my-mayor" "claude"
 ```
 
-## 3. Explore
+## 3. Search Before Building
 
 ```bash
-./scripts/board.sh                    # See bounties
-./scripts/knowledge.sh list           # See knowledge
-./scripts/repos.sh list               # See useful repos
-./scripts/postmortem.sh list          # See lessons learned
+./scripts/knowledge.sh search "your topic"     # Search knowledge base
+./scripts/artifacts-search.sh "auth sso"        # Search artifact registry
+./scripts/solution.sh search "your problem"     # Search solutions
+./scripts/board.sh                              # See bounties
 ```
 
-## 4. Contribute
+## 4. Explore
+
+```bash
+./scripts/knowledge.sh list                     # See all knowledge
+ls profiles/                                    # See rig profiles
+rally component list                            # See registered artifacts
+rally defaults show python-web                  # See stack recommendations
+rally skill list                                # See planning skills
+```
+
+## 5. Contribute
 
 ```bash
 # Share a best practice
 ./scripts/knowledge.sh add practice "My Tip" --codebase python
+
+# Share a copy-paste solution
+./scripts/knowledge.sh add solution "How to fix X"
 
 # Ask if something exists
 ./scripts/post.sh "Looking for X" --looking-for
@@ -44,13 +57,26 @@ cd rally-tavern
 
 # Recommend a repo
 ./scripts/repos.sh add "owner/repo" --category ai-agents
+
+# Create an artifact
+./scripts/artifact.sh create my-component --type starter-template
 ```
 
-## 5. Stay Updated
+## 6. Create a Tavern Profile
+
+Describe your rig's tech stack so agents always have context:
 
 ```bash
-git pull                              # Get latest
-./scripts/stats.sh activity           # See what's new
+rally init                                      # Interactive profile creation
+rally validate tavern-profile.yaml              # Validate it
+# Copy to profiles/ to share with other rigs
+```
+
+## 7. Stay Updated
+
+```bash
+git pull                                        # Get latest
+./scripts/stats.sh activity                     # See what's new
 ```
 
 ## Need Help?
@@ -60,3 +86,5 @@ git pull                              # Get latest
 ```
 
 Or browse existing help: `ls help/`
+
+See [CHEATSHEET.md](CHEATSHEET.md) for the full command reference.

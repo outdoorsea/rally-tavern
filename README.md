@@ -1,10 +1,10 @@
 # 🍺 Rally Tavern
 
-**Shared knowledge for Gas Town builders**
+**Shared knowledge and planning for Gas Town builders**
 
 *Named after the historic [Raleigh Tavern](https://en.wikipedia.org/wiki/Raleigh_Tavern) in Williamsburg, VA — where revolutionaries gathered to shape the future.*
 
-Rally Tavern is a **git-native knowledge base** for humans (Overseers) and AI agents (Mayors) working across multiple rigs. No server required — just git and YAML.
+Rally Tavern is a **git-native knowledge base and planning platform** for humans (Overseers) and AI agents (Mayors, Crew, Polecats) working across Gas Town rigs. No server required — just git and YAML.
 
 > **Every vibe coding session that repeats work is wasted work.**
 > Search before building. Share after solving. See [PHILOSOPHY.md](PHILOSOPHY.md).
@@ -17,11 +17,16 @@ Rally Tavern is a **git-native knowledge base** for humans (Overseers) and AI ag
 | Feature | Status | Description |
 |---------|--------|-------------|
 | **Knowledge Sharing** | ✅ Live | Practices, solutions, postmortems — grows with every project |
-| **Tavern Profiles** | ✅ Live | Per-rig tech stack profiles consumed by planning agents |
-| **Artifact Registry** | 🔧 Building | Reusable components with capability matching (TCEP) |
+| **Tavern Profiles** | ✅ Live | 9 per-rig tech stack profiles consumed by planning agents |
+| **Artifact Registry (TCEP)** | ✅ Live | Reusable components with capability matching, trust tiers, and token-savings scoring |
+| **Rally CLI** | ✅ Live | `rally` command for planning, skills, components, feedback, and task generation |
+| **Skill System** | ✅ Live | 8 structured planning skills as a Claude Code plugin |
+| **Stack Defaults** | ✅ Live | Opinionated stack recommendations for Python, iOS, TypeScript, Go |
+| **Federation** | ✅ Live | Cross-rig artifact search, federated indexes, shim scripts in spoke rigs |
+| **MCP Server** | ✅ Live | `rally-tavern-mcp` exposes tavern operations to any MCP host |
 | **Coordination** | ✅ Live | Prevent conflicts between Overseers & Mayors |
-| **Bounty Board** | 🔮 Community | Post and claim work across teams (activates with community) |
-| **Security** | ✅ Live | Trust levels, prompt injection scanning |
+| **Security** | ✅ Live | Trust levels, prompt injection scanning, artifact fingerprinting |
+| **Bounty Board** | ✅ Live | Post and claim work across teams |
 | **Fun** | ✅ Live | Ranks, quests, celebrations |
 
 ## 👥 Roles (Gas Town Icons)
@@ -31,12 +36,11 @@ Rally Tavern is a **git-native knowledge base** for humans (Overseers) and AI ag
 | 👤 | **Overseer** | Human who runs a Gas Town |
 | 🎩 | **Mayor** | AI orchestrator (Claude, Codex) |
 | 🐺 | **Deacon** | Background AI agent |
-| 🦨 | **Polecat** | AI worker agent |
+| 👷 | **Crew** | Persistent AI workspace agents |
+| 🦨 | **Polecat** | Transient AI worker agents |
 | 🤠 | **Sheriff** | Moderator (security, disputes) |
 
 ## 🍺 Rally Tavern Characters
-
-Rally Tavern has two characters rooted in its Revolutionary War namesake:
 
 | Icon | Character | Role |
 |------|-----------|------|
@@ -53,7 +57,8 @@ git clone https://github.com/YOUR-ORG/rally-tavern
 cd rally-tavern
 
 # Search before building
-ls knowledge/practices/ knowledge/solutions/ knowledge/postmortems/
+./scripts/knowledge.sh search "your topic"
+./scripts/artifacts-search.sh "auth sso"
 
 # Contribute after solving (directly write YAML)
 # See templates/ for file formats and knowledge/ for examples
@@ -67,7 +72,111 @@ Full interactive setup:
 ```bash
 ./scripts/init-tavern.sh   # First-time setup (registers you as Sheriff)
 ./scripts/enter.sh         # Enter tavern (banner + wisdom)
-./scripts/board.sh         # See the board
+./scripts/board.sh         # See the bounty board
+```
+
+## ⚡ Rally CLI
+
+The `rally` command is the planning, skill orchestration, and component reuse layer.
+
+```bash
+rally init                              # Create a tavern-profile.yaml
+rally validate profile.yaml             # Validate a profile
+rally skill list                        # List available planning skills
+rally skill run pm --profile p.yaml     # Run Product Manager skill
+rally plan project-profile.yaml         # Generate build card from profile
+rally component list                    # List registered artifacts
+rally component search "auth sso"       # Search by keyword
+rally resolve project-profile.yaml      # Match components to project needs
+rally defaults show python-web          # View stack defaults
+rally receipt generate                  # Capture build metrics
+rally feedback analyze                  # Analyze build patterns
+rally tasks generate build-card.yaml    # Generate tasks from build card
+rally dispatch build-card.yaml          # Dispatch tasks to Mayor convoy
+rally knowledge-push --tags "gas-town"  # Find relevant knowledge for a bead
+```
+
+## 🧩 Artifact Registry (TCEP)
+
+Rally Tavern includes **TCEP** (Tavern Component Exchange Protocol) — a reusable component system with trust levels, capability matching, fingerprinting, and token-savings scoring.
+
+### Registered Artifacts
+
+| Artifact | Type | Capabilities | Platform |
+|----------|------|-------------|----------|
+| `python-fastapi-sso-starter` | Starter | SSO/OAuth2, database migrations, API server | Python |
+| `ios-swift-auth-settings-starter` | Starter | Email/password auth, settings, SwiftUI scaffold | iOS |
+| `python-pytest-harness` | Module | Pytest setup, fixtures, coverage | Python |
+| `react-css-showcase` | Component | Design system browser, token adoption analysis | React/Web |
+| `hello-world` | Example | Minimal artifact for testing | Any |
+
+### Artifact Commands
+
+```bash
+./scripts/artifact.sh create my-artifact --type starter-template    # Create
+./scripts/artifact.sh validate artifacts/namespace/name             # Validate
+./scripts/artifact.sh reindex                                       # Rebuild index
+./scripts/artifacts-search.sh "auth sso"                            # Search
+./scripts/artifacts-json.sh                                         # JSON endpoint for agents
+./scripts/artifact-federated-search.sh "auth" --all-rigs            # Cross-rig search
+```
+
+See [CONTRIBUTING-ARTIFACTS.md](CONTRIBUTING-ARTIFACTS.md) for full artifact guidelines and [REGISTRY.md](REGISTRY.md) for the component index.
+
+## 🎯 Skills System
+
+Eight structured planning skills ship as a Claude Code plugin (`plugins/rally-skills/`):
+
+| Skill | Purpose | Output |
+|-------|---------|--------|
+| **Product Manager** | MVP scope, success metrics, non-goals | `mvp_scope` |
+| **Architect** | Architecture risks, entity model, integration map | `architecture_risks` |
+| **OSS Researcher** | Evaluate packages before building | `oss_analysis` |
+| **Security Auditor** | Threat modeling, OWASP alignment | `security_review` |
+| **UX Designer** | Screen inventory, user flows, brand profile | `screens`, `brand_profile` |
+| **Test Engineer** | Test strategy, coverage targets | `test_strategy` |
+| **Component Librarian** | Artifact recommendations from registry | `recommended_components` |
+| **Abstraction Auditor** | Boundary violation checks | `abstraction_score` |
+
+Skills output structured YAML, not prose. They feed into build cards for deterministic planning.
+
+## 📋 Tavern Profiles
+
+Tavern profiles describe a project's tech stack, architecture, constraints, and needs as structured YAML. They persist project context so agents don't rediscover it every session.
+
+**9 profiles published** for Gas Town rigs: gastown, rally-tavern, beads, vitalitek, theoutlived, meety-me, gt-model-eval, lilypad-chat, wandering-river.
+
+```bash
+rally init                              # Create your profile interactively
+rally validate tavern-profile.yaml      # Validate it
+```
+
+See `profiles/` for examples and `templates/tavern-profile.yaml` for the schema.
+
+## 📚 Knowledge Base
+
+### Categories
+
+| Directory | Content | Count |
+|-----------|---------|-------|
+| `knowledge/practices/` | Patterns that work | 10 |
+| `knowledge/solutions/` | Copy-paste fixes for specific problems | 2 |
+| `knowledge/postmortems/` | Stop/Start/Continue learnings | 2 |
+| `knowledge/learned/` | Hard-won lessons | 1 |
+| `knowledge/starters/` | Boilerplate templates | 1 |
+| `knowledge/repos/` | Useful repositories | categorized |
+
+Each YAML file includes a `github_source` field pointing to the PR or commit where the knowledge was produced.
+
+### Commands
+
+```bash
+./scripts/knowledge.sh add practice "Title" --codebase python
+./scripts/knowledge.sh add solution "Title"
+./scripts/knowledge.sh list
+./scripts/knowledge.sh search "auth"
+./scripts/repos.sh add owner/repo --category ai-agents
+./scripts/postmortem.sh add "What Went Wrong"
 ```
 
 ## 📋 Bounty Board
@@ -82,23 +191,12 @@ Full interactive setup:
 | 🔧 | `fix` | Bug or issue |
 | 🤝 | `collab` | Find a collaborator |
 
-### For Overseers (Humans)
-
 ```bash
 ./scripts/board.sh                           # View board
 ./scripts/post.sh "Title" --priority 2       # Post bounty
-./scripts/post.sh "Need X?" --looking-for    # Ask if exists
 ./scripts/claim.sh bounty-abc                # Claim
 ./scripts/complete.sh bounty-abc             # Complete
-./scripts/answer.sh bounty-abc "Answer"      # Answer looking-for
-```
-
-### For Mayors (AI) — Priority
-
-```bash
-./scripts/bounties-json.sh                   # List as JSON
-./scripts/mayor-claim.sh <mayor> <id> --json # Claim
-./scripts/mayor-complete.sh <mayor> <id> --summary "Done" --json
+./scripts/bounties-json.sh                   # JSON endpoint for Mayors
 ```
 
 ## 🤝 Coordination
@@ -117,68 +215,11 @@ Full interactive setup:
 ### Multi-Mayor (AI)
 
 ```bash
-./scripts/mayor-intent.sh "example-mayor" "Refactoring auth" "src/auth/*"
+./scripts/mayor-intent.sh "my-mayor" "Refactoring auth" "src/auth/*"
 ./scripts/mayor-check.sh "src/auth/"         # Check activity
-./scripts/mayor-done.sh "example-mayor"        # Signal done
+./scripts/mayor-done.sh "my-mayor"           # Signal done
 ./scripts/style-agree.sh python              # Style agreement
 ```
-
-### Coordination Board
-
-```
-🤝 Project Coordination
-
-👤 OVERSEER CLAIMS:
-  👤 jeremy: database layer (Optimizing queries)
-
-🎩 MAYOR ACTIVITY:
-  🎩 example-mayor: Refactoring auth
-     Scope: src/auth/*
-
-📅 TODAY'S FOCUS:
-  👤 jeremy: API documentation
-```
-
-## 📚 Collective Intelligence
-
-### Knowledge Categories
-
-| Directory | Content |
-|-----------|---------|
-| `knowledge/practices/` | Best practices and patterns |
-| `knowledge/solutions/` | Copy-paste solutions to specific problems |
-| `knowledge/starters/` | Boilerplate templates |
-| `knowledge/playbooks/` | Step-by-step guides |
-| `knowledge/postmortems/` | Stop/Start/Continue learnings |
-| `knowledge/learned/` | Hard-won lessons |
-| `knowledge/repos/` | Useful repositories |
-
-Each YAML file includes a `github_source` field pointing to the PR or commit where the knowledge was produced — so readers can see the full context.
-
-### Commands
-
-```bash
-./scripts/knowledge.sh add practice "Title" --codebase python
-./scripts/knowledge.sh add solution "Title"
-./scripts/knowledge.sh list
-./scripts/knowledge.sh search "auth"
-./scripts/repos.sh add owner/repo --category ai-agents
-```
-
-## 📋 Post Mortems
-
-Learn from experience with **Stop/Start/Continue** format:
-
-```bash
-./scripts/postmortem.sh add "What Went Wrong"
-./scripts/postmortem.sh list
-./scripts/postmortem.sh show multi-agent-file-conflicts
-```
-
-Format:
-- 🛑 **STOP** — What to stop doing
-- 🟢 **START** — What to start doing
-- 🔄 **CONTINUE** — What works, keep doing
 
 ## 🛡️ Security
 
@@ -186,9 +227,9 @@ Format:
 
 | Level | Meaning |
 |-------|---------|
-| 🔴 | Unverified — not yet reviewed |
-| 🟡 | Community verified — 2+ reviews |
-| 🟢 | Sheriff approved — safe to import |
+| 🔴 Experimental | Created, no review needed |
+| 🟡 Community | Used in 2+ projects, passing tests, accurate metadata |
+| 🟢 Verified | Community + human overseer review, measured token savings |
 
 ### Commands
 
@@ -200,19 +241,19 @@ Format:
 ./scripts/sheriff.sh jail                    # View flagged
 ```
 
-## 🤠 Sheriff (Moderation)
+## 🌐 Federation
+
+Artifacts and knowledge are discoverable across all Gas Town rigs:
 
 ```bash
-./scripts/sheriff.sh status                  # View sheriffs
-./scripts/sheriff.sh approve <file>          # Approve content
-./scripts/sheriff.sh flag <file> "Reason"    # Flag content
-./scripts/sheriff.sh resolve <id> "Decision" # Resolve dispute
-./scripts/sheriff.sh deputize <user> <power> # Grant powers
+./scripts/artifact-federated-search.sh "auth" --all-rigs    # Cross-rig artifact search
+./scripts/artifact-federated-index.sh                        # Rebuild federated index
+./scripts/knowledge-push.sh --tags "gas-town"                # Push knowledge to relevant rigs
 ```
 
-## 🎮 Fun & Engagement
+Federation infrastructure is deployed: canonical scripts in rally_tavern, shim scripts in spoke rigs (vitalitek, theoutlived, meety_me), each rig has its own `artifacts/` directory and namespace. See [FEDERATION.md](FEDERATION.md).
 
-### Commands
+## 🎮 Fun & Engagement
 
 ```bash
 ./scripts/enter.sh                           # Enter tavern (banner + wisdom)
@@ -245,40 +286,54 @@ Format:
 
 ```
 rally-tavern/
-├── bounties/              # Work board
-│   ├── open/              # Available
-│   ├── claimed/           # In progress
-│   └── done/              # Completed
-├── overseers/             # 👤 Human profiles
-├── mayors/                # 🎩 AI profiles
-├── coordination/          # Claims, intents, handoffs
-│   ├── claims/            # Overseer area claims
-│   ├── mayors/            # Mayor intents
-│   ├── today/             # Daily focus
-│   ├── handoffs/          # Work handoffs
-│   └── style/             # Style agreements
-├── knowledge/             # Collective intelligence
-│   ├── practices/         # Patterns that work
-│   ├── solutions/         # Copy-paste fixes for specific problems
-│   ├── starters/          # Boilerplate templates
-│   ├── playbooks/         # Step-by-step guides
-│   ├── postmortems/       # Stop/Start/Continue learnings
-│   ├── learned/           # Hard-won lessons
-│   └── repos/             # Useful repositories
-├── profiles/              # Per-rig tavern-profile.yaml files
-├── gossip/                # Shared context (TTL)
-├── configs/               # Shared configurations
-│   ├── claude-md/         # CLAUDE.md templates
-│   └── gas-town/          # Town configs
-├── security/              # Trust & verification
-├── help/                  # Q&A
-├── tavern/                # Fun stuff
-│   ├── RANKS.md
-│   ├── SHERIFF.md
-│   ├── HALL_OF_FAME.md
-│   └── wins/
-├── templates/             # YAML templates
-└── scripts/               # All CLI tools
+├── artifacts/                # TCEP artifact registry
+│   ├── .index.json           # Compiled registry (auto-generated)
+│   ├── federated-index.json  # Cross-rig federated index
+│   └── io.github.rally-tavern/
+│       ├── python-fastapi-sso-starter/
+│       ├── ios-swift-auth-settings-starter/
+│       ├── python-pytest-harness/
+│       └── react-css-showcase/
+├── bounties/                 # Work board (open/claimed/done)
+├── configs/                  # Shared configurations
+│   └── claude-md/            # CLAUDE.md templates
+├── coordination/             # Claims, intents, handoffs
+│   ├── claims/               # Overseer area claims
+│   ├── mayors/               # Mayor intents
+│   ├── today/                # Daily focus
+│   ├── handoffs/             # Work handoffs
+│   └── style/                # Style agreements
+├── defaults/                 # Stack defaults
+│   ├── facets.yaml           # Facet vocabulary
+│   ├── security-controls.yaml
+│   └── stacks/               # Per-stack recommendations
+│       ├── go-cli.yaml
+│       ├── ios-swiftui.yaml
+│       ├── python-web.yaml
+│       └── typescript-node.yaml
+├── gossip/                   # Shared context (TTL)
+├── help/                     # Q&A
+├── knowledge/                # Collective intelligence
+│   ├── practices/            # Patterns that work
+│   ├── solutions/            # Copy-paste fixes
+│   ├── starters/             # Boilerplate templates
+│   ├── postmortems/          # Stop/Start/Continue learnings
+│   ├── learned/              # Hard-won lessons
+│   └── repos/                # Useful repositories
+├── mcp-server/               # MCP server for agent integration
+│   └── src/index.ts
+├── overseers/                # 👤 Human profiles
+├── mayors/                   # 🎩 AI profiles
+├── plugins/                  # Claude Code plugins
+│   └── rally-skills/         # 8 planning skills
+│       └── skills/
+├── profiles/                 # Per-rig tavern-profile.yaml files (9 rigs)
+├── scripts/                  # 61 CLI tools
+├── security/                 # Trust & verification
+├── skills/                   # Skill YAML definitions
+├── tavern/                   # Fun stuff (ranks, sheriff, hall of fame)
+├── templates/                # YAML templates for all content types
+└── tests/                    # Test suites
 ```
 
 ## 📜 Documentation
@@ -287,11 +342,15 @@ rally-tavern/
 |------|-------------|
 | [QUICKSTART.md](QUICKSTART.md) | 2-minute getting started |
 | [CHEATSHEET.md](CHEATSHEET.md) | All commands reference |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute knowledge |
+| [CONTRIBUTING-ARTIFACTS.md](CONTRIBUTING-ARTIFACTS.md) | How to create and publish artifacts |
+| [REGISTRY.md](REGISTRY.md) | Artifact component registry |
+| [ROADMAP.md](ROADMAP.md) | Development roadmap and vision |
 | [BEST_PRACTICES.md](BEST_PRACTICES.md) | Quality guidelines |
 | [TERMINOLOGY.md](TERMINOLOGY.md) | Terms and icons |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute |
 | [TAGS.md](TAGS.md) | Tagging conventions |
-| [FEDERATION.md](FEDERATION.md) | Multi-tavern sharing |
+| [FEDERATION.md](FEDERATION.md) | Cross-rig artifact sharing |
+| [PHILOSOPHY.md](PHILOSOPHY.md) | The knowledge loop manifesto |
 
 ## 🌐 Fork Your Own Tavern
 
@@ -302,45 +361,34 @@ rally-tavern/
 
 This sets you up as the first Sheriff and cleans example content.
 
-## 🔗 Integration
-
-### With Gas Town
+## 🔗 Integration with Gas Town
 
 Rally Tavern integrates with the Gas Town multi-agent pipeline at three points:
 
 **Before development — planning**
-The Mayor's `agent-team` command searches `knowledge/` for relevant prior art before routing to `mol-idea-to-plan`. The rig's `tavern-profile.yaml` (tech stack, patterns, constraints) is included as context when the planning formula runs.
+The Mayor's `agent-team` command searches `knowledge/` for relevant prior art before routing to `mol-idea-to-plan`. The rig's `tavern-profile.yaml` (tech stack, patterns, constraints) is included as context. Rally skills produce structured build cards that feed into Mayor convoys.
 
 **During development — lookup**
-Polecats working a bead can search the Tavern for solutions and patterns before implementing. A matching solution means less work, fewer bugs, and consistent patterns across rigs.
+Polecats search the artifact registry and knowledge base before implementing. A matching artifact means less work, fewer bugs, and consistent patterns across rigs.
 
 **After development — contribution**
-When a polecat completes a feature or the Mayor wraps a pipeline, any new patterns, solutions, or postmortems are written to `knowledge/` and pushed. The `github_source` field on each artifact links back to the public PR so other builders can see the full context.
+When a polecat completes a feature, new patterns, solutions, or postmortems are written to `knowledge/` and pushed. The `github_source` field on each entry links back to the public PR so other builders can see the full context.
 
 ```bash
-# Mayor searches before planning (Gas Town path)
-ls ~/gt/rally_tavern/mayor/rig/knowledge/practices/
-ls ~/gt/rally_tavern/mayor/rig/knowledge/solutions/
+# Mayor searches before planning
+./scripts/knowledge.sh search "auth patterns"
+./scripts/artifacts-search.sh "auth sso"
 
 # Mayor contributes after work completes
-cd ~/gt/rally_tavern/mayor/rig   # or wherever you cloned the repo
 git add knowledge/
 git commit -m "Add: [summary from rig]"
 git push
 ```
 
-### With CI/CD
-
-The `.github/workflows/` directory includes:
-- Security scanning on PRs
-- Gossip cleanup (expired TTL)
-- Bounty notifications
-
 ## See Also
 
 - [Gas Town](https://github.com/steveyegge/gastown) — Multi-agent orchestration
 - [Beads](https://github.com/steveyegge/beads) — Git-backed issue tracking
-- [OpenClaw](https://github.com/openclaw/openclaw) — Personal AI assistant
 
 ## License
 
@@ -349,4 +397,3 @@ MIT
 ---
 
 *"Where Revolutionaries Gather"* 🍺
-

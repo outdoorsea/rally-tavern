@@ -28,6 +28,19 @@ Using official Gas Town icons for consistency.
 | **Bead** | A work item in Gas Town |
 | **Convoy** | A batch of related beads |
 | **Round** | Distributing work to multiple |
+| **Build Card** | Structured planning output from Rally skills |
+
+## Rally
+
+| Term | What |
+|------|------|
+| **TCEP** | Tavern Component Exchange Protocol — the artifact system |
+| **Artifact** | A reusable component (starter, module, skill, playbook) |
+| **Tavern Profile** | YAML describing a rig's tech stack and needs |
+| **Skill** | Structured prompt + output schema for planning/review |
+| **Stack Default** | Opinionated technology recommendations per platform |
+| **Federation** | Cross-rig artifact and knowledge sharing |
+| **Trust Tier** | Artifact maturity level (experimental → community → verified) |
 
 ## Communication
 

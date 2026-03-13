@@ -45,6 +45,12 @@ rally component add ./path/to/component
 |-----------|-------------|----------|-------|
 | `python-pytest-harness` | test-harness (pytest), test-fixtures (factory-pattern), coverage-reporting (pytest-cov) | python-web, python-api, python-cli | experimental |
 
+### Components
+
+| Component | Capabilities | Platform | Trust |
+|-----------|-------------|----------|-------|
+| `react-css-showcase` | design-system-browser (css-custom-properties), showcase-page (react-component), token-adoption-analysis (stylesheet-scanner) | web (react, typescript) | experimental |
+
 ### Examples
 
 | Component | Description | Trust |
