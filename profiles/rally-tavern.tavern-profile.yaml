@@ -1,6 +1,7 @@
 # Rally Tavern — Project Profile
 # ==============================
 # Git-native knowledge base and planning platform.
+# Visibility: PUBLIC (github.com/outdoorsea/rally-tavern)
 
 id: project-rally-tavern
 name: "Rally Tavern"
@@ -9,12 +10,33 @@ description: |
   share knowledge, coordinate work, and plan features. Provides bounty boards,
   knowledge sharing, artifact registry (TCEP), planning skills, and security
   scanning. No server required — just git and YAML.
+repo: github.com/outdoorsea/rally-tavern
 
 facets:
   platform: cli
   languages: [bash]
   frameworks: []
   runtime: bash
+  build_system: make
+  package_manager: null
+
+architecture:
+  style: cli-tool
+  components:
+    - scripts/               # 61 bash scripts — the CLI surface
+    - artifacts/             # TCEP component registry
+    - knowledge/             # Collective intelligence
+    - profiles/              # Per-rig tavern profiles
+    - skills/                # Planning skill definitions
+    - plugins/               # Claude Code plugins
+    - mcp-server/            # MCP server for agent integration
+    - bounties/              # Work board
+    - coordination/          # Multi-agent conflict prevention
+    - templates/             # YAML templates
+  data_stores: []
+  protocols: [cli, git]
+  deployment: git-clone
+  ci_cd: github-actions
 
 needs:
   - "Artifact registry for reusable components"

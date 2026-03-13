@@ -1,6 +1,7 @@
 # Beads — Project Profile
 # =======================
 # AI-native issue tracker with first-class dependency support.
+# Visibility: PUBLIC (github.com/steveyegge/beads)
 
 id: project-beads
 name: "Beads"
@@ -9,12 +10,22 @@ description: |
   codebases. Issues chained together like beads — with first-class dependency
   tracking, blocking/blocked-by relationships, and molecule-based work
   decomposition. Built for AI coding agents, not web UIs.
+repo: github.com/steveyegge/beads
 
 facets:
   platform: cli
   languages: [go]
   frameworks: [cobra]
   runtime: go
+  build_system: make
+  package_manager: go-modules
+
+architecture:
+  style: cli-tool
+  data_stores: [dolt]
+  protocols: [cli, mysql]
+  deployment: homebrew
+  ci_cd: github-actions
 
 needs:
   - "Stable database server lifecycle"

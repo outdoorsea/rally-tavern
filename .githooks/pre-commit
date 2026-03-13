@@ -17,17 +17,27 @@ if [[ -n "$STAGED" ]]; then
   done
 fi
 
-# Block sensitive data in profiles and public files
+# Block sensitive data in private profiles
 PROFILE_FILES=$(echo "$STAGED" | grep -E '^profiles/' || true)
 if [[ -n "$PROFILE_FILES" ]]; then
   for file in $PROFILE_FILES; do
-    # Profiles must not contain architecture internals, security details, or PII
-    if grep -qiE "^(architecture|security|quality|constraints|context|repo|contributed_by|created_at|updated_at):" "$file" 2>/dev/null; then
-      echo "❌ Profile privacy violation in: $file"
-      echo "   Profiles must only contain: id, name, description, facets, needs, tags"
-      echo "   Do NOT include: architecture, security, quality, constraints, context,"
-      echo "   repo URLs, contributed_by, or timestamps."
-      exit 1
+    # Public profiles (marked with "Visibility: PUBLIC") may include more detail
+    if grep -q "Visibility: PUBLIC" "$file" 2>/dev/null; then
+      # Public profiles: still block security, quality, constraints, context, PII
+      if grep -qiE "^(security|quality|constraints|context|contributed_by|created_at|updated_at):" "$file" 2>/dev/null; then
+        echo "❌ Profile privacy violation in PUBLIC profile: $file"
+        echo "   Even public profiles must not include: security, quality, constraints,"
+        echo "   context, contributed_by, or timestamps."
+        exit 1
+      fi
+    else
+      # Private profiles: block everything sensitive
+      if grep -qiE "^(architecture|security|quality|constraints|context|repo|contributed_by|created_at|updated_at):" "$file" 2>/dev/null; then
+        echo "❌ Profile privacy violation in: $file"
+        echo "   Private profiles must only contain: id, name, description, facets, needs, tags"
+        echo "   Add '# Visibility: PUBLIC' comment to allow architecture and repo fields."
+        exit 1
+      fi
     fi
   done
 fi

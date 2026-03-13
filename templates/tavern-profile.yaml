@@ -10,9 +10,12 @@
 #
 # Convention: snake_case fields, kebab-case values.
 #
-# NOTE: Profiles are public when published. Include only information you
-# are comfortable sharing. Do NOT include: repo URLs, internal file paths,
-# security implementation details, credentials, or PII.
+# PRIVACY LEVELS:
+#   Private repos: Only include id, name, description, facets, needs, tags.
+#   Public repos:  Add '# Visibility: PUBLIC' below the header comment,
+#                  then you may also include: repo URL, architecture.
+#   NEVER include: security, quality, constraints, context, contributed_by,
+#                  timestamps, internal file paths, credentials, or PII.
 
 # --- Identity ---
 id: project-CHANGEME           # kebab-case project slug

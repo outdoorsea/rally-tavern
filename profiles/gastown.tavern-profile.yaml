@@ -1,6 +1,7 @@
 # Gas Town — Project Profile
 # ==========================
 # The multi-agent workspace orchestrator.
+# Visibility: PUBLIC (github.com/steveyegge/gastown)
 
 id: project-gastown
 name: "Gas Town"
@@ -9,12 +10,22 @@ description: |
   Orchestrates coding agent sessions as persistent agents with roles,
   work tracking, messaging, and autonomous execution.
   Local-first, git-native, runs on a single developer machine.
+repo: github.com/steveyegge/gastown
 
 facets:
   platform: cli
   languages: [go]
   frameworks: [cobra]
   runtime: go
+  build_system: make
+  package_manager: go-modules
+
+architecture:
+  style: monolith
+  data_stores: [dolt]
+  protocols: [cli]
+  deployment: local-binary
+  ci_cd: github-actions
 
 needs:
   - "Reliable database server lifecycle management"
