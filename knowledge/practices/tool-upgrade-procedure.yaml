@@ -1,0 +1,32 @@
+id: tool-upgrade-procedure
+title: Upgrading gt, bd (beads), and dolt
+contributed_by: mayor
+created_at: 2026-03-13T00:00:00Z
+last_verified: 2026-03-13T00:00:00Z
+verified_by: [mayor]
+tags: [maintenance, gt, beads, dolt, upgrade]
+lesson: |
+  gt is built from source (gastown repo). bd and dolt install via Homebrew.
+  These should be checked and updated periodically.
+solution: |
+  # Check current versions
+  gt version
+  bd version
+  dolt version
+
+  # Upgrade bd and dolt (Homebrew)
+  brew upgrade beads dolt
+
+  # Upgrade gt (rebuild from source — always gets latest committed code)
+  cd ~/gt/gastown/mayor/rig
+  git pull
+  make install
+  # This rebuilds, signs, installs to ~/.local/bin/gt, restarts daemon, and syncs plugins.
+
+  # Verify
+  gt version && bd version && dolt version
+notes: |
+  - gt version shows commit hash; '-dirty' means uncommitted .beads/backup files (normal).
+  - 'make install' also syncs plugins from gastown repo to ~/gt/plugins/.
+  - Run brew update first to refresh the formula index before upgrading.
+  - Recommended cadence: weekly, or after any gastown commits.
