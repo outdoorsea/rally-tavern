@@ -1,0 +1,263 @@
+/* =========================================================================
+   ShowcasePage — Living CSS Design System Browser
+   Self-contained styles. Uses the host app's CSS custom properties for
+   content but keeps its own layout/chrome intentionally neutral.
+   ========================================================================= */
+
+.showcase-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: #1a1a2e;
+  line-height: 1.6;
+}
+
+/* --- Header --- */
+
+.showcase-header {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid #e8e8f0;
+}
+
+.showcase-header__title {
+  margin: 0 0 0.25rem;
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.showcase-header__meta {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+/* --- Navigation --- */
+
+.showcase-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: #f9fafb;
+  border-radius: 8px;
+}
+
+.showcase-nav__link {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-decoration: none;
+  color: #374151;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.showcase-nav__link:hover {
+  background: #eef2ff;
+  border-color: #818cf8;
+}
+
+/* --- Empty state --- */
+
+.showcase-empty {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: #f9fafb;
+  border-radius: 12px;
+  color: #6b7280;
+}
+
+.showcase-empty code {
+  background: #e5e7eb;
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  font-size: 0.85em;
+}
+
+/* --- Sections --- */
+
+.showcase-section {
+  margin-bottom: 3rem;
+}
+
+.showcase-section__title {
+  margin: 0 0 0.25rem;
+  font-size: 1.35rem;
+  font-weight: 600;
+}
+
+.showcase-section__subtitle {
+  margin: 0 0 1rem;
+  font-size: 0.8rem;
+  color: #9ca3af;
+}
+
+.showcase-section__subtitle code {
+  background: #f3f4f6;
+  padding: 0.1em 0.35em;
+  border-radius: 3px;
+  font-size: 0.9em;
+}
+
+.showcase-section__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+/* --- Token base --- */
+
+.showcase-token {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  transition: box-shadow 0.15s;
+}
+
+.showcase-token:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.showcase-token__info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.showcase-token__name {
+  font-size: 0.72rem;
+  color: #4b5563;
+  word-break: break-all;
+}
+
+.showcase-token__value {
+  font-size: 0.68rem;
+  color: #9ca3af;
+  word-break: break-all;
+}
+
+/* --- Color swatch --- */
+
+.showcase-color__swatch {
+  width: 100%;
+  height: 64px;
+  border-radius: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* --- Size bar --- */
+
+.showcase-size__bar-container {
+  width: 100%;
+  height: 24px;
+  background: #f3f4f6;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.showcase-size__bar {
+  height: 100%;
+  min-width: 4px;
+  max-width: 100%;
+  background: #6366f1;
+  border-radius: 4px;
+  transition: width 0.3s;
+}
+
+/* --- Shadow box --- */
+
+.showcase-shadow__box {
+  width: 100%;
+  height: 48px;
+  background: #fff;
+  border-radius: 6px;
+}
+
+/* --- Radius box --- */
+
+.showcase-radius__box {
+  width: 64px;
+  height: 64px;
+  background: #eef2ff;
+  border: 2px solid #6366f1;
+}
+
+/* --- Timing demo --- */
+
+.showcase-timing__demo {
+  width: 100%;
+  height: 32px;
+  position: relative;
+  background: #f3f4f6;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.showcase-timing__circle {
+  position: absolute;
+  top: 4px;
+  left: 8px;
+  width: 24px;
+  height: 24px;
+  background: #6366f1;
+  border-radius: 50%;
+  transition-property: transform;
+  transition-timing-function: ease-in-out;
+}
+
+.showcase-timing__demo:hover .showcase-timing__circle {
+  transform: translateX(calc(100% + 120px));
+}
+
+/* --- Z-index layer --- */
+
+.showcase-zindex__layer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  background: linear-gradient(135deg, #eef2ff, #e0e7ff);
+  border-radius: 6px;
+  border: 1px solid #c7d2fe;
+}
+
+.showcase-zindex__number {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #4338ca;
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Raw token --- */
+
+.showcase-raw__sample {
+  display: block;
+  line-height: 1.2;
+  color: #1a1a2e;
+}
+
+/* --- Responsive --- */
+
+@media (max-width: 640px) {
+  .showcase-page {
+    padding: 1rem;
+  }
+
+  .showcase-section__grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .showcase-header__title {
+    font-size: 1.5rem;
+  }
+}

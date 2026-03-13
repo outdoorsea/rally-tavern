@@ -1,0 +1,48 @@
+schema_version: 1
+name: react-css-showcase
+namespace: io.github.rally-tavern
+version: "0.1.0"
+description: "Living CSS design system browser — renders all CSS custom properties as visual swatches, scales, and tokens"
+provides:
+  - capability: design-system-browser
+    style: css-custom-properties
+  - capability: showcase-page
+    style: react-component
+compatibility:
+  platforms: [web]
+  frameworks: [react]
+  languages: [typescript, javascript]
+trust_tier: experimental
+contributed_by: rally-tavern
+created_at: "2026-03-13T00:00:00Z"
+spec:
+  artifactType: component-template
+  audience: both
+  packaging:
+    format: directory
+    rootPath: "."
+  entrypoints:
+    setup: "npm install"
+    run: "Add <ShowcasePage /> to your router at /showcase or /_style"
+    test: "npm test"
+acceptance:
+  commands:
+    - "npm test"
+  criteria:
+    - "Component renders without errors"
+    - "Color swatches display CSS custom property values"
+    - "Typography scale renders with correct font sizes"
+    - "Spacing scale renders visual boxes"
+    - "Component reads from live CSS custom properties"
+scoring:
+  tokenSavingsEstimate:
+    baselineTokens: 25000
+    withArtifactTokens: 5000
+    estimatedSavingsTokens: 20000
+    method: "manual estimate"
+tags: [react, css, design-system, tokens, showcase, typography, colors, spacing]
+requires: []
+entrypoints:
+  install: skills/install/SKILL.md
+  configure: null
+  test: acceptance/run.sh

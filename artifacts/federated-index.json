@@ -13,7 +13,7 @@
     },
     "rally_tavern": {
       "worker": "max",
-      "count": 3,
+      "count": 4,
       "artifacts": [
         {
           "id": "io.github.example/hello-world",
@@ -67,6 +67,27 @@
           ],
           "tokenSavingsEstimate": 45000,
           "path": "io.github.rally-tavern/python-fastapi-sso-starter"
+        },
+        {
+          "id": "io.github.rally-tavern/react-css-showcase",
+          "name": "react-css-showcase",
+          "namespace": "io.github.rally-tavern",
+          "version": "0.1.0",
+          "description": "Living CSS design system browser — renders all CSS custom properties as visual swatches, scales, and tokens",
+          "artifactType": "component-template",
+          "trust": "experimental",
+          "tags": [
+            "react",
+            "css",
+            "design-system",
+            "tokens",
+            "showcase",
+            "typography",
+            "colors",
+            "spacing"
+          ],
+          "tokenSavingsEstimate": 20000,
+          "path": "io.github.rally-tavern/react-css-showcase"
         }
       ]
     },
@@ -86,5 +107,5 @@
       "artifacts": []
     }
   },
-  "total": 3
+  "total": 4
 }
