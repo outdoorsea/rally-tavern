@@ -1,92 +1,26 @@
 # Rally Tavern — Project Profile
 # ==============================
-# Git-native coordination hub for humans and AI agents.
+# Git-native knowledge base and planning platform.
 
 id: project-rally-tavern
 name: "Rally Tavern"
 description: |
-  Git-native coordination hub where Overseers (humans) and Mayors (AI agents)
-  gather to coordinate. Provides bounty boards, knowledge sharing, coordination
-  tools, security scanning, and engagement mechanics. No server required — just git.
-
-  Evolving into the Rally planning system: a structured planning, skill
-  orchestration, and component reuse layer for Gas Town.
-repo: github.com/outdoorsea/rally-tavern
-created_at: 2025-01-01T00:00:00Z
-updated_at: 2026-03-03T00:00:00Z
-contributed_by: overseer
-contributed_by_type: overseer
+  Git-native knowledge base and planning platform where humans and AI agents
+  share knowledge, coordinate work, and plan features. Provides bounty boards,
+  knowledge sharing, artifact registry (TCEP), planning skills, and security
+  scanning. No server required — just git and YAML.
 
 facets:
   platform: cli
   languages: [bash]
   frameworks: []
-  runtime: bash-5
-  build_system: make
-  package_manager: null       # No package manager — shell scripts + YAML
-
-architecture:
-  style: cli-tool
-  components:
-    - scripts/                # 42 bash scripts — the entire CLI surface
-    - bounties/               # Work board (open/claimed/done)
-    - coordination/           # Multi-overseer and multi-mayor conflict prevention
-    - knowledge/              # Collective intelligence (practices, starters, playbooks, postmortems)
-    - templates/              # YAML templates for bounties, knowledge, profiles
-    - configs/                # Shared configs (CLAUDE.md templates, gas town configs)
-    - security/               # Trust levels, prompt injection scanning
-    - tavern/                 # Engagement (ranks, quests, sheriff, hall of fame)
-    - gossip/                 # Shared context with TTL
-    - help/                   # Q&A
-    - profiles/               # Project profiles (Rally planning input)
-  data_stores: []             # Pure git — no database
-  protocols: [cli, git]
-  deployment: git-clone
-  ci_cd: github-actions
-
-security:
-  auth_method: none           # Trust is git-identity-based
-  encryption: none
-  multi_tenant: false         # Single tavern per instance (federation for sharing)
-  sensitive_data: []
-  compliance: []
-
-quality:
-  test_framework: null        # Scripts tested manually / via health.sh
-  linter: null
-  type_checking: null
-  coverage_target: null
-
-constraints:
-  must_use: [bash, yaml, git]
-  must_avoid: [databases, servers] # Local-first, git-native, no runtime deps
-  budget: null
-  timeline: "MVP Rally planning by Q2 2026"
-  team_size: null
+  runtime: bash
 
 needs:
-  - "Artifact/component registry for reusable modules (TCEP — in progress)"
+  - "Artifact registry for reusable components"
   - "Skill framework for structured planning prompts"
   - "Project profile system for persistent project context"
   - "Build card generation from skill outputs"
-  - "Integration bridge to Mayor convoy system"
-
-context: |
-  Rally Tavern serves two purposes:
-
-  1. COORDINATION HUB (existing, working):
-     Bounty board, knowledge sharing, multi-overseer coordination,
-     security scanning, engagement mechanics. 42 bash scripts, all git-native.
-
-  2. RALLY PLANNING SYSTEM (in development):
-     Structured planning pipeline that transforms ideas into build cards
-     via skill-based analysis (PM, Architect, Security, OSS, UX, etc.).
-     See .specs/plan.md for the full 19-feature development plan.
-     The artifact system (TCEP) is being built by polecats now.
-
-  Design philosophy: "Every vibe coding session that repeats work is
-  wasted work." Search before building, share after solving.
-
-  Named after the historic Raleigh Tavern in Williamsburg, VA.
+  - "Integration bridge to convoy dispatch system"
 
 tags: [coordination, planning, knowledge-sharing, git-native, bash, yaml]

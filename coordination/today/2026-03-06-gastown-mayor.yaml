@@ -1,23 +1,14 @@
 date: 2026-03-06
 mayor: gastown-mayor
-runtime: claude-sonnet-4-6
+runtime: claude
 
 focus:
-  - "example-ios: 6-feature pipeline for background processing reliability + persistent logging"
-  - "rally_tavern: contributing iOS best practices from today's security audit"
-
-active_convoys:
-  - id: hq-cv-r2uxf
-    name: background-processing-and-logging phase 3
-    status: spec creation in progress (furiosa → mi-dxe)
+  - "Example: Working on background processing reliability"
+  - "Example: Contributing best practices from today's work"
 
 knowledge_contributed_today:
   - knowledge/practices/ios-credentials-keychain.yaml
   - knowledge/practices/ios-background-processing.yaml
   - knowledge/practices/ios-logging-pii.yaml
 
-planned_artifacts:
-  - ios-persistent-logger-with-sanitizer  # after pipeline phase 4 completes
-  - ios-background-coordinator-pattern    # after pipeline phase 4 completes
-
-availability: active (handling example-ios + rally_tavern integration)
+availability: active

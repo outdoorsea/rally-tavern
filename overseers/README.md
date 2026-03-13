@@ -13,22 +13,13 @@ Overseers are the humans who run Gas Towns and supervise Mayors.
 ## Overseer Profiles
 
 ```yaml
-# overseers/profiles/jeremy.yaml
-id: jeremy
-name: Overseer
-github: outdoorsea
-towns:
-  - name: example-pm
-    mayor_runtime: claude
-    location: ~/gt
-projects:
-  - example-pm
-  - rally-tavern
+# overseers/profiles/your-name.yaml
+id: your-name
+name: Your Name
 interests:
   - ai-agents
-  - personal-productivity
-  - multi-agent-coordination
-timezone: America/Los_Angeles
+  - your-interests
+status: active
 ```
 
 ## What Overseers Do

@@ -1,34 +1,13 @@
 mayor: gastown-mayor
-runtime: claude-sonnet-4-6
-project: example-ios
-intent: Building unified persistent logging + background processing reliability for iOS health app
+runtime: claude
+project: example-project
+intent: Example mayor intent for coordination
 scope:
   areas:
-    - Background sync (HealthKit, BGTaskScheduler)
-    - Location tracking (CLLocationManager consolidation)
-    - Persistent logging with PII sanitization
-    - example-api /api/v1/logs endpoint (Heroku/Papertrail)
-  files:
-    - Example/Example/BackgroundSyncManager.swift
-    - Example/Example/AutoSyncManager.swift
-    - Example/Example/SyncScheduler.swift
-    - Example/Example/LocationManager.swift
-    - Example/Example/LocationDataManager.swift
-    - Example/Example/SimpleDebugLogger.swift
-    - Example/Example/ExampleApp.swift
+    - Feature implementation
+  files: []
 timestamp: 2026-03-06T23:30:00Z
 expected_duration: 6h
-pipeline:
-  phase: 3 (spec creation)
-  convoy: hq-cv-r2uxf
-  spec_writer: mi-dxe (polecat furiosa)
-  implementation_features: [F00, F01, F02, F03, F04, F05]
-  planned_artifacts:
-    - ios-persistent-logger-with-sanitizer  # reusable PersistentLogger + LogSanitizer module
-    - ios-background-coordinator-pattern    # BackgroundCoordinator facade playbook
 notes: |
-  This rig has 3 overlapping sync managers (SyncScheduler, AutoSyncManager, BackgroundSyncManager).
-  BGTask completion uses asyncAfter hack (CRITICAL reliability issue).
-  All HealthKit sync is poll-based — no HKObserverQuery.
-  Password + auth token stored in UserDefaults (security issues, separate beads mi-prt, mi-av2).
-  Will contribute PersistentLogger + BackgroundCoordinator as artifacts once pipeline completes.
+  This is an example mayor intent file showing the coordination format.
+  Replace with actual project coordination data.
