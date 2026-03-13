@@ -8,7 +8,8 @@ STAGED=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(yaml|yml|
 
 if [[ -n "$STAGED" ]]; then
   for file in $STAGED; do
-    # Quick injection check
+    # Quick injection check (skip security/README.md which has intentional examples)
+    if [[ "$file" == "security/README.md" ]]; then continue; fi
     if grep -qi "ignore.*previous.*instruction\|system.*prompt\|you.*are.*now" "$file" 2>/dev/null; then
       echo "❌ Security issue in: $file"
       echo "   Possible prompt injection detected"

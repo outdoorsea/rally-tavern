@@ -8,7 +8,7 @@ DURATION="${4:-2h}"
 
 if [ -z "$MAYOR" ] || [ -z "$INTENT" ]; then
   echo "Usage: mayor-intent.sh <mayor-name> <intent> [scope] [duration]"
-  echo "Example: mayor-intent.sh example-mayor 'Refactoring auth' 'src/auth/*' '2h'"
+  echo "Example: mayor-intent.sh my-mayor 'Refactoring auth' 'src/auth/*' '2h'"
   exit 1
 fi
 

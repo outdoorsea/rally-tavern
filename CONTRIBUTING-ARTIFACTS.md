@@ -141,7 +141,7 @@ Use double-brace syntax for substitution: `{{variable_name}}`
 ./scripts/artifact.sh instantiate io.github.rally-tavern/python-fastapi-sso-starter \
   --into ./my-project \
   --set project_name=my-api \
-  --set author="Jeremy"
+  --set author="Your Name"
 ```
 
 This replaces all `{{project_name}}` occurrences in template files with `my-api`.
