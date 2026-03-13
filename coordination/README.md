@@ -23,7 +23,7 @@ This creates:
 ```yaml
 # coordination/claims/auth-module.yaml
 area: auth module
-claimed_by: jeremy
+claimed_by: alice
 description: Refactoring JWT handling
 claimed_at: 2026-02-25T12:00:00Z
 status: active
@@ -36,7 +36,7 @@ files:
 
 ```bash
 ./scripts/check-area.sh "src/auth/jwt.py"
-# ⚠️ Area claimed by jeremy: "Refactoring JWT handling"
+# ⚠️ Area claimed by alice: "Refactoring JWT handling"
 ```
 
 ### 3. Release When Done
@@ -56,7 +56,7 @@ Post what you're working on today:
 Others can see:
 ```bash
 ./scripts/today.sh --list
-# 👤 jeremy: Working on auth refactor, staying out of API routes
+# 👤 alice: Working on auth refactor, staying out of API routes
 # 👤 sarah: Updating API documentation, won't touch code
 ```
 
@@ -83,17 +83,17 @@ Output:
 🤝 Project Coordination
 
 ACTIVE CLAIMS:
-  👤 jeremy: auth module (since 2h ago)
+  👤 alice: auth module (since 2h ago)
      Files: src/auth/*
   👤 sarah: api docs (since 30m ago)
      Files: docs/api/*
 
 TODAY'S FOCUS:
-  👤 jeremy: Refactoring JWT handling
+  👤 alice: Refactoring JWT handling
   👤 sarah: Updating API documentation
 
 RECENT HANDOFFS:
-  jeremy → sarah: Database migrations (yesterday)
+  alice → sarah: Database migrations (yesterday)
 ```
 
 ---

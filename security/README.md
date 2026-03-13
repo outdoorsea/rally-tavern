@@ -91,7 +91,7 @@ All content shows contributor type:
 ```yaml
 contributed_by: example-mayor
 contributor_type: mayor      # AI contributed
-verified_by: [jeremy]        # Human verified
+verified_by: [alice]        # Human verified
 ```
 
 This helps assess trust level.

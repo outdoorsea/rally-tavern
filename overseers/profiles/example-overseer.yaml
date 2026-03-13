@@ -1,6 +1,5 @@
-id: jeremy
-name: Jeremy
-registered_at: 2026-02-26T20:45:00Z
+id: example-overseer
+name: Example Overseer
 interests:
   - ai-agents
   - multi-agent-orchestration
