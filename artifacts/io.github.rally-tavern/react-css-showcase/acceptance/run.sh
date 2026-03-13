@@ -40,13 +40,32 @@ for renderer in ColorSwatch SizeToken ShadowToken RadiusToken TimingToken ZIndex
 done
 
 # Check CSS file has required classes
-for cls in showcase-page showcase-header showcase-section showcase-color__swatch showcase-size__bar; do
+for cls in showcase-page showcase-header showcase-section showcase-color__swatch showcase-size__bar showcase-adoption__summary showcase-adoption__table; do
   if ! grep -q "\.$cls" "$TEMPLATES/ShowcasePage.css"; then
     echo "FAIL: Missing CSS class: .$cls"
     exit 1
   fi
   echo "OK: .$cls class found"
 done
+
+# Check adoption analysis feature
+if ! grep -q "analyzeAdoption" "$TEMPLATES/ShowcasePage.tsx"; then
+  echo "FAIL: ShowcasePage.tsx missing analyzeAdoption function"
+  exit 1
+fi
+echo "OK: analyzeAdoption function found"
+
+if ! grep -q "AdoptionSection" "$TEMPLATES/ShowcasePage.tsx"; then
+  echo "FAIL: ShowcasePage.tsx missing AdoptionSection component"
+  exit 1
+fi
+echo "OK: AdoptionSection component found"
+
+if ! grep -q "showAdoption" "$TEMPLATES/ShowcasePage.tsx"; then
+  echo "FAIL: ShowcasePage.tsx missing showAdoption prop"
+  exit 1
+fi
+echo "OK: showAdoption prop found"
 
 echo ""
 echo "=== All acceptance checks passed ==="

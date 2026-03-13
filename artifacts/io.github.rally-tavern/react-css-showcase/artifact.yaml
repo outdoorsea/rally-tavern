@@ -1,13 +1,15 @@
 schema_version: 1
 name: react-css-showcase
 namespace: io.github.rally-tavern
-version: "0.1.0"
-description: "Living CSS design system browser — renders all CSS custom properties as visual swatches, scales, and tokens"
+version: "0.2.0"
+description: "Living CSS design system browser — renders all CSS custom properties as visual swatches, scales, and tokens, with adoption gap analysis"
 provides:
   - capability: design-system-browser
     style: css-custom-properties
   - capability: showcase-page
     style: react-component
+  - capability: token-adoption-analysis
+    style: stylesheet-scanner
 compatibility:
   platforms: [web]
   frameworks: [react]
@@ -34,6 +36,9 @@ acceptance:
     - "Typography scale renders with correct font sizes"
     - "Spacing scale renders visual boxes"
     - "Component reads from live CSS custom properties"
+    - "Token Adoption section shows adoption percentage"
+    - "Hardcoded color values matching tokens are listed with suggestions"
+    - "Inline style count is reported"
 scoring:
   tokenSavingsEstimate:
     baselineTokens: 25000
