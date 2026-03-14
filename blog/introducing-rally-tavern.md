@@ -4,7 +4,7 @@
 
 ---
 
-If you've read Steve Yegge's [Welcome to Gas Town](https://steve-yegge.medium.com/welcome-to-gas-town-4f25ee16dd04), you know the pitch: Gas Town is an industrialized coding factory manned by superintelligent robot chimps. You sling work around, polecats swarm it, the Refinery merges it, and convoys land. It's glorious chaos. Throughput measured in fish-barrels-per-hour.
+If you've read Steve Yegge's [Welcome to Gas Town](https://steve-yegge.medium.com/welcome-to-gas-town-4f25ee16dd04), you know the pitch: Gas Town is an industrialized coding factory manned by superintelligent robot chimps. You sling work around, polecats swarm it, the Refinery merges it, and convoys land. It's glorious chaos. Throughput is measured in fish-barrels-per-hour.
 
 But here's the thing about running a fish-slopping factory at superhuman speed: **your chimps keep reinventing the wheel.**
 
@@ -118,6 +118,8 @@ Profiles come in two flavors. **Public profiles** — for open-source repos like
 ### Planning Skills
 
 Rally Tavern ships with 8 structured planning skills, packaged as a Claude Code plugin:
+
+
 
 | Skill | What It Does |
 |-------|-------------|
@@ -392,3 +394,7 @@ Rally Tavern is MIT licensed and lives at [github.com/outdoorsea/rally-tavern](h
 If you're already running Gas Town, you're already paying the tuition. Rally Tavern just makes sure you don't have to take the same class twice.
 
 *"Where Revolutionaries Gather"*
+
+---
+
+**Medium Topics:** `Coding Agents` · `Claude Code` · `AI Orchestration` · `Developer Tools` · `Knowledge Management`
