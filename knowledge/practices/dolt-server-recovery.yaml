@@ -1,0 +1,59 @@
+id: dolt-server-recovery
+title: Dolt Shared Server Recovery — Coordinated Restart Procedure
+contributed_by: crew/max
+created_at: 2026-03-15T00:00:00Z
+verified_by: [gt-mayor, ]
+codebase_type: gas-town
+summary: |
+  When the shared Dolt server dies in a multi-rig Gas Town deployment,
+  bd auto-start creates rogue servers from each rig's .beads/dolt directory.
+  Recovery requires a coordinated shutdown to prevent the thundering herd.
+details: |
+  ## Symptoms
+  - gt mail inbox fails with "database beads_hq not found"
+  - gt dolt status says "not running" but port 3307 is in use
+  - /usr/sbin/lsof -p <pid> -Fn shows cwd is NOT ~/gt/.dolt-data
+  - mysql SHOW DATABASES only returns dolt, information_schema, mysql
+
+  ## Diagnosis
+  1. Check what's on port 3307:
+     /usr/sbin/lsof -i :3307 | grep LISTEN
+  2. Verify it's a rogue (cwd should be ~/gt/.dolt-data, not a rig's .beads/dolt):
+     /usr/sbin/lsof -p <PID> -Fn | head -3
+  3. If cwd is any rig's .beads/dolt → it's a rogue
+
+  ## Recovery (MUST follow this order)
+  1. STOP all rigs first to prevent respawning:
+     gt rig stop rally_tavern myndy_api meety_me vitalitek myndy_ios gastown
+     (Use --force if needed for rigs with uncommitted polecat work)
+  2. Kill ALL dolt processes:
+     pkill -9 -f "dolt sql-server"
+  3. Verify port is free:
+     /usr/sbin/lsof -i :3307  # Should show no LISTEN entries
+  4. Start correct server:
+     gt dolt start
+  5. Verify databases loaded:
+     mysql -h 127.0.0.1 -P 3307 -u root -e "SHOW DATABASES;"
+     # Must show beads_hq plus all rig databases
+  6. Test mail:
+     gt mail inbox
+  7. Restart all rigs:
+     gt rig start rally_tavern myndy_api meety_me vitalitek myndy_ios gastown
+  8. Notify mayor:
+     gt nudge mayor "Dolt recovered. All rigs restarted."
+
+  ## Key Insight: Communication During Dolt Outage
+  When Dolt is down, gt mail, gt escalate, and bd all fail.
+  Use gt nudge — it delivers via tmux, independent of Dolt.
+
+  ## Do NOT
+  - Race individual rogues (new ones spawn in milliseconds)
+  - Use gt escalate (it needs beads_hq which is the broken thing)
+  - Restart Dolt without stopping agents first
+gotchas:
+  - bd auto-starts a local Dolt server from cwd when it can't connect
+  - In multi-rig deployments, this creates N competing servers on port 3307
+  - Each rogue only serves its own rig's database, not the shared set
+  - gt dolt status checks PID file, not actual process — may report wrong state
+  - Vitalitek or other rigs may refuse gt rig stop if polecats have uncommitted work
+tags: [gas-town, dolt, operations, recovery, thundering-herd]

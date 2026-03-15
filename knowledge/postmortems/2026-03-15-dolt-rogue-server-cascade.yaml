@@ -1,0 +1,67 @@
+id: dolt-rogue-server-cascade
+title: Dolt Rogue Server Cascade — bd Auto-Start Creates Port 3307 War
+date: 2026-03-15
+contributed_by: crew/max
+contributor_type: crew
+
+context: |
+  The shared Dolt server (~/gt/.dolt-data, port 3307) went down — PID file
+  pointed to dead process 29478, but a rogue Dolt (PID 18988) from
+  gastown/mayor/rig/.beads/dolt had claimed port 3307. This rogue only served
+  its own single database, not beads_hq or the other 14 databases.
+
+  Every bd command across every rig includes auto-start logic: if no Dolt
+  server responds on 3307, bd starts one from its local .beads/dolt directory.
+  With 5+ witnesses, a mayor, boot process, deacon, and dogs all running bd
+  commands, new rogues spawned within milliseconds of killing the previous one.
+
+  The result was a cascading port war: kill a rogue from myndy_api/.beads/dolt,
+  vitalitek/.beads/dolt spawns before gt dolt start can bind. Each rogue only
+  serves one database, so mail (needs beads_hq), cross-rig beads, and
+  escalation all fail — creating a catch-22 where the tools to report the
+  outage are broken by the outage.
+
+  Resolution required coordinated shutdown: stop all rigs (gt rig stop), kill
+  all dolt processes (pkill -9 -f "dolt sql-server"), start the correct server
+  (gt dolt start), then restart rigs. Total time from detection to resolution:
+  ~25 minutes, mostly spent losing the port race before understanding the
+  systemic nature of the problem.
+
+stop:
+  - Racing individual rogues without stopping the spawners first
+  - Assuming killing one rogue Dolt will leave the port free long enough
+  - Trying to escalate via gt escalate when beads_hq is the thing that's down
+
+start:
+  - Stopping all rig agents FIRST before attempting Dolt recovery
+  - Using /usr/sbin/lsof -p <pid> -Fn to check a Dolt process's working dir
+  - Recognizing the catch-22 early and using gt nudge (not gt escalate or mail) to communicate during Dolt outages
+  - Checking lsof cwd against ~/gt/.dolt-data to distinguish correct vs rogue servers
+
+continue:
+  - gt dolt status showing available databases even when server is down
+  - gt nudge working independently of Dolt (direct tmux delivery)
+  - Mayor acknowledging and validating recovery promptly
+
+outcome: |
+  Coordinated restart succeeded. Correct server started from ~/gt/.dolt-data
+  with all 10 databases verified. All rigs restarted. Mayor confirmed stable.
+  One rig (vitalitek) required --force due to uncommitted polecat work, but
+  mayor confirmed this was harmless (staged .gitignore change).
+
+  Root cause: bd's auto-start behavior is a reasonable fallback for single-rig
+  use, but in a multi-rig Gas Town deployment it creates a thundering herd
+  problem. When the shared server dies, N agents all race to start their own
+  local server, each serving only their own database.
+
+  Suggested fix: bd auto-start should check if the running server's data
+  directory matches the expected shared directory before spawning a new one,
+  or should defer to gt dolt start rather than starting from cwd.
+
+tags:
+  - gas-town
+  - dolt
+  - operations
+  - crash-recovery
+  - thundering-herd
+  - port-conflict
