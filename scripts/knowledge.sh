@@ -59,15 +59,90 @@ case "$ACTION" in
     ;;
     
   search)
-    QUERY=""
+    SEARCH_TERMS=()
+    FILTER_TAG=""
+    FILTER_CODEBASE=""
+    FILTER_PLATFORM=""
     while [[ $# -gt 0 ]]; do
       case $1 in
-        --tag) grep -rl "tags:.*$2" knowledge/ 2>/dev/null; shift 2;;
-        --codebase) grep -rl "codebase_type: $2" knowledge/ 2>/dev/null; shift 2;;
-        --platform) grep -rl "platform: $2" knowledge/ 2>/dev/null; shift 2;;
-        *) grep -rl "$1" knowledge/ 2>/dev/null; shift;;
+        --tag) FILTER_TAG="$2"; shift 2;;
+        --codebase) FILTER_CODEBASE="$2"; shift 2;;
+        --platform) FILTER_PLATFORM="$2"; shift 2;;
+        *) SEARCH_TERMS+=("$1"); shift;;
       esac
     done
+
+    SCORE_FILE=$(mktemp)
+    trap "rm -f '$SCORE_FILE'" EXIT
+
+    for kfile in knowledge/*/*.yaml; do
+      [ -f "$kfile" ] || continue
+      content=$(cat "$kfile" 2>/dev/null) || continue
+      echo "$content" | grep -q "^title:" || continue
+
+      score=0
+
+      # Apply filters (hard gates)
+      if [ -n "$FILTER_TAG" ]; then
+        echo "$content" | grep -qi "tags:.*${FILTER_TAG}" || continue
+        score=$((score + 3))
+      fi
+      if [ -n "$FILTER_CODEBASE" ]; then
+        echo "$content" | grep -qi "codebase_type:.*${FILTER_CODEBASE}" || continue
+        score=$((score + 2))
+      fi
+      if [ -n "$FILTER_PLATFORM" ]; then
+        echo "$content" | grep -qi "platform:.*${FILTER_PLATFORM}" || continue
+        score=$((score + 2))
+      fi
+
+      # Term matching
+      content_lower=$(echo "$content" | tr '[:upper:]' '[:lower:]')
+      for term in "${SEARCH_TERMS[@]}"; do
+        term_lower=$(echo "$term" | tr '[:upper:]' '[:lower:]')
+        if echo "$content_lower" | grep -q "$term_lower"; then
+          score=$((score + 3))
+        fi
+      done
+
+      [ $score -eq 0 ] && continue
+
+      # Verification bonus/penalty
+      verified_by=$(echo "$content" | grep "^verified_by:" | head -1 | cut -d: -f2- | xargs 2>/dev/null || true)
+      if [ -n "$verified_by" ] && [ "$verified_by" != "[]" ]; then
+        score=$((score + 3))
+      else
+        score=$((score - 2))
+      fi
+
+      # Time decay — penalize old entries
+      created_at=$(echo "$content" | grep "^created_at:" | head -1 | cut -d: -f2- | xargs 2>/dev/null || true)
+      if [ -n "$created_at" ]; then
+        created_date="${created_at%%T*}"
+        if created_epoch=$(date -j -f "%Y-%m-%d" "$created_date" "+%s" 2>/dev/null); then
+          now_epoch=$(date "+%s")
+          age_days=$(( (now_epoch - created_epoch) / 86400 ))
+          if [ $age_days -gt 0 ]; then
+            decay=$(( age_days / 30 ))
+            [ $decay -gt 5 ] && decay=5
+            score=$((score - decay))
+          fi
+        fi
+      fi
+
+      [ $score -le 0 ] && continue
+
+      title=$(echo "$content" | grep "^title:" | head -1 | cut -d: -f2- | xargs)
+      echo "${score}|${kfile}|${title}" >> "$SCORE_FILE"
+    done
+
+    if [ -s "$SCORE_FILE" ]; then
+      sort -t'|' -k1 -nr "$SCORE_FILE" | head -10 | while IFS='|' read -r score file title; do
+        printf "  [%2d] %s — %s\n" "$score" "$file" "$title"
+      done
+    else
+      echo "  No matches found."
+    fi
     ;;
     
   list)

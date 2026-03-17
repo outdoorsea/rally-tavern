@@ -146,6 +146,33 @@ while IFS= read -r kfile; do
     done <<< "$title_keywords"
   fi
 
+  # 3. Verification bonus/penalty
+  verified_by=$(echo "$content" | grep "^verified_by:" | head -1 | cut -d: -f2- | xargs || true)
+  if [[ -n "$verified_by" ]] && [[ "$verified_by" != "[]" ]]; then
+    score=$((score + 3))
+  else
+    # Penalize unverified entries
+    score=$((score - 2))
+  fi
+
+  # 4. Time decay — penalize old entries
+  created_at=$(echo "$content" | grep "^created_at:" | head -1 | cut -d: -f2- | xargs || true)
+  if [[ -n "$created_at" ]]; then
+    # Extract date portion (YYYY-MM-DD) from ISO timestamp
+    created_date="${created_at%%T*}"
+    # Calculate age in days using epoch seconds
+    if created_epoch=$(date -j -f "%Y-%m-%d" "$created_date" "+%s" 2>/dev/null); then
+      now_epoch=$(date "+%s")
+      age_days=$(( (now_epoch - created_epoch) / 86400 ))
+      # Decay: -1 point per 30 days of age, capped at -5
+      if [[ $age_days -gt 0 ]]; then
+        decay=$(( age_days / 30 ))
+        [[ $decay -gt 5 ]] && decay=5
+        score=$((score - decay))
+      fi
+    fi
+  fi
+
   if [[ $score -gt 0 ]]; then
     entry_title=$(echo "$content" | grep "^title:" | head -1 | cut -d: -f2- | xargs)
     # Format: score|file|matched_tags|title
