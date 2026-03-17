@@ -594,17 +594,22 @@ adopts this identity. Gives the repo personality — you're asking the Barkeep, 
 a database.
 
 **📜 Historian** — the knowledge approval role
-When a rig Mayor nominates a knowledge artifact (two-stage approval flow), the Historian
-evaluates it before it enters the permanent record. The Historian is the rally_tavern Mayor
-acting in review mode. Named for the Revolutionary War role of preserving ideas for
-posterity — the Barkeep served the revolutionaries; the Historian made sure their work
-survived.
+In v1 (single-hop topology), the Historian evaluates nominations sent directly by polecats
+at `gt done` time. The Historian is the rally_tavern Mayor acting in review mode. Named for
+the Revolutionary War role of preserving ideas for posterity — the Barkeep served the
+revolutionaries; the Historian made sure their work survived.
+
+> **Future: two-stage approval.** When Gas Town scales beyond ~5 rigs or accepts
+> contributions from untrusted sources, add a rig Mayor nomination hop: polecat →
+> rig Mayor (filters noise) → Barkeep/Historian (accepts into corpus). This adds
+> a quality gate at the rig level but is unnecessary overhead while all contributors
+> are trusted polecats in a small number of rigs.
 
 These characters appear in:
 - CLI output from `rally` scripts (`The Historian has reviewed...`)
 - The rally_tavern Mayor's CLAUDE.md identity
 - README and docs
-- Approval/rejection messages in the two-stage workflow
+- Approval/rejection messages in the knowledge review workflow
 
 ---
 
@@ -615,8 +620,8 @@ These characters appear in:
 | rally_tavern location | `$GT_ROOT/rally_tavern/` — conventional path, graceful degradation if absent |
 | `rally` CLI language | Bash + grep/yq — matches existing 44 scripts, zero new dependencies |
 | Search scope (v1) | Knowledge only (practices, solutions, postmortems, learned) — artifact search stays separate |
-| AFTER phase trigger | Agent self-nominates at `gt done` — polecat marks bead knowledge-worthy at completion |
-| Approval routing | Two-stage: rig Mayor nominates → rally_tavern Mayor accepts |
+| AFTER phase trigger | Polecat nominates directly to Barkeep at `gt done` via `gt rally nominate` — single-hop, no rig Mayor intermediary in v1 |
+| Approval routing | Single-stage for v1: polecat nominates directly to Barkeep. Two-stage (rig Mayor nomination hop) deferred until >5 rigs or untrusted contributors. |
 | CLI form | `rally search` (bolt-on), NOT `gt rally search` (would require Gas Town source changes) |
 
 ---
