@@ -365,7 +365,11 @@ server.tool(
   {
     category: z
       .enum(["practice", "solution", "learned"])
-      .describe("Knowledge category"),
+      .optional()
+      .describe(
+        "Knowledge category. If omitted, auto-classified from fields: " +
+        "problem+solution → solution, lesson → learned, else practice"
+      ),
     title: z.string().describe("Short title for the knowledge entry"),
     summary: z.string().describe("One-sentence summary"),
     tags: z
@@ -415,8 +419,12 @@ server.tool(
     details,
     dryRun,
   }) => {
+    // Auto-classify category from provided fields when not explicit
+    const resolvedCategory =
+      category ?? (problem || solution ? "solution" : lesson ? "learned" : "practice");
+
     const args: string[] = [
-      "--category", category,
+      "--category", resolvedCategory,
       "--title", title,
       "--summary", summary,
     ];
@@ -437,7 +445,10 @@ server.tool(
         env: process.env,
         timeout: 30_000,
       });
-      const output = stdout + (stderr ? "\n" + stderr : "");
+      const autoNote = !category
+        ? `[auto-classified as "${resolvedCategory}"]\n`
+        : "";
+      const output = autoNote + stdout + (stderr ? "\n" + stderr : "");
       return { content: [{ type: "text" as const, text: output }] };
     } catch (err: unknown) {
       const error = err as { stdout?: string; stderr?: string; message?: string };
