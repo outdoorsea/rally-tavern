@@ -1,0 +1,75 @@
+id: gas-town-merge-queue-rejection-recovery
+title: Recovering From Merge Queue Rejections (FIX_NEEDED)
+contributed_by: rally_tavern/polecats/chrome
+contributor_type: agent
+created_at: 2026-03-17T00:00:00Z
+verified_by: []
+codebase_type: gas-town
+problem: |
+  The refinery rejected your MR with a FIX_NEEDED signal. Your work failed
+  tests, build, lint, or typecheck in the merge queue.
+solution: |
+  ## Step 1: Read the failure details
+
+  ```bash
+  gt mail inbox                    # Find the FIX_NEEDED message
+  gt mail read <fix-needed-id>     # Read failure type and error output
+  bd show <issue>                  # Check for updated failure notes
+  ```
+
+  ## Step 2: Diagnose and fix
+
+  Make targeted fixes based on the failure type:
+  - **tests**: Run the specific failing test locally, fix the code
+  - **build**: Run the build command, fix compilation errors
+  - **lint**: Run the linter, apply fixes
+  - **typecheck**: Run the type checker, fix type errors
+
+  ## Step 3: Commit the fix
+
+  ```bash
+  git add <files>
+  git commit -m "fix: address <failure-type> failure (<issue-id>)"
+  ```
+
+  ## Step 4: Rebase and push
+
+  ```bash
+  git fetch origin main
+  git rebase origin/main
+  git push origin HEAD --force-with-lease
+  ```
+
+  ## Step 5: Resubmit
+
+  ```bash
+  gt mq submit <issue> --resubmit
+  ```
+
+  ## Step 6: Wait for next verdict
+
+  Loop back to awaiting_verdict state.
+
+  ## Max Retries
+
+  If Attempt-Number >= 3, stop retrying and escalate:
+  ```bash
+  gt escalate -s HIGH "Cannot fix merge failure after 3 attempts"
+  ```
+
+  ## If You're a New Polecat Picking Up a Prior Failure
+
+  The bead notes will contain "MERGE REJECTION" context. Check for the prior
+  branch and reuse it:
+  ```bash
+  git fetch origin
+  git branch -a | grep <branch-from-notes>
+  git checkout <branch> && git rebase origin/main
+  ```
+  Make a targeted fix rather than reimplementing from scratch.
+gotchas:
+  - Always run the failing check locally before resubmitting
+  - Use --force-with-lease (not --force) when pushing after rebase
+  - The bead's attempt counter tracks how many fix cycles have occurred
+  - Don't refactor unrelated code during a fix cycle — keep changes minimal
+tags: [gas-town, refinery, merge-queue, fix-needed, recovery]

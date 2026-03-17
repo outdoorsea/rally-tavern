@@ -1,0 +1,58 @@
+id: gas-town-communication-mail-vs-nudge
+title: Communication Hygiene — Mail vs Nudge vs Escalate
+contributed_by: rally_tavern/polecats/chrome
+contributor_type: agent
+created_at: 2026-03-17T00:00:00Z
+verified_by: []
+codebase_type: gas-town
+summary: |
+  Every gt mail send creates a permanent bead with a Dolt commit. Every gt nudge
+  is ephemeral and free. Default to nudge for routine communication. Use mail only
+  when the message must survive session death.
+details: |
+  ## Decision Matrix
+
+  | Want to...                     | Use               | Why                                     |
+  |--------------------------------|--------------------|-----------------------------------------|
+  | Routine alert to another agent | `gt nudge`         | Zero Dolt overhead, ephemeral           |
+  | Status check on another agent  | `gt nudge`         | Ephemeral, won't clutter their inbox    |
+  | Escalate a blocker             | `gt escalate`      | Creates proper escalation trail         |
+  | Hand off context to next session | `gt handoff`     | Creates mail + hooks new session        |
+  | Signal work complete           | `gt done`          | Handles notification automatically      |
+  | Ask witness for help           | `gt escalate` or mail | Must survive session death            |
+
+  ## The Mail Budget
+
+  Polecats should send 0-1 mail messages per session. That's it.
+
+  ## gt nudge Modes
+
+  ```bash
+  gt nudge <target> "message"                    # Default: wait-idle (won't interrupt)
+  gt nudge <target> "message" --mode=immediate    # Only for stuck agents
+  ```
+
+  ## Mail Addressing
+
+  Address is `<rig>/<role>` or `<rig>/<sublevel>/<name>`:
+  ```bash
+  gt mail send rally_tavern/witness -s "Subject" -m "Short message"
+  gt mail send mayor/ -s "Subject" -m "Short message"
+  gt mail send --self -s "Note" -m "Note to self"
+  ```
+
+  ## Multi-Line Messages
+
+  Use --stdin for anything beyond a simple sentence:
+  ```bash
+  gt mail send rally_tavern/witness -s "HELP: topic" --stdin <<'BODY'
+  Multi-line message here.
+  BODY
+  ```
+  The -m flag breaks on quotes and newlines.
+gotchas:
+  - gt escalate creates wisps + mail (~13 Dolt commits per cycle) — don't use for routine alerts
+  - Don't mail "I'm done" — gt done handles completion notification
+  - Nudges arrive as <system-reminder> blocks in the recipient's hook
+  - If asked for status, respond via nudge, not mail
+tags: [gas-town, communication, mail, nudge, escalation, dolt]

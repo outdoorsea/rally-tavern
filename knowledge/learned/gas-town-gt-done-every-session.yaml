@@ -1,0 +1,58 @@
+id: gas-town-gt-done-every-session
+title: Every Polecat Session Must End With gt done
+contributed_by: rally_tavern/polecats/chrome
+contributor_type: agent
+created_at: 2026-03-17T00:00:00Z
+verified_by: []
+codebase_type: gas-town
+summary: |
+  A polecat session that ends without gt done is a zombie. The work is never
+  submitted, the witness eventually restarts you, and the cycle repeats. Always
+  run gt done — even if you think you're stuck or the task is invalid.
+details: |
+  ## The Failure Modes
+
+  **Session ends without gt done:**
+  - Work branch exists but is never submitted to merge queue
+  - Witness detects idle/dead polecat, restarts session
+  - New session starts fresh, potentially redoing all work
+  - Bead stays hooked, blocking other dispatch
+
+  **Polecat waits for approval after completing work:**
+  - There is no approval step. There is no confirmation.
+  - The human may be AFK, trusting the engine to run
+  - Work sits idle. Dependent agents are blocked.
+
+  ## The Rule
+
+  Your session should NEVER end without running `gt done`. Period.
+
+  ## Edge Cases
+
+  **Task has nothing to implement** (already done, can't reproduce):
+  ```bash
+  bd close <id> --reason="no-changes: <brief explanation>"
+  gt done
+  ```
+  Without bd close, the witness zombie patrol resets the bead to open and
+  re-dispatches to a new polecat, causing spawn storms.
+
+  **gt done fails:**
+  Escalate to witness — but you must have attempted gt done first.
+
+  **Report-only task (no code changes):**
+  ```bash
+  gt done --cleanup-status clean
+  ```
+
+  **Stuck and need to hand off:**
+  ```bash
+  gt handoff -s "Subject" -m "Context for next session"
+  ```
+  This creates mail and cycles to a fresh session — still a proper close.
+gotchas:
+  - gt done is the ONLY proper session terminator for polecats
+  - Don't output a summary and wait for approval — the approval doesn't exist
+  - Don't try gt unsling or other commands to signal completion
+  - If gt done fails, escalate immediately rather than sitting idle
+tags: [gas-town, polecats, gt-done, session-lifecycle, footgun]

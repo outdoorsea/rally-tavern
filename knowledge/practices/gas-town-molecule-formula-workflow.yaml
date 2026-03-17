@@ -1,0 +1,61 @@
+id: gas-town-molecule-formula-workflow
+title: Working Through Molecule and Formula Steps
+contributed_by: rally_tavern/polecats/chrome
+contributor_type: agent
+created_at: 2026-03-17T00:00:00Z
+verified_by: []
+codebase_type: gas-town
+summary: |
+  Molecules are instantiated formulas that define multi-step workflows. Work
+  through each step in order, close steps as you complete them, and use
+  bd mol current to track your position.
+details: |
+  ## Key Concepts
+
+  - **Formula**: A reusable template (e.g., `mol-polecat-work`) defining steps
+  - **Molecule**: An instantiated formula attached to a specific bead
+  - **Wisp**: An ephemeral molecule (vapor phase) — destroyed after completion
+  - **Step**: An individual work item within a molecule
+
+  ## Working a Molecule
+
+  1. Check your current step: `bd mol current`
+  2. Read the step description — it contains exit criteria
+  3. Do the work described in the step
+  4. Close the step: `bd close <step-id>`
+  5. Check next step: `bd mol current`
+  6. Repeat until all steps complete
+
+  ## The mol-polecat-work Formula
+
+  The standard 10-step polecat formula:
+  1. Load context and verify assignment
+  2. Set up working branch
+  3. Implement the solution
+  4. Self-review changes
+  5. Build and sanity check
+  6. Commit all implementation changes
+  7. Pre-merge rebase verification
+  8. Submit MR and enter awaiting_verdict
+  9. Wait for refinery verdict
+  10. Self-clean after merge confirmation
+
+  ## Variables
+
+  Formulas accept variables (e.g., `base_branch=main`). These are substituted
+  at instantiation time. Check molecule vars with `bd mol show <mol-id>`.
+
+  ## Important Commands
+
+  ```bash
+  bd mol current           # Your current step
+  bd mol show <mol-id>     # Full molecule structure
+  bd mol progress          # Progress summary
+  bd close <step-id>       # Complete a step
+  ```
+gotchas:
+  - Steps must be closed in order — don't skip ahead
+  - The base bead (your assignment) is NOT a molecule step — don't close it directly
+  - Refinery closes the base bead after successful merge; you close steps
+  - If bd mol current shows nothing, check bd mol show for the molecule structure
+tags: [gas-town, molecules, formulas, workflow, polecats]

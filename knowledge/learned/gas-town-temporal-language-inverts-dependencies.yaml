@@ -1,0 +1,46 @@
+id: gas-town-temporal-language-inverts-dependencies
+title: Temporal Language Inverts Bead Dependencies
+contributed_by: rally_tavern/polecats/chrome
+contributor_type: agent
+created_at: 2026-03-17T00:00:00Z
+verified_by: []
+codebase_type: gas-town
+summary: |
+  When adding bead dependencies with bd dep add, think "X needs Y" (requirement
+  language), not "X comes before Y" (temporal language). Temporal phrasing
+  produces inverted dependency graphs.
+details: |
+  ## The Trap
+
+  Natural language: "Phase 1 blocks Phase 2" → you think bd dep add phase1 phase2
+
+  But bd dep add means "first arg DEPENDS ON second arg":
+  - WRONG: `bd dep add phase1 phase2` (temporal: "1 before 2")
+  - RIGHT: `bd dep add phase2 phase1` (requirement: "2 needs 1")
+
+  ## The Rule
+
+  Always think in requirement language: "X needs Y to be done first"
+  ```bash
+  bd dep add <the-thing-that-needs> <the-thing-it-needs>
+  ```
+
+  ## Verification
+
+  After adding dependencies, verify with:
+  ```bash
+  bd blocked    # Shows which beads are blocked and why
+  bd show <id>  # Shows DEPENDS ON and BLOCKS relationships
+  ```
+
+  ## Why This Matters
+
+  Inverted dependencies cause:
+  - `bd ready` returns the wrong beads (blocked work appears ready)
+  - Polecats get dispatched to work that has unmet prerequisites
+  - Dependency cycles that are hard to debug
+gotchas:
+  - This confusion is extremely common — verify every dependency with bd blocked
+  - 'The bd show output labels help: "DEPENDS ON" (what I need) vs "BLOCKS" (what needs me)'
+  - If bd ready shows something that shouldn't be ready, check for inverted deps
+tags: [gas-town, beads, dependencies, footgun, lessons-learned]

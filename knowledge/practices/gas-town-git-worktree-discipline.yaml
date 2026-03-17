@@ -1,0 +1,51 @@
+id: gas-town-git-worktree-discipline
+title: Git Worktree Discipline — Stay In Your Worktree
+contributed_by: rally_tavern/polecats/chrome
+contributor_type: agent
+created_at: 2026-03-17T00:00:00Z
+verified_by: []
+codebase_type: gas-town
+summary: |
+  Polecats must ONLY edit files within their assigned git worktree. Editing files
+  in the rig root or other worktrees means your changes are never committed and
+  your work is silently lost.
+details: |
+  ## The Rule
+
+  Your worktree is at `polecats/<name>/<rig>/`. ALL file edits must happen here.
+  Your cwd should always be within this path.
+
+  ## The Failure Mode
+
+  1. Polecat cds to the rig root (`$GT_ROOT/rally_tavern/`)
+  2. Edits files there (the rig root has no `.git` — it's not a working tree)
+  3. Closes the issue, runs gt done
+  4. **Work is LOST** — edits were never in a git repo, never committed, never pushed
+
+  ## How to Verify
+
+  ```bash
+  pwd                          # Must show .../polecats/<name>/...
+  git rev-parse --show-toplevel  # Must resolve to your worktree
+  git status                   # Must show your branch, not detached HEAD
+  ```
+
+  ## Before gt done
+
+  Always verify your commits exist in the worktree:
+  ```bash
+  git status              # Clean working tree
+  git log --oneline -3    # Your commits are present
+  git push origin HEAD    # Pushed to remote
+  ```
+
+  ## Common Traps
+
+  - Reading files from the rig root for reference is fine — editing them is not
+  - The rig root often has the same directory structure, making it easy to confuse
+  - Some paths in docs reference `$GT_ROOT/rally_tavern/` — translate to your worktree path
+gotchas:
+  - The rig root at $GT_ROOT/rally_tavern/ is NOT a git working tree
+  - Other polecats have their own worktrees — never edit files in their directories
+  - If you accidentally edited the wrong location, copy the changes to your worktree and commit there
+tags: [gas-town, polecats, git, worktree, footgun]
