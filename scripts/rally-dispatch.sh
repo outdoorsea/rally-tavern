@@ -247,6 +247,7 @@ else
   # Attempt to create beads via bd if available
   if command -v bd >/dev/null 2>&1; then
     beads_created=0
+    created_bead_ids=""
     log_info "Creating beads..."
 
     while IFS= read -r task_line; do
@@ -255,14 +256,24 @@ else
       [[ -z "$ttitle" ]] && continue
 
       set +e
-      bd create --title "$ttitle" --type task 2>/dev/null
+      bead_id=$(bd q --title "$ttitle" --type task 2>/dev/null)
       bd_exit=$?
       set -e
 
-      if [[ $bd_exit -eq 0 ]]; then
+      if [[ $bd_exit -eq 0 ]] && [[ -n "$bead_id" ]]; then
         beads_created=$((beads_created + 1))
+        created_bead_ids="${created_bead_ids}${bead_id} "
       else
-        log_warn "Failed to create bead for: $ttitle"
+        # Fallback to bd create if bd q is not available
+        set +e
+        bd create --title "$ttitle" --type task 2>/dev/null
+        bd_exit=$?
+        set -e
+        if [[ $bd_exit -eq 0 ]]; then
+          beads_created=$((beads_created + 1))
+        else
+          log_warn "Failed to create bead for: $ttitle"
+        fi
       fi
     done < <(for key in "${!phase_tasks[@]}"; do echo "${phase_tasks[$key]}"; done)
 
@@ -298,11 +309,15 @@ else
       [[ -n "${phase_tasks["$phase_key"]:-}" ]] && phase_tags="${phase_tags}${phase_key},"
     done
 
+    # Pass --bead if we have a created bead ID (uses graph-aware ranking)
+    first_bead_id=$(echo "$created_bead_ids" | awk '{print $1}')
+
     # Generate knowledge context for the dispatch
     set +e
     "$knowledge_push_script" \
       --title "$all_titles" \
       ${phase_tags:+--tags "${phase_tags%,}"} \
+      ${first_bead_id:+--bead "$first_bead_id"} \
       --format markdown \
       --max 5 \
       > "${knowledge_dir}/dispatch-knowledge.md" 2>/dev/null

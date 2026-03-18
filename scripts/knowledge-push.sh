@@ -11,6 +11,8 @@
 #   knowledge-push.sh --tags "gas-town" --title "hooks cleanup"
 #   knowledge-push.sh --tags "gas-town" --format yaml
 #   knowledge-push.sh --tags "gas-town" --max 3
+#   knowledge-push.sh --bead rt-sl8p
+#   knowledge-push.sh --bead rt-sl8p --tags "gas-town"
 #
 # Output formats:
 #   markdown (default) — Human-readable context block for CLAUDE.md injection
@@ -23,14 +25,17 @@ source "$(dirname "$0")/../lib/common.sh"
 
 TAGS=""
 TITLE=""
+BEAD_ID=""
 FORMAT="markdown"
 MAX_RESULTS=5
 KNOWLEDGE_DIR="$TAVERN_ROOT/knowledge"
+BEAD_WALK_SCRIPT="$(dirname "$0")/knowledge-bead-walk.sh"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --tags)     TAGS="${2:-}"; shift 2;;
     --title)    TITLE="${2:-}"; shift 2;;
+    --bead)     BEAD_ID="${2:-}"; shift 2;;
     --format)   FORMAT="${2:-markdown}"; shift 2;;
     --max)      MAX_RESULTS="${2:-5}"; shift 2;;
     --help|-h)
@@ -41,12 +46,14 @@ while [[ $# -gt 0 ]]; do
       echo "Options:"
       echo "  --tags <t1,t2,...>  Comma-separated tags to match against knowledge entries"
       echo "  --title <text>     Bead title — extracted keywords match against knowledge"
+      echo "  --bead <id>        Bead ID — walk dependency graph for contextual matching"
       echo "  --format <fmt>     Output format: markdown (default), yaml, paths"
       echo "  --max <n>          Maximum entries to return (default: 5)"
       echo ""
       echo "Searches knowledge/ for entries whose tags overlap with the given tags"
-      echo "or whose content matches keywords from the title. Results are ranked"
-      echo "by tag overlap count."
+      echo "or whose content matches keywords from the title. When --bead is provided,"
+      echo "walks the bead dependency graph (depth 2) to find contextually adjacent"
+      echo "knowledge. Ranking: graph-linked > tag-matched > title-matched."
       exit 0
       ;;
     -*)
@@ -62,8 +69,63 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+# --- Bead graph walk: enrich tags and title from dependency graph ---
+
+GRAPH_SOURCE_BEADS=""  # Knowledge entry IDs linked via source_beads in the graph
+
+if [[ -n "$BEAD_ID" ]] && [[ -x "$BEAD_WALK_SCRIPT" ]]; then
+  bead_walk_json=$("$BEAD_WALK_SCRIPT" "$BEAD_ID" --format json 2>/dev/null) || true
+
+  if [[ -n "$bead_walk_json" ]]; then
+    # Extract graph tags and merge with explicit tags
+    graph_tags=$(echo "$bead_walk_json" | python3 -c "
+import json, sys
+data = json.load(sys.stdin)
+for tag in data.get('tags', []):
+    print(tag)
+" 2>/dev/null) || true
+
+    if [[ -n "$graph_tags" ]]; then
+      # Merge graph tags into TAGS (comma-separated), deduplicating
+      if [[ -n "$TAGS" ]]; then
+        merged=$(printf '%s\n%s' "$(echo "$TAGS" | tr ',' '\n')" "$graph_tags" | sort -u | tr '\n' ',' | sed 's/,$//')
+        TAGS="$merged"
+      else
+        TAGS=$(echo "$graph_tags" | tr '\n' ',' | sed 's/,$//')
+      fi
+    fi
+
+    # Extract graph titles and merge with explicit title
+    graph_titles=$(echo "$bead_walk_json" | python3 -c "
+import json, sys
+data = json.load(sys.stdin)
+for title in data.get('titles', []):
+    print(title)
+" 2>/dev/null) || true
+
+    if [[ -n "$graph_titles" ]]; then
+      if [[ -n "$TITLE" ]]; then
+        TITLE="$TITLE $graph_titles"
+      else
+        TITLE="$graph_titles"
+      fi
+    fi
+
+    # Extract source_beads (knowledge entry IDs linked via graph)
+    GRAPH_SOURCE_BEADS=$(echo "$bead_walk_json" | python3 -c "
+import json, sys
+data = json.load(sys.stdin)
+for sb in data.get('source_beads', []):
+    print(sb)
+" 2>/dev/null) || true
+  fi
+elif [[ -n "$BEAD_ID" ]] && [[ ! -x "$BEAD_WALK_SCRIPT" ]]; then
+  log_warn "Bead walk script not found or not executable: $BEAD_WALK_SCRIPT"
+  log_warn "Falling back to tag/title matching only"
+fi
+
 if [[ -z "$TAGS" ]] && [[ -z "$TITLE" ]]; then
-  log_error "At least one of --tags or --title is required"
+  log_error "At least one of --tags, --title, or --bead is required"
   exit 1
 fi
 
@@ -125,10 +187,18 @@ import json, sys
 snapshot = json.load(open('$SNAPSHOT_FILE'))
 tag_list = [t.strip() for t in '''$TAGS'''.split(',') if t.strip()] if '''$TAGS''' else []
 title_keywords = [k for k in '''$title_keywords'''.split('\n') if k.strip()]
+graph_source_beads = set(s.strip() for s in '''$GRAPH_SOURCE_BEADS'''.split('\n') if s.strip())
 
 for entry in snapshot.get('entries', []):
     score = 0
     matched = []
+
+    entry_id = entry.get('id', '')
+
+    # Graph-linked scoring (highest priority: +10)
+    if entry_id in graph_source_beads:
+        score += 10
+        matched.append('graph-linked')
 
     # Tag overlap scoring
     entry_tags = [t.lower() for t in entry.get('tags', [])]
@@ -156,7 +226,7 @@ for entry in snapshot.get('entries', []):
 
     if score > 0:
         # Format: score|source|matched_tags|title
-        src = f'snapshot:{entry[\"id\"]}'
+        src = f'snapshot:{entry_id}'
         print(f'{score}|{src}|{\",\".join(matched)}|{entry.get(\"title\",\"\")}')
 " >> "$SCORE_FILE" 2>/dev/null
 
@@ -172,6 +242,15 @@ else
 
     # Skip entries without a title field (e.g., repo listings)
     echo "$content" | grep -q "^title:" || continue
+
+    # Graph-linked scoring (highest priority: +10)
+    if [[ -n "$GRAPH_SOURCE_BEADS" ]]; then
+      entry_id=$(echo "$content" | grep "^id:" | head -1 | cut -d: -f2- | xargs)
+      if [[ -n "$entry_id" ]] && echo "$GRAPH_SOURCE_BEADS" | grep -qx "$entry_id"; then
+        score=$((score + 10))
+        matched="${matched}graph-linked,"
+      fi
+    fi
 
     # Score by tag overlap
     if [[ -n "$tag_list" ]]; then

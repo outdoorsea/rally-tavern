@@ -94,6 +94,7 @@ case "$COMMAND" in
     echo "  rally tasks generate build-card.yaml  # Generate tasks from build card"
     echo "  rally dispatch build-card.yaml      # Dispatch tasks to Mayor"
     echo "  rally knowledge-push --tags 'gas-town,hooks' # Find relevant knowledge"
+    echo "  rally knowledge-push --bead rt-abc           # Graph-aware knowledge push"
     ;;
   *)
     log_error "Unknown command: $COMMAND"

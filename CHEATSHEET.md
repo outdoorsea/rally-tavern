@@ -26,6 +26,7 @@ rally feedback analyze          # Analyze build patterns
 rally tasks generate card.yaml  # Generate tasks from build card
 rally dispatch card.yaml        # Dispatch to Mayor convoy
 rally knowledge-push --tags "X" # Push relevant knowledge
+rally knowledge-push --bead rt-abc  # Graph-aware knowledge push
 ```
 
 ## Artifacts (TCEP)
