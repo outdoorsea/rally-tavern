@@ -41,5 +41,12 @@ needs:
                                # e.g., "real-time notifications"
                                # e.g., "PDF report generation"
 
+# --- Knowledge ---
+# Settings for the knowledge lifecycle (nomination, staleness, push).
+knowledge:
+  auto_nominate_threshold: 3   # Minimum heuristic score to trigger nomination prompt
+                               # Signals: reopened(+3), comments>2(+2), bug/incident(+2),
+                               #          children(+1), blocked(+1), gotcha label(+3)
+
 # --- Tags ---
 tags: []                       # e.g., [multi-agent, cli, infrastructure]
