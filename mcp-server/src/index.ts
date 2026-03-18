@@ -512,6 +512,56 @@ server.tool(
   }
 );
 
+// --- Staleness Tools ---
+
+server.tool(
+  "tavern.stale",
+  "Return knowledge entries flagged as stale by graph-aware staleness detection (superseded source beads, canary markers, or manual flags)",
+  {
+    category: z
+      .string()
+      .optional()
+      .describe("Filter by knowledge category (practices, solutions, learned, postmortems)"),
+    format: z
+      .enum(["text", "json"])
+      .optional()
+      .default("json")
+      .describe("Output format"),
+  },
+  async ({ category, format }) => {
+    const args: string[] = [];
+    if (category) args.push("--category", category);
+    args.push("--format", format ?? "json");
+
+    try {
+      const { stdout } = await runScript("knowledge-stale.sh", args);
+
+      if (format === "json" || !format) {
+        const parsed = parseJsonSafe(stdout);
+        if (parsed) {
+          return {
+            content: [
+              {
+                type: "text" as const,
+                text: JSON.stringify(parsed, null, 2),
+              },
+            ],
+          };
+        }
+      }
+
+      return { content: [{ type: "text" as const, text: stdout }] };
+    } catch (err: unknown) {
+      const error = err as { stdout?: string; stderr?: string; message?: string };
+      const output =
+        (error.stdout ?? "") + "\n" + (error.stderr ?? error.message ?? "Unknown error");
+      return {
+        content: [{ type: "text" as const, text: `Staleness check failed:\n${output}` }],
+      };
+    }
+  }
+);
+
 // --- Trust Tools ---
 
 server.tool(
