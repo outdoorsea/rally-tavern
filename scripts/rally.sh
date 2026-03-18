@@ -59,6 +59,9 @@ case "$COMMAND" in
   knowledge-push)
     exec "$TAVERN_ROOT/scripts/knowledge-push.sh" "$@"
     ;;
+  knowledge-bead-walk)
+    exec "$TAVERN_ROOT/scripts/knowledge-bead-walk.sh" "$@"
+    ;;
   help|--help|-h)
     echo "Rally - Agent-first planning and skill orchestration"
     echo ""

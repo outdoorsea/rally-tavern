@@ -11,6 +11,11 @@
 #   knowledge-push.sh --tags "gas-town" --title "hooks cleanup"
 #   knowledge-push.sh --tags "gas-town" --format yaml
 #   knowledge-push.sh --tags "gas-town" --max 3
+#   knowledge-push.sh --bead rt-sl8p --tags "beads"
+#
+# When --bead is provided, the script walks the bead dependency graph (depth 2)
+# to find knowledge entries linked to adjacent beads. Graph-linked entries rank
+# higher than tag-matched or title-matched entries.
 #
 # Output formats:
 #   markdown (default) — Human-readable context block for CLAUDE.md injection
@@ -23,14 +28,17 @@ source "$(dirname "$0")/../lib/common.sh"
 
 TAGS=""
 TITLE=""
+BEAD_ID=""
 FORMAT="markdown"
 MAX_RESULTS=5
 KNOWLEDGE_DIR="$TAVERN_ROOT/knowledge"
+BEAD_WALK_SCRIPT="$(dirname "$0")/knowledge-bead-walk.sh"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --tags)     TAGS="${2:-}"; shift 2;;
     --title)    TITLE="${2:-}"; shift 2;;
+    --bead)     BEAD_ID="${2:-}"; shift 2;;
     --format)   FORMAT="${2:-markdown}"; shift 2;;
     --max)      MAX_RESULTS="${2:-5}"; shift 2;;
     --help|-h)
@@ -41,12 +49,14 @@ while [[ $# -gt 0 ]]; do
       echo "Options:"
       echo "  --tags <t1,t2,...>  Comma-separated tags to match against knowledge entries"
       echo "  --title <text>     Bead title — extracted keywords match against knowledge"
+      echo "  --bead <id>        Bead ID — walks dependency graph for linked knowledge"
       echo "  --format <fmt>     Output format: markdown (default), yaml, paths"
       echo "  --max <n>          Maximum entries to return (default: 5)"
       echo ""
       echo "Searches knowledge/ for entries whose tags overlap with the given tags"
-      echo "or whose content matches keywords from the title. Results are ranked"
-      echo "by tag overlap count."
+      echo "or whose content matches keywords from the title. When --bead is given,"
+      echo "also walks the bead dependency graph (depth 2) for linked knowledge."
+      echo "Ranking: graph-linked > tag-matched > title-matched."
       exit 0
       ;;
     -*)
@@ -62,8 +72,8 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-if [[ -z "$TAGS" ]] && [[ -z "$TITLE" ]]; then
-  log_error "At least one of --tags or --title is required"
+if [[ -z "$TAGS" ]] && [[ -z "$TITLE" ]] && [[ -z "$BEAD_ID" ]]; then
+  log_error "At least one of --tags, --title, or --bead is required"
   exit 1
 fi
 
@@ -239,6 +249,146 @@ else
       echo "${score}|${kfile}|${matched%,}|${entry_title}" >> "$SCORE_FILE"
     fi
   done < <(find "$KNOWLEDGE_DIR" -name "*.yaml" -type f 2>/dev/null)
+fi
+
+# --- Graph walk bonus: boost entries linked via bead dependency graph ---
+
+GRAPH_LINKED_IDS=""
+if [[ -n "$BEAD_ID" ]] && [[ -x "$BEAD_WALK_SCRIPT" ]]; then
+  GRAPH_LINKED_IDS=$("$BEAD_WALK_SCRIPT" "$BEAD_ID" --format json 2>/dev/null) || GRAPH_LINKED_IDS=""
+fi
+
+if [[ -n "$GRAPH_LINKED_IDS" ]] && [[ "$GRAPH_LINKED_IDS" != "[]" ]]; then
+  # For graph-linked entries not already in SCORE_FILE, add them with a base score
+  # For entries already scored, boost their score based on graph distance
+
+  if $USE_SNAPSHOT; then
+    # Boost/add from snapshot
+    python3 -c "
+import json, sys
+
+graph_data = json.loads('''$GRAPH_LINKED_IDS''')
+if not graph_data:
+    sys.exit(0)
+
+# Build map of knowledge_id -> graph_distance
+graph_map = {e['knowledge_id']: e['graph_distance'] for e in graph_data}
+
+# Read existing scores to check what's already present
+existing = set()
+try:
+    with open('$SCORE_FILE') as f:
+        for line in f:
+            parts = line.strip().split('|')
+            if len(parts) >= 2:
+                src = parts[1]
+                if src.startswith('snapshot:'):
+                    existing.add(src[len('snapshot:'):])
+except FileNotFoundError:
+    pass
+
+# Load snapshot for entries we need to add
+snapshot = json.load(open('$SNAPSHOT_FILE'))
+
+for entry in snapshot.get('entries', []):
+    eid = entry.get('id', '')
+    if eid in graph_map and eid not in existing:
+        # Graph bonus: 10 for depth 0, 8 for depth 1, 6 for depth 2+
+        dist = graph_map[eid]
+        bonus = max(6, 10 - (dist * 2))
+        title = entry.get('title', '')
+        print(f'{bonus}|snapshot:{eid}|graph-linked|{title}')
+" 2>/dev/null >> "$SCORE_FILE" || true
+  fi
+
+  if [[ -d "$KNOWLEDGE_DIR" ]]; then
+    # Boost/add from filesystem knowledge entries
+    python3 -c "
+import json, sys, os, glob
+
+graph_data = json.loads('''$GRAPH_LINKED_IDS''')
+if not graph_data:
+    sys.exit(0)
+
+graph_map = {e['knowledge_id']: e['graph_distance'] for e in graph_data}
+
+# Read existing scored files
+existing_files = set()
+try:
+    with open('$SCORE_FILE') as f:
+        for line in f:
+            parts = line.strip().split('|')
+            if len(parts) >= 2 and not parts[1].startswith('snapshot:'):
+                existing_files.add(parts[1])
+except FileNotFoundError:
+    pass
+
+# Scan knowledge directory for matching entry IDs
+for kfile in glob.glob('$KNOWLEDGE_DIR/*/*.yaml'):
+    with open(kfile) as f:
+        content = f.read()
+    # Extract id field
+    for line in content.splitlines():
+        if line.startswith('id:'):
+            eid = line.split(':', 1)[1].strip()
+            break
+    else:
+        continue
+
+    if eid in graph_map and kfile not in existing_files:
+        dist = graph_map[eid]
+        bonus = max(6, 10 - (dist * 2))
+        # Extract title
+        title = ''
+        for line in content.splitlines():
+            if line.startswith('title:'):
+                title = line.split(':', 1)[1].strip()
+                break
+        print(f'{bonus}|{kfile}|graph-linked|{title}')
+" 2>/dev/null >> "$SCORE_FILE" || true
+  fi
+
+  # Boost scores for entries already in SCORE_FILE that are also graph-linked
+  if [[ -s "$SCORE_FILE" ]]; then
+    BOOSTED_FILE=$(mktemp)
+    python3 -c "
+import json, sys
+
+graph_data = json.loads('''$GRAPH_LINKED_IDS''')
+graph_map = {e['knowledge_id']: e['graph_distance'] for e in graph_data}
+
+for line in sys.stdin:
+    line = line.strip()
+    if not line:
+        continue
+    parts = line.split('|', 3)
+    if len(parts) < 4:
+        print(line)
+        continue
+    score, src, matched, title = parts
+    score = int(score)
+
+    # Determine entry ID from source
+    eid = ''
+    if src.startswith('snapshot:'):
+        eid = src[len('snapshot:'):]
+    else:
+        # Extract from filename or content
+        import os
+        eid = os.path.splitext(os.path.basename(src))[0]
+
+    if eid in graph_map:
+        dist = graph_map[eid]
+        bonus = max(6, 10 - (dist * 2))
+        score += bonus
+        if matched and 'graph-linked' not in matched:
+            matched = f'graph-linked,{matched}'
+        elif not matched:
+            matched = 'graph-linked'
+
+    print(f'{score}|{src}|{matched}|{title}')
+" < "$SCORE_FILE" > "$BOOSTED_FILE" 2>/dev/null && mv "$BOOSTED_FILE" "$SCORE_FILE" || rm -f "$BOOSTED_FILE"
+  fi
 fi
 
 # --- Rank and limit results ---
