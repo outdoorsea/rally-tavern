@@ -1,0 +1,96 @@
+id: gas-town-git-hygiene-gaps
+title: "Gas Town Git Hygiene Gaps and Automated Fixes"
+tags: [git, automation, submodules, gitignore, polecat-workflow, gas-town]
+created: 2026-03-13
+author: mayor
+
+summary: >
+  Four recurring git hygiene problems that Gas Town does not currently fix
+  automatically, their root causes, and the designed solutions (tracked as
+  beads hq-g8ka, hq-w3q0, hq-z2z1, hq-dbvf in gastown rig).
+
+problems:
+
+  tracked_but_gitignored:
+    symptom: >
+      Files show as modified in git status even after being added to .gitignore.
+      Requires manual git rm --cached + commit to stop tracking them.
+    root_cause: >
+      .gitignore rules only prevent NEW untracked files from being staged.
+      They have no effect on files that are already committed. The rule was
+      added after the files were first committed.
+    examples:
+      - docker/db/dbdata/ in lilypad_chat (PostgreSQL runtime data)
+      - .beads/backup/ in wandering_river and rally_tavern
+    fix:
+      bead: hq-g8ka
+      solution: >
+        gitignore-reconcile plugin (6h cooldown). Uses
+        'git ls-files --ignored --excluded-standard --cached' to find tracked
+        files matching gitignore rules. Auto-untrack + commit on clean main
+        branches. Create a chore bead on polecat branches to avoid interference.
+
+  staged_unstaged_split:
+    symptom: >
+      MM status files after a polecat commits. The staged portion was committed
+      but unstaged changes remain, leaving the working tree dirty.
+    root_cause: >
+      mol-polecat-work's commit-changes step instructs polecats to commit but
+      does not enforce a hard gate verifying 'git status --porcelain' is empty.
+      Polecats can close the step with remaining unstaged work.
+    fix:
+      bead: hq-w3q0
+      solution: >
+        Add explicit hard gate to mol-polecat-work commit-changes step:
+        'git status --porcelain must be empty before this step can be closed.'
+        Document MM resolution pattern (git add <file>, then amend or new commit).
+        Witness patrol also detects dirty idle polecats as secondary safety net.
+
+  submodule_blindspot:
+    symptom: >
+      Real code changes accumulate inside git submodules with no automated
+      commit workflow. Gas Town polecats only see the parent repo.
+    root_cause: >
+      Polecats operate on parent repo worktrees. Git submodules are independent
+      git repos with their own histories. No Gas Town agent has a commit
+      mandate for submodule repos.
+    examples:
+      - lilypad-admin-panel: password change UX, docker prod configs
+      - lilypad-chat-mobile: yarn.lock, integration planning docs
+      - discourse: admin/ops scripts
+    fix:
+      bead: hq-z2z1
+      solution: >
+        submodule-commit plugin (2h cooldown, opt-in per rig via plugin.md).
+        Reads .gitmodules, commits accumulated changes in each submodule on
+        a known branch, pushes with || true (local commit is the priority),
+        then updates parent repo submodule pointer. Rig configures via
+        plugin frontmatter (commit_branch, push_enabled, submodule allowlist).
+
+  gas_town_files_in_external_repos:
+    symptom: >
+      CLAUDE.md, .claude/, state.json etc. appear as untracked noise in
+      submodule/external repos that Gas Town touches. They never get gitignored
+      because the external repo's .gitignore doesn't know about Gas Town.
+    root_cause: >
+      Gas Town drops operational files into any directory it works in.
+      External repos (especially client Bitbucket repos) have no Gas Town
+      gitignore entries.
+    fix:
+      bead: hq-dbvf
+      solution: >
+        submodule-gitignore plugin (12h cooldown). Detects Gas Town files as
+        untracked in submodules (git ls-files --others). Appends a standard
+        guard block to the submodule's .gitignore if missing. Idempotent via
+        marker comment. Commits + pushes with || true.
+
+prevention_checklist:
+  - >
+    When adding a .gitignore rule for a file that already exists: also run
+    "git rm --cached <file>" and commit. Do not just add the gitignore rule.
+  - >
+    When Gas Town starts working in a new external repo or submodule: run
+    "gt touch <path>" (future command, hq-dbvf) to inject gitignore entries.
+  - >
+    When sling-ing a polecat: the polecat's final MR must have a clean
+    "git status --porcelain" -- this is a hard gate in mol-polecat-work (hq-w3q0).
