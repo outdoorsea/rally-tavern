@@ -27,6 +27,42 @@ if [ -z "$QUERY" ]; then
   exit 1
 fi
 
+# --- Beads-first search ---
+# Try bd search for artifact beads; fall back to local YAML if unavailable
+_search_beads() {
+  command -v bd >/dev/null 2>&1 || return 1
+
+  local beads_json
+  beads_json=$(bd search "$QUERY" --label artifact --json --limit "$LIMIT" 2>/dev/null) || return 1
+
+  # Validate we got a non-empty JSON array
+  [ -z "$beads_json" ] && return 1
+  local count
+  count=$(echo "$beads_json" | jq 'length' 2>/dev/null) || return 1
+  [ "$count" -eq 0 ] && return 1
+
+  # Convert bead results to our output format using jq
+  echo "$beads_json" | jq '[.[] | {
+    id: (.metadata.artifact_id // .title // "" | gsub("^artifact: "; "")),
+    version: (.metadata.version // "0.0.0"),
+    artifactType: (.metadata.artifact_type // "unknown"),
+    trust: ((.labels // []) | map(select(startswith("trust:"))) | first // "trust:experimental" | ltrimstr("trust:")),
+    tokenSavingsEstimate: (.metadata.token_savings_estimate // 0),
+    usage: {useCount: 0, totalTokensSaved: 0, avgTokensSaved: 0},
+    description: (.description // ""),
+    tags: [(.labels // [])[] | select((startswith("trust:") or startswith("artifact-type:") or . == "artifact") | not)],
+    score: 0,
+    source: "beads"
+  }]' 2>/dev/null || return 1
+  return 0
+}
+
+# Try beads first
+if _search_beads; then
+  exit 0
+fi
+
+# Fall back to local YAML search
 command -v yq >/dev/null 2>&1 || { echo "❌ yq is required. Install: brew install yq" >&2; exit 1; }
 
 # Split query into terms

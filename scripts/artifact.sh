@@ -245,19 +245,75 @@ cmd_register() {
   if [[ "$path" == "$ARTIFACTS_DIR"/* ]]; then
     rebuild_index
     echo "✓ Registered artifact: $namespace/$name (index rebuilt)"
-    return
+  else
+    # Otherwise copy it in
+    local dest="$ARTIFACTS_DIR/$namespace/$name"
+    [ -d "$dest" ] && die "Artifact already exists at: $dest"
+    mkdir -p "$(dirname "$dest")"
+    cp -r "$path" "$dest"
+    rebuild_index
+    git add "$dest"
+
+    echo "✓ Registered artifact: $namespace/$name"
+    echo "  Copied to: $dest"
+    path="$dest"
   fi
 
-  # Otherwise copy it in
-  local dest="$ARTIFACTS_DIR/$namespace/$name"
-  [ -d "$dest" ] && die "Artifact already exists at: $dest"
-  mkdir -p "$(dirname "$dest")"
-  cp -r "$path" "$dest"
-  rebuild_index
-  git add "$dest"
+  # Publish artifact as a bead via bd ship
+  _ship_artifact_bead "$path" "$namespace" "$name"
+}
 
-  echo "✓ Registered artifact: $namespace/$name"
-  echo "  Copied to: $dest"
+# Publish an artifact as a bead for cross-rig discovery
+_ship_artifact_bead() {
+  local path="$1" namespace="$2" name="$3"
+  local artifact_id="${namespace}/${name}"
+
+  # Check if bd is available
+  if ! command -v bd >/dev/null 2>&1; then
+    echo "  ⚠️  bd not available — skipping bead publish"
+    return 0
+  fi
+
+  local desc version trust artifact_type token_savings
+  desc=$(yq -r '.description // .metadata.description // ""' "$path/artifact.yaml")
+  version=$(yq -r '.version // .metadata.version // "0.0.0"' "$path/artifact.yaml")
+  trust=$(yq -r '.trust_tier // .trust.level // "experimental"' "$path/artifact.yaml")
+  artifact_type=$(yq -r '.spec.artifactType // "unknown"' "$path/artifact.yaml" 2>/dev/null || echo "unknown")
+  token_savings=$(read_token_savings "$path/artifact.yaml")
+
+  # Map trust tier to label
+  local trust_label="trust:${trust}"
+
+  # Read tags from manifest
+  local tags_csv
+  tags_csv=$(yq -r '(.tags // .metadata.tags // []) | join(",")' "$path/artifact.yaml" 2>/dev/null || echo "")
+
+  # Build labels list
+  local labels="artifact,${trust_label},artifact-type:${artifact_type}"
+  [ -n "$tags_csv" ] && labels="${labels},${tags_csv}"
+
+  # Build metadata JSON with token savings and version
+  local metadata
+  metadata=$(printf '{"artifact_id":"%s","version":"%s","token_savings_estimate":%s,"artifact_type":"%s","namespace":"%s"}' \
+    "$artifact_id" "$version" "$token_savings" "$artifact_type" "$namespace")
+
+  # Create bead for the artifact
+  local bead_title="artifact: ${artifact_id} v${version}"
+  local bead_id
+  bead_id=$(bd create "$bead_title" \
+    -d "${desc:-No description}" \
+    -l "$labels" \
+    --metadata "$metadata" \
+    --silent 2>/dev/null) || true
+
+  if [ -n "$bead_id" ]; then
+    # Close the bead (registration is complete) and ship the capability
+    bd close "$bead_id" 2>/dev/null || true
+    bd ship "$artifact_id" --force 2>/dev/null || true
+    echo "  📦 Published bead: $bead_id (labels: $trust_label)"
+  else
+    echo "  ⚠️  Bead publish failed — local registration still valid"
+  fi
 }
 
 cmd_update() {

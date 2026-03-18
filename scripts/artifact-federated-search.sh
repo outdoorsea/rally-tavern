@@ -28,6 +28,46 @@ if [ -z "$QUERY" ]; then
   exit 1
 fi
 
+# --- Beads-first federated search ---
+# Use bd search across rigs for artifact beads; fall back to filesystem walk
+_federated_search_beads() {
+  command -v bd >/dev/null 2>&1 || return 1
+
+  # Build search args with optional rig filter
+  local search_args=("$QUERY" --label artifact --json --limit "$LIMIT" --status all)
+  [ -n "$FILTER_RIG" ] && search_args+=(--metadata-field "source_rig=$FILTER_RIG")
+
+  local beads_json
+  beads_json=$(bd search "${search_args[@]}" 2>/dev/null) || return 1
+
+  [ -z "$beads_json" ] && return 1
+  local count
+  count=$(echo "$beads_json" | jq 'length' 2>/dev/null) || return 1
+  [ "$count" -eq 0 ] && return 1
+
+  # Convert bead results to our output format using jq
+  echo "$beads_json" | jq '[.[] | {
+    id: (.metadata.artifact_id // .title // "" | gsub("^artifact: "; "")),
+    version: (.metadata.version // "0.0.0"),
+    artifactType: (.metadata.artifact_type // "unknown"),
+    trust: ((.labels // []) | map(select(startswith("trust:"))) | first // "trust:experimental" | ltrimstr("trust:")),
+    tokenSavingsEstimate: (.metadata.token_savings_estimate // 0),
+    usage: {useCount: 0, totalTokensSaved: 0, avgTokensSaved: 0},
+    description: (.description // ""),
+    tags: [(.labels // [])[] | select((startswith("trust:") or startswith("artifact-type:") or . == "artifact") | not)],
+    score: 0,
+    source_rig: (.metadata.source_rig // "unknown"),
+    source_worker: (.metadata.source_worker // "unknown"),
+    source: "beads"
+  }]' 2>/dev/null || return 1
+  return 0
+}
+
+if _federated_search_beads; then
+  exit 0
+fi
+
+# Fall back to filesystem walk
 command -v yq >/dev/null 2>&1 || { echo '{"error": "yq is required"}' >&2; exit 1; }
 
 # Split query into terms
