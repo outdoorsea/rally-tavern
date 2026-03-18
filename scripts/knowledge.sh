@@ -23,6 +23,7 @@ case "$ACTION" in
     echo "verified_by: []" >> "$FILE"
     
     # Parse additional args
+    BEAD_IDS=()
     while [[ $# -gt 0 ]]; do
       case $1 in
         --summary) echo "summary: $2" >> "$FILE"; shift 2;;
@@ -32,13 +33,30 @@ case "$ACTION" in
         --lesson) echo "lesson: |"$'\n'"  $2" >> "$FILE"; shift 2;;
         --context) echo "context: $2" >> "$FILE"; shift 2;;
         --tags) echo "tags: [$2]" >> "$FILE"; shift 2;;
+        --bead) BEAD_IDS+=("$2"); shift 2;;
         *) shift;;
       esac
     done
-    
+
+    # Write source_beads field
+    if [ ${#BEAD_IDS[@]} -gt 0 ]; then
+      printf "source_beads: [%s]\n" "$(IFS=,; echo "${BEAD_IDS[*]}")" >> "$FILE"
+    else
+      echo "source_beads: []" >> "$FILE"
+    fi
+
     echo "✓ Added knowledge: $FILE"
     echo "  Edit to add more details, then commit."
     git add "$FILE"
+
+    # Apply backlink labels to source beads
+    for bead_id in "${BEAD_IDS[@]}"; do
+      if command -v bd &>/dev/null; then
+        bd label "$bead_id" "knowledge:$ID" 2>/dev/null && \
+          echo "  ✓ Backlinked bead $bead_id with knowledge:$ID" || \
+          echo "  ⚠ Could not label bead $bead_id (may not exist)"
+      fi
+    done
     ;;
     
   verify)
@@ -160,7 +178,7 @@ case "$ACTION" in
     echo "Usage: knowledge.sh <action> [args]"
     echo ""
     echo "Actions:"
-    echo "  add <type> <title> [--summary ...] [--tags ...]"
+    echo "  add <type> <title> [--summary ...] [--tags ...] [--bead <id>...]"
     echo "  verify <file>"
     echo "  search <query> | --tag <tag> | --codebase <type>"
     echo "  list"

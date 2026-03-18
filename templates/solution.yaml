@@ -10,4 +10,5 @@ works_with: [framework1, framework2]
 contributed_by: YOURNAME
 verified_by: []
 tags: []
+source_beads: []  # optional: bead IDs that produced this knowledge
 created_at: TIMESTAMP

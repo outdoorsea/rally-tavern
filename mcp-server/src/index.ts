@@ -400,6 +400,10 @@ server.tool(
       .string()
       .optional()
       .describe("Full details (multiline)"),
+    sourceBeads: z
+      .array(z.string())
+      .optional()
+      .describe("Bead IDs that produced this knowledge (for provenance linking)"),
     dryRun: z
       .boolean()
       .optional()
@@ -417,11 +421,30 @@ server.tool(
     lesson,
     context,
     details,
+    sourceBeads,
     dryRun,
   }) => {
     // Auto-classify category from provided fields when not explicit
     const resolvedCategory =
       category ?? (problem || solution ? "solution" : lesson ? "learned" : "practice");
+
+    // Auto-fill source_beads from hooked bead if not explicitly provided
+    let resolvedSourceBeads = sourceBeads ?? [];
+    if (resolvedSourceBeads.length === 0) {
+      try {
+        const { stdout: hookOut } = await execFileAsync("gt", ["hook", "--json"], {
+          cwd: TAVERN_ROOT,
+          env: process.env,
+          timeout: 10_000,
+        });
+        const hookData = parseJsonSafe(hookOut) as { hook_bead?: string } | null;
+        if (hookData?.hook_bead) {
+          resolvedSourceBeads = [hookData.hook_bead];
+        }
+      } catch {
+        // No hooked bead or gt not available — proceed without auto-fill
+      }
+    }
 
     const args: string[] = [
       "--category", resolvedCategory,
@@ -435,6 +458,10 @@ server.tool(
     if (lesson) args.push("--lesson", lesson);
     if (context) args.push("--context", context);
     if (details) args.push("--details", details);
+    if (resolvedSourceBeads.length > 0) {
+      // Pass first source bead ID via --issue (audit trail)
+      args.push("--issue", resolvedSourceBeads[0]);
+    }
     if (dryRun) args.push("--dry-run");
 
     try {
@@ -448,7 +475,32 @@ server.tool(
       const autoNote = !category
         ? `[auto-classified as "${resolvedCategory}"]\n`
         : "";
-      const output = autoNote + stdout + (stderr ? "\n" + stderr : "");
+      let output = autoNote + stdout + (stderr ? "\n" + stderr : "");
+
+      // Apply backlink labels to source beads
+      if (resolvedSourceBeads.length > 0 && !dryRun) {
+        // Derive entry ID from title (same logic as knowledge.sh)
+        const entryId = title
+          .toLowerCase()
+          .replace(/\s+/g, "-")
+          .replace(/[^a-z0-9-]/g, "");
+
+        for (const beadId of resolvedSourceBeads) {
+          try {
+            await execFileAsync("bd", [
+              "label", beadId, `knowledge:${entryId}`,
+            ], {
+              cwd: TAVERN_ROOT,
+              env: process.env,
+              timeout: 10_000,
+            });
+            output += `\n✓ Backlinked bead ${beadId} with knowledge:${entryId}`;
+          } catch {
+            output += `\n⚠ Could not label bead ${beadId} (may not exist)`;
+          }
+        }
+      }
+
       return { content: [{ type: "text" as const, text: output }] };
     } catch (err: unknown) {
       const error = err as { stdout?: string; stderr?: string; message?: string };

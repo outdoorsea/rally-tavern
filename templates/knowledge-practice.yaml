@@ -24,3 +24,4 @@ gotchas:
   - Another gotcha
 
 tags: []
+source_beads: []  # optional: bead IDs that produced this knowledge
