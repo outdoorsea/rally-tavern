@@ -1,0 +1,64 @@
+schema_version: 1
+
+project:
+  name: "myndyai Gas Town"
+  slug: "myndyai"
+  description: "Multi-agent AI workspace: myndy-agent, myndy-ai, myndy-calendar, myndy-comms, dashboard"
+  repo: ""
+
+platform: "docker"
+language: "python"
+framework: "fastapi"
+stack_preset: ""
+
+facets:
+  auth: "session"
+  database: "multi"        # MongoDB, PostgreSQL, Redis, Dolt
+  api_style: "rest"
+  deployment: "docker"
+  ui: "web-spa"
+  realtime: true
+  multi_tenant: false
+  file_storage: false
+  search: false
+  queue: true              # Celery
+  caching: true            # Redis
+  i18n: false
+
+constraints:
+  budget: "startup"
+  timeline: "long-term"
+  team_size: "solo"
+  compliance: []
+  hosting: "self-hosted"
+
+priorities:
+  speed_to_market: 2
+  scalability: 3
+  security: 3
+  maintainability: 2
+  developer_experience: 1
+
+# Gas Town specifics
+gastown:
+  town_root: "~/gt"
+  rigs:
+    - name: myndy_monorepo
+      path: "~/gt/myndy_monorepo"
+      description: "Main monorepo rig: myndy-agent, myndy-ai, calendar, comms, location"
+    - name: myndy_pm
+      path: "~/gt/myndy_pm"
+      description: "Project management rig"
+  agents:
+    - mayor
+    - deacon
+    - witness (myndy_monorepo)
+    - refinery (myndy_monorepo)
+    - witness (myndy_pm)
+    - refinery (myndy_pm)
+
+notes: |
+  Multi-agent workspace running Gas Town (gt 0.12.1), Beads (bd 0.62.0), Dolt (1.84.0).
+  Primary services: myndy-agent (port 8888), myndy-ai (port 8000), myndy-calendar (port 8009),
+  myndy-comms (port 8006), dashboard (port 3000).
+  MongoDB: myndy-agent-mongodb:27017. Dolt: 127.0.0.1:3307.
