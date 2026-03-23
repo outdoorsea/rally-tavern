@@ -59,19 +59,25 @@ cd ~/gt/rally-tavern/mcp-server
 npm install && npm run build
 ```
 
-Add to `~/.claude/settings.json`:
+Add to `~/.claude/settings.json` (replace `$HOME` with your actual home path — JSON does not expand `~`):
 ```json
 {
   "mcpServers": {
     "rally-tavern": {
       "command": "node",
-      "args": ["~/gt/rally-tavern/mcp-server/dist/index.js"],
+      "args": ["/home/you/gt/rally-tavern/mcp-server/dist/index.js"],
       "env": {
-        "RALLY_TAVERN_ROOT": "~/gt/rally-tavern"
+        "RALLY_TAVERN_ROOT": "/home/you/gt/rally-tavern"
       }
     }
   }
 }
+```
+
+You can generate the correct snippet with:
+```bash
+echo "\"args\": [\"$(realpath ~/gt/rally-tavern/mcp-server/dist/index.js)\"]"
+echo "\"RALLY_TAVERN_ROOT\": \"$(realpath ~/gt/rally-tavern)\""
 ```
 
 Restart Claude Code after saving.
