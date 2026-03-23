@@ -34,7 +34,7 @@ EOF
   list)
     echo "👤 Rally Tavern Overseers"
     echo ""
-    for f in overseers/profiles/*.yaml 2>/dev/null; do
+    for f in overseers/profiles/*.yaml; do
       [ -f "$f" ] || continue
       name=$(grep "^name:" "$f" | cut -d: -f2- | xargs)
       github=$(grep "^github:" "$f" | cut -d: -f2 | xargs)

@@ -51,7 +51,7 @@ EOF
     
   list)
     echo "🆘 Open Help Requests"
-    for f in help/*.yaml 2>/dev/null; do
+    for f in help/*.yaml; do
       [ -f "$f" ] || continue
       id=$(basename "$f" .yaml)
       q=$(grep "^question:" "$f" | cut -d: -f2- | xargs)

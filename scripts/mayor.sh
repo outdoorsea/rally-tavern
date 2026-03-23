@@ -55,7 +55,7 @@ EOF
   list)
     echo "🎩 Rally Tavern Mayors"
     echo ""
-    for f in mayors/profiles/*.yaml 2>/dev/null; do
+    for f in mayors/profiles/*.yaml; do
       [ -f "$f" ] || continue
       name=$(grep "^name:" "$f" | cut -d: -f2- | xargs)
       runtime=$(grep "^runtime:" "$f" | cut -d: -f2 | xargs)

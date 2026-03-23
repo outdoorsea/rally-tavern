@@ -4,7 +4,7 @@
 echo "🍺 THE RALLY TAB"
 echo "=========="
 
-for f in bounties/claimed/*.yaml 2>/dev/null; do
+for f in bounties/claimed/*.yaml; do
   [ -f "$f" ] || continue
   id=$(basename "$f" .yaml)
   title=$(grep "^title:" "$f" | cut -d: -f2- | xargs)
