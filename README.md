@@ -75,6 +75,24 @@ Full interactive setup:
 ./scripts/board.sh         # See the bounty board
 ```
 
+### Gas Town Integration: Barkeep Plugin
+
+If you're running Gas Town, install the Barkeep to automatically curate your
+knowledge base. The Barkeep processes nominations from agents and writes
+accepted entries to the knowledge directory.
+
+```bash
+# Copy (or symlink) the plugin into your town's plugin directory
+cp -r plugins/barkeep $GT_ROOT/plugins/barkeep
+# OR: ln -s $(pwd)/plugins/barkeep $GT_ROOT/plugins/barkeep
+```
+
+The Deacon dispatches the Barkeep every 10 minutes. No other configuration needed.
+
+For power users who want a persistent, context-rich curator session, see
+[`plugins/barkeep/ADVANCED.md`](plugins/barkeep/ADVANCED.md) for crew-based
+patrol mode.
+
 ## ⚡ Rally CLI
 
 The `rally` command is the planning, skill orchestration, and component reuse layer.
