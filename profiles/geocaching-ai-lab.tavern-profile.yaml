@@ -1,0 +1,38 @@
+# Geocaching AI Lab — Project Profile
+# ====================================
+# Internal AI experimentation platform for Geocaching data.
+# Visibility: PUBLIC (github.com/outdoorsea/geocaching-ai-lab)
+
+id: project-geocaching-ai-lab
+name: "Geocaching AI Lab"
+description: |
+  Internal platform for AI experimentation against 25 years of
+  Geocaching data. Employees enter a GC code, view a Cache Dossier,
+  run prompt-based Recipes through local LLMs, and crowdsource
+  the most effective prompts through ratings and comparisons.
+  Immediate target: multi-level hint generation from log summarization.
+repo: github.com/outdoorsea/geocaching-ai-lab
+
+facets:
+  platform: web
+  languages: [python, typescript]
+  frameworks: [fastapi, react]
+  runtime: python
+  build_system: docker-compose
+  package_manager: pip
+  database: [postgresql, redis]
+
+architecture:
+  style: client-server
+  data_stores: [postgresql, redis]
+  protocols: [http, rest]
+  deployment: docker
+  ci_cd: github-actions
+
+needs:
+  - "Local LLM integration for prompt execution"
+  - "Prompt crowdsourcing and ranking system"
+  - "Cache dossier generation from structured data"
+  - "Batch processing for hint generation"
+
+tags: [ai, llm, geocaching, fastapi, react, data-analysis, internal-tool]

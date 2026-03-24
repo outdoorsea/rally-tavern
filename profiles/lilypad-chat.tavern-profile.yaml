@@ -1,0 +1,35 @@
+# Lilypad Chat — Project Profile
+# ================================
+# Discourse forum instance.
+# Visibility: PUBLIC
+
+id: project-lilypad-chat
+name: "Lilypad Chat"
+description: |
+  Discourse forum instance. Ruby on Rails application with
+  Ember.js frontend. Large codebase with long history —
+  changes require understanding context before modifying.
+repo: lilypad-chat
+
+facets:
+  platform: web
+  languages: [ruby, javascript]
+  frameworks: [rails, ember]
+  runtime: ruby
+  build_system: rake
+  package_manager: [bundler, pnpm]
+  database: postgresql
+
+architecture:
+  style: monolith
+  data_stores: [postgresql, redis]
+  protocols: [http]
+  deployment: container
+  ci_cd: github-actions
+
+needs:
+  - "Translatable display strings"
+  - "Linting all changed files"
+  - "Understanding large codebase context before changes"
+
+tags: [discourse, ruby, rails, ember, forum, community]

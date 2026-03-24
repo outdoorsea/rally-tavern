@@ -1,0 +1,31 @@
+# Meety Me — Project Profile
+# ============================
+# Visibility: PUBLIC (github.com/outdoorsea/meety-me)
+
+id: project-meety-me
+name: "Meety Me"
+description: |
+  Web application built with Gradio, FastAPI, and Pydantic.
+  Interactive UI with Python backend.
+repo: github.com/outdoorsea/meety-me
+
+facets:
+  platform: web
+  languages: [python]
+  frameworks: [gradio, fastapi]
+  runtime: python
+  build_system: pip
+  package_manager: pip
+
+architecture:
+  style: monolith
+  data_stores: []
+  protocols: [http]
+  deployment: uvicorn
+  ci_cd: github-actions
+
+needs:
+  - "Gradio UI components"
+  - "FastAPI backend patterns"
+
+tags: [gradio, fastapi, python, web-ui]

@@ -1,0 +1,37 @@
+# Vitalitek — Project Profile
+# =============================
+# HIPAA-compliant health data platform.
+# Visibility: PUBLIC (github.com/outdoorsea/vitalitek)
+
+id: project-vitalitek
+name: "Vitalitek"
+description: |
+  HIPAA-compliant health data platform built with Flask.
+  Handles PHI with encryption at rest, SSL-enforced database
+  connections, and strict secret management. No hardcoded keys,
+  no default passwords.
+repo: github.com/outdoorsea/vitalitek
+
+facets:
+  platform: web
+  languages: [python]
+  frameworks: [flask]
+  runtime: python
+  build_system: pip
+  package_manager: pip
+  database: postgresql
+
+architecture:
+  style: monolith
+  data_stores: [postgresql]
+  protocols: [http, rest]
+  deployment: gunicorn
+  ci_cd: github-actions
+
+needs:
+  - "HIPAA compliance — PHI encryption at rest"
+  - "SSL-enforced database connections"
+  - "Environment-based secret management"
+  - "Compliance linting in CI"
+
+tags: [health, hipaa, flask, python, compliance, api, phi]

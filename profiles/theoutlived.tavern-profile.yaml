@@ -1,0 +1,31 @@
+# The Outlived — Project Profile
+# ================================
+# Visibility: PUBLIC (github.com/outdoorsea/theoutlived)
+
+id: project-theoutlived
+name: "The Outlived"
+description: |
+  Web application built with FastAPI and Pydantic.
+  Python backend with modern async patterns.
+repo: github.com/outdoorsea/theoutlived
+
+facets:
+  platform: web
+  languages: [python]
+  frameworks: [fastapi]
+  runtime: python
+  build_system: pip
+  package_manager: pip
+
+architecture:
+  style: api-server
+  data_stores: []
+  protocols: [http, rest]
+  deployment: uvicorn
+  ci_cd: github-actions
+
+needs:
+  - "FastAPI async patterns"
+  - "Pydantic model validation"
+
+tags: [fastapi, python, api, pydantic]

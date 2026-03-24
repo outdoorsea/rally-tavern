@@ -1,0 +1,38 @@
+# Faultline — Project Profile
+# ===========================
+# Self-hosted Sentry-compatible error tracking with Dolt storage.
+# Visibility: PUBLIC (github.com/outdoorsea/faultline)
+
+id: project-faultline
+name: "Faultline"
+description: |
+  Self-hosted Sentry-compatible error tracking with Dolt storage
+  and Gas Town agentic loop integration. Drop-in replacement for
+  any Sentry SDK. Errors become beads; polecats fix them; closed
+  when PR merges. Zero extra infrastructure — runs on existing
+  Dolt server.
+repo: github.com/outdoorsea/faultline
+
+facets:
+  platform: server
+  languages: [go]
+  frameworks: []
+  runtime: go
+  build_system: make
+  package_manager: go-modules
+  database: dolt
+
+architecture:
+  style: monolith
+  data_stores: [dolt]
+  protocols: [sentry-sdk, http]
+  deployment: local-binary
+  ci_cd: github-actions
+
+needs:
+  - "Sentry SDK protocol compatibility"
+  - "Dolt-backed event storage with time-travel"
+  - "Gas Town beads integration for auto-triage"
+  - "Efficient event ingestion and grouping"
+
+tags: [error-tracking, sentry, dolt, go, observability, gas-town]

@@ -1,0 +1,36 @@
+# Myndy iOS — Project Profile
+# =============================
+# iOS health tracking app with barcode scanning and mood tracking.
+# Visibility: PUBLIC (github.com/myndyaicom/myndy-ios)
+
+id: project-myndy-ios
+name: "Myndy iOS"
+description: |
+  Comprehensive iOS health tracking application with barcode
+  scanning, mood tracking, and API integration. Tracks steps,
+  heart rate, sleep, blood pressure. Includes product information
+  lookup via barcode/QR scanning.
+repo: github.com/myndyaicom/myndy-ios
+
+facets:
+  platform: ios
+  languages: [swift, python]
+  frameworks: [swiftui, healthkit]
+  runtime: ios
+  build_system: xcode
+  package_manager: spm
+
+architecture:
+  style: client-server
+  data_stores: [core-data, api]
+  protocols: [http, rest]
+  deployment: app-store
+  ci_cd: github-actions
+
+needs:
+  - "HealthKit data integration"
+  - "Barcode and QR code scanning"
+  - "API endpoint compatibility testing"
+  - "SwiftUI best practices"
+
+tags: [ios, swift, swiftui, health, barcode, mobile, healthkit]
