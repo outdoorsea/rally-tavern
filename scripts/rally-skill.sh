@@ -381,6 +381,9 @@ case "$ACTION" in
   validate)
     rally_skill_validate "$@"
     ;;
+  import)
+    exec "$TAVERN_ROOT/scripts/rally-skill-import.sh" "$@"
+    ;;
   *)
     echo "Rally Skill Runner"
     echo ""
@@ -391,6 +394,7 @@ case "$ACTION" in
     echo "  list                           List available skills"
     echo "  show <name>                    Show skill definition"
     echo "  validate <file>                Validate skill YAML"
+    echo "  import <path|--from-repo>      Import SKILL.md skills"
     echo ""
     echo "Options for run:"
     echo "  --profile <path>    Project profile (required)"
