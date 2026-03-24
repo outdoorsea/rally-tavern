@@ -1,5 +1,8 @@
 # Rally System - Development Plan
 
+> **Status: COMPLETE** — All 19 features implemented as of 2026-03-18.
+> Verified 2026-03-23 by crew/franklin. See implementation notes below.
+
 > Agent-First Planning, Skill Orchestration, and Component Reuse for Gas Town
 
 ## 1. Project Overview
@@ -699,3 +702,18 @@ The skill runner (`rally-skill.sh`) feeds the skill definition + project profile
 to the Mayor (Claude), validates the output matches the schema, and saves it.
 The Mayor IS the execution engine — Rally just structures what it asks for
 and validates what it gets back.
+
+---
+
+## Implementation Notes (2026-03-23)
+
+All 19 features are implemented. Notable deviations from the original plan:
+
+- **Components live in `artifacts/`** instead of a separate `components/` directory.
+  The artifact system (`artifact.sh`, `artifacts-search.sh`) serves the same role
+  with richer functionality (federated search, JSON export, usage telemetry).
+- **`docs/RALLY.md` not yet written** — user-facing docs are the main gap. The
+  scripts are self-documenting via `--help` flags and `rally help`.
+- **Beads-knowledge integration** was added beyond the original plan scope
+  (design spec: `.specs/design-beads-knowledge-integration.md`), delivering
+  provenance linking, graph-aware push, auto-nomination, and staleness detection.
