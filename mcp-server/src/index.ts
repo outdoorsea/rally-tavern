@@ -1,5 +1,13 @@
 #!/usr/bin/env node
 
+import * as Sentry from "@sentry/node";
+
+Sentry.init({
+  dsn: "http://rally_tavern_key@localhost:8080/5",
+  environment: process.env.NODE_ENV ?? "development",
+  tracesSampleRate: 1.0,
+});
+
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
@@ -656,7 +664,9 @@ async function main() {
   await server.connect(transport);
 }
 
-main().catch((err) => {
+main().catch(async (err) => {
+  Sentry.captureException(err);
   console.error("Fatal error:", err);
+  await Sentry.flush(2000);
   process.exit(1);
 });
