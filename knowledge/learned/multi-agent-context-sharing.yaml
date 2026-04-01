@@ -3,15 +3,19 @@ title: Multi-Agent Context Sharing
 contributed_by: rally-tavern
 created_at: 2026-02-25T00:00:00Z
 verified_by: []
-context: Rally Tavern development
 lesson: |
   When multiple agents work on related tasks, they need shared context.
   Without it, agents duplicate work or make conflicting decisions.
 solution: |
-  Use Rally Tavern gossip for ephemeral shared context.
-  Use knowledge/ for permanent collective intelligence.
-  Include context field in bounties with relevant intel.
+  Use ephemeral channels (nudge/broadcast) for transient shared context that
+  doesn't need to survive session death. Use a persistent knowledge base for
+  permanent collective intelligence. Include relevant context in task/bounty
+  definitions so spawned agents don't have to re-discover it.
+
+  Pattern: when dispatching parallel agents, include a "shared_context" block
+  in each agent's instructions covering: what other agents are doing, which
+  files/modules are off-limits, and any decisions already made upstream.
 references:
-  - Gas Town hooks for persistent agent state
-  - Beads for work tracking
-tags: [multi-agent, context, coordination]
+  - Issue trackers (e.g. beads) for work tracking and dependency modeling
+  - Knowledge bases for cross-session persistent patterns
+tags: [multi-agent, context, coordination, parallel-agents]

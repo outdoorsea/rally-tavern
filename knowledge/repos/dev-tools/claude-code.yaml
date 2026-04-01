@@ -3,10 +3,18 @@ url: https://claude.ai/code
 category: dev-tools
 contributed_by: rally-tavern
 why: |
-  AI coding assistant from Anthropic.
-  Terminal-based, understands full codebase context.
+  AI coding assistant from Anthropic. Terminal-based, understands full codebase
+  context. Supports CLAUDE.md for per-project instructions that shape agent
+  behavior. Skills (slash commands) extend Claude Code with reusable workflows.
+  Hooks let you trigger automations before/after commits, file edits, etc.
 use_for:
   - AI-assisted coding
   - Code review and refactoring
   - Learning new codebases
-tags: [coding, ai, anthropic]
+  - Automating repetitive workflows via hooks and skills
+actionable_tips: |
+  - Put a CLAUDE.md in every repo root to inject persistent instructions
+  - Use ~/.claude/CLAUDE.md for cross-repo personal preferences
+  - Skills live in ~/.claude/skills/ and are triggered by slash commands
+  - Hooks in settings.json fire on events like PreToolUse, PostToolUse
+tags: [coding, ai, anthropic, claude-code, automation]

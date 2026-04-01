@@ -65,5 +65,7 @@ tags:
   - security
   - compliance
   - python
+  - flask
+  - fastapi
   - api-design
   - minimum-necessary

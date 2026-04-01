@@ -74,4 +74,4 @@ gotchas:
   - Test the sanitizer against your actual log corpus, not just hypothetical inputs
   - Log rotation and shipping are separate concerns — you can persist locally without shipping, or ship without full persistence
 
-tags: [ios, swift, logging, pii, security, gdpr, sentry, privacy]
+tags: [ios, swift, logging, pii, security, gdpr, sentry, privacy, hipaa]
